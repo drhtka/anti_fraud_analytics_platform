@@ -1,0 +1,85 @@
+-- Base metrics for IEEE-CIS Fraud Detection in DuckDB.
+-- Keep only one SELECT active while learning with scripts/run_duckdb_sql.py.
+-- The file creates local views so it can be run independently.
+--
+-- Proxy mapping used in this file:
+-- - customer_id -> card1 (customer-like card proxy, use carefully)
+-- - device_id -> DeviceInfo / DeviceType from train_identity
+-- - region -> addr1 (region-like encoded proxy)
+-- - merchant_category -> ProductCD (business segment proxy, not true merchant category)
+-- CREATE OR REPLACE VIEW train_transaction AS
+-- SELECT *
+-- FROM read_csv_auto('data/train_transaction.csv', header = true);
+-- CREATE OR REPLACE VIEW train_identity AS
+-- SELECT *
+-- FROM read_csv_auto('data/train_identity.csv', header = true);
+-- CREATE OR REPLACE VIEW train_tx_identity AS
+-- SELECT t.*,
+--   i.DeviceType,
+--   i.DeviceInfo
+-- FROM train_transaction t
+--   LEFT JOIN train_identity i USING (TransactionID);
+-- -- 1. Overall transaction volume and fraud rate.
+-- SELECT COUNT(*) AS total_transactions,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_transactions,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction;
+-- 2. Transaction amount metrics.
+-- SELECT MIN(TransactionAmt) AS min_amount,
+--   AVG(TransactionAmt) AS avg_amount,
+--   MAX(TransactionAmt) AS max_amount
+-- FROM train_transaction;
+-- 3. Metrics by customer proxy (card1).
+-- SELECT card1 AS customer_proxy,
+--   COUNT(*) AS tx_count,
+--   SUM(TransactionAmt) AS total_amount,
+--   AVG(TransactionAmt) AS avg_amount,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count
+-- FROM train_transaction
+-- GROUP BY card1
+-- ORDER BY fraud_tx_count DESC,
+--   total_amount DESC;
+-- 4. Metrics by device identity.
+-- s
+-- 5. Metrics by region-like and product segment proxies.
+-- SELECT addr1 AS region_proxy,
+--   ProductCD AS product_segment,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY addr1,
+--   ProductCD
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;

@@ -1,0 +1,151 @@
+-- Week 1 starter queries for IEEE-CIS in DuckDB.
+-- Work with one query at a time while learning.
+CREATE OR REPLACE VIEW train_transaction AS
+SELECT *
+FROM read_csv_auto('data/train_transaction.csv', header = true);
+-- 1. Overall fraud rate.
+-- SELECT
+--     COUNT(*) AS total_transactions,
+--     SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS fraud_transactions,
+--     ROUND(100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*), 4) AS fraud_rate_pct
+-- FROM train_transaction;
+-- 2. Fraud rate by ProductCD.
+-- SELECT ProductCD,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY ProductCD
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
+-- 3. Fraud rate by card4.
+-- SELECT card4,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY card4
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
+-- 4. Fraud rate by card6.
+-- SELECT card6,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY card6
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
+-- 5. Fraud rate by P_emaildomain.
+-- SELECT P_emaildomain,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY P_emaildomain
+-- HAVING COUNT(*) >= 100
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
+-- 6. Fraud rate by R_emaildomain.
+-- SELECT R_emaildomain,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY R_emaildomain
+-- HAVING COUNT(*) >= 100
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
+-- 7. Fraud rate by amount bucket.
+-- SELECT CASE
+--     WHEN TransactionAmt < 50 THEN 'lt_50'
+--     WHEN TransactionAmt < 100 THEN '50_100'
+--     WHEN TransactionAmt < 500 THEN '100_500'
+--     WHEN TransactionAmt < 1000 THEN '500_1000'
+--     ELSE 'ge_1000'
+--   END AS amount_bucket,
+--   COUNT(*) AS tx_count,
+--   SUM(
+--     CASE
+--       WHEN isFraud = 1 THEN 1
+--       ELSE 0
+--     END
+--   ) AS fraud_tx_count,
+--   ROUND(
+--     100.0 * SUM(
+--       CASE
+--         WHEN isFraud = 1 THEN 1
+--         ELSE 0
+--       END
+--     ) / COUNT(*),
+--     2
+--   ) AS fraud_rate_pct
+-- FROM train_transaction
+-- GROUP BY amount_bucket
+-- ORDER BY fraud_rate_pct DESC,
+--   tx_count DESC;
