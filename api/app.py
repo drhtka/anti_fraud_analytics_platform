@@ -6,6 +6,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
 
@@ -21,8 +22,14 @@ app = FastAPI(
     description="Week 4 MVP API with /health, /score, and /explain endpoints.",
 )
 
-templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
+BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @lru_cache(maxsize=1)
