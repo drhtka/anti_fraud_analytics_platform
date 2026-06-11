@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
@@ -16,10 +19,23 @@ app = FastAPI(
     description="Week 4 MVP API with /health, /score, and /explain endpoints.",
 )
 
+templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
+
 
 @lru_cache(maxsize=1)
 def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
+
+
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "page_title": "Anti-Fraud Analytics Platform",
+        },
+    )
 
 
 @app.get("/health", response_model=HealthResponse)
