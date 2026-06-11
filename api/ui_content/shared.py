@@ -6,6 +6,10 @@ from io import BytesIO
 from pathlib import Path
 
 import duckdb
+import matplotlib
+
+# FastAPI renders charts on the server, so a non-interactive backend is required.
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 DATA_FILE_NAMES = ("train_transaction.csv", "train_identity.csv")
