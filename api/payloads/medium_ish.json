@@ -1,0 +1,10 @@
+{
+  "transaction_id": 2000002,
+  "transaction_amount": 180,
+  "product_cd": "W",
+  "card1": 13926,
+  "card4": "visa",
+  "card6": "credit",
+  "p_emaildomain": "outlook.com",
+  "r_emaildomain": null
+}

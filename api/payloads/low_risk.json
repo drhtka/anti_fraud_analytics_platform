@@ -1,0 +1,10 @@
+{
+  "transaction_id": 2000003,
+  "transaction_amount": 50,
+  "product_cd": "W",
+  "card1": 13926,
+  "card4": "visa",
+  "card6": "debit",
+  "p_emaildomain": "yahoo.com",
+  "r_emaildomain": "yahoo.com"
+}
