@@ -111,6 +111,19 @@
                 margin-top: 4px;
             }
 
+            .form-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 4px;
+            }
+
+            .secondary-button {
+                background: #ffffff;
+                color: #334155;
+                border: 1px solid #cbd5e1;
+            }
+
             .placeholder {
                 margin-top: 20px;
                 padding: 20px;
@@ -229,6 +242,13 @@
                 margin-bottom: 16px;
             }
 
+            .meta-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 12px;
+                margin-top: 16px;
+            }
+
             .metric {
                 padding: 12px;
                 background: #f8fafc;
@@ -311,7 +331,7 @@
                     <button
                         type="button"
                         class="demo-button"
-                        data-demo-payload="{{ demo_payload.payload | tojson }}"
+                        data-demo-key="{{ demo_payload.filename }}"
                     >
                         {{ demo_payload.label }}
                     </button>
@@ -407,9 +427,18 @@
                     </label>
                 </div>
 
-                <button type="submit" class="submit-button">
-                    Score transaction
-                </button>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">
+                        Score transaction
+                    </button>
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="clear-form"
+                    >
+                        Clear form
+                    </button>
+                </div>
             </form>
 
             {% if error_message %}
@@ -463,6 +492,21 @@
                         </div>
                     </div>
 
+                    <div class="meta-grid">
+                        <div class="metric">
+                            <span class="metric-label">Model Name</span>
+                            <span class="metric-value"
+                                >{{ score_result.model_name }}</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Model Version</span>
+                            <span class="metric-value"
+                                >{{ score_result.model_version }}</span
+                            >
+                        </div>
+                    </div>
+
                     <h3>Active Signals</h3>
                     <ul class="signals-list">
                         {% for signal in score_result.active_signals %}
@@ -498,15 +542,28 @@
             </section>
             {% endif %}
         </main>
+        <script id="demo-payloads-json" type="application/json">
+            {{ demo_payloads | tojson }}
+        </script>
         <script>
             const transactionForm = document.getElementById('transaction-form');
-            const demoButtons = document.querySelectorAll(
-                '[data-demo-payload]',
+            const clearFormButton = document.getElementById('clear-form');
+            const demoButtons = document.querySelectorAll('[data-demo-key]');
+            const demoPayloads = JSON.parse(
+                document.getElementById('demo-payloads-json').textContent,
             );
 
             demoButtons.forEach((button) => {
                 button.addEventListener('click', () => {
-                    const payload = JSON.parse(button.dataset.demoPayload);
+                    const payloadKey = button.dataset.demoKey;
+                    const payloadEntry = demoPayloads.find(
+                        (entry) => entry.filename === payloadKey,
+                    );
+                    const payload = payloadEntry?.payload;
+
+                    if (!payload) {
+                        return;
+                    }
 
                     Object.entries(payload).forEach(
                         ([fieldName, fieldValue]) => {
@@ -520,6 +577,16 @@
                             input.value = fieldValue ?? '';
                         },
                     );
+                });
+            });
+
+            clearFormButton.addEventListener('click', () => {
+                Array.from(transactionForm.elements).forEach((element) => {
+                    if (!(element instanceof HTMLInputElement)) {
+                        return;
+                    }
+
+                    element.value = '';
                 });
             });
         </script>
