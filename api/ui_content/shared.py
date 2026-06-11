@@ -8,6 +8,8 @@ from pathlib import Path
 import duckdb
 import matplotlib.pyplot as plt
 
+DATA_FILE_NAMES = ("train_transaction.csv", "train_identity.csv")
+
 
 def build_notes(*items: str) -> list[dict[str, str]]:
     return [{"kind": "bullet", "text": item} for item in items]
@@ -63,6 +65,19 @@ def run_query(connection: duckdb.DuckDBPyConnection, query: str) -> tuple[list[s
     columns = [column[0] for column in result.description]
     rows = result.fetchall()
     return columns, rows
+
+
+def resolve_dataset_dir(data_dir: Path) -> Path | None:
+    candidate_dirs = [
+        data_dir / "raw",
+        data_dir,
+    ]
+
+    for candidate_dir in candidate_dirs:
+        if all((candidate_dir / file_name).exists() for file_name in DATA_FILE_NAMES):
+            return candidate_dir
+
+    return None
 
 
 def build_duckdb_connection(data_dir: Path) -> duckdb.DuckDBPyConnection:

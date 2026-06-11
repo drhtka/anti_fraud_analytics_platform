@@ -3,22 +3,24 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from api.ui_content.shared import build_duckdb_connection, render_html_table
+from api.ui_content.shared import build_duckdb_connection, render_html_table, resolve_dataset_dir
 
 
 @lru_cache(maxsize=1)
 def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
-    data_path = Path(data_dir)
-    if not (data_path / "train_transaction.csv").exists() or not (data_path / "train_identity.csv").exists():
+    base_data_path = Path(data_dir)
+    dataset_dir = resolve_dataset_dir(base_data_path)
+    if dataset_dir is None:
         return [
             {
                 "title": "SQL results are unavailable",
                 "table_name": "missing_local_data",
                 "source_file": "sql/",
-                "description": "The SQL screen needs local IEEE-CIS CSV files in data/ to render result tables.",
-                "query": "Place train_transaction.csv and train_identity.csv into data/ to enable live SQL sections.",
+                "description": "The SQL screen needs local IEEE-CIS CSV files in data/raw/ to render result tables.",
+                "query": "Place train_transaction.csv and train_identity.csv into data/raw/ to enable live SQL sections.",
                 "reading_notes": [
                     "The UI is ready for live DuckDB-backed SQL blocks.",
+                    "As a fallback, the same files can also be placed directly in data/.",
                     "Once local CSV files are present, the same screen can show real result tables.",
                 ],
                 "result_html": None,
@@ -183,7 +185,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
         },
     ]
 
-    connection = build_duckdb_connection(data_path)
+    connection = build_duckdb_connection(dataset_dir)
     try:
         for section in sql_sections:
             result = connection.execute(section["query"])

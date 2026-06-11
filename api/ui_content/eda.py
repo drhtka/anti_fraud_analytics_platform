@@ -8,26 +8,29 @@ from api.ui_content.shared import (
     build_notes,
     render_chart,
     render_html_table,
+    resolve_dataset_dir,
     run_query,
 )
 
 
 @lru_cache(maxsize=1)
 def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
-    data_path = Path(data_dir)
-    if not (data_path / "train_transaction.csv").exists() or not (data_path / "train_identity.csv").exists():
+    base_data_path = Path(data_dir)
+    dataset_dir = resolve_dataset_dir(base_data_path)
+    if dataset_dir is None:
         return [
             {
                 "title": "EDA data is unavailable",
                 "notes": build_notes(
-                    "Place train_transaction.csv and train_identity.csv into data/ to build the EDA screen.",
+                    "Place train_transaction.csv and train_identity.csv into data/raw/ to build the EDA screen.",
+                    "As a fallback, the app also supports the same files directly in data/.",
                     "The EDA UI is designed to read directly from local CSV files instead of notebook outputs.",
                 ),
                 "outputs": [],
             }
         ]
 
-    connection = build_duckdb_connection(data_path)
+    connection = build_duckdb_connection(dataset_dir)
     try:
         transaction_columns = len(connection.execute("DESCRIBE train_transaction").fetchall())
         identity_columns = len(connection.execute("DESCRIBE train_identity").fetchall())
