@@ -24,6 +24,34 @@ h1 {
     color: #4b5563;
 }
 
+.screen-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.screen-tab {
+    background: #ffffff;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.screen-tab.is-active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.screen {
+    display: grid;
+    gap: 20px;
+}
+
+.screen[hidden] {
+    display: none;
+}
+
 form {
     display: grid;
     gap: 16px;
@@ -146,6 +174,71 @@ button {
     background: #fee2e2;
     border: 1px solid #fca5a5;
     color: #991b1b;
+}
+
+.content-card {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+}
+
+.content-card h2,
+.content-card h3 {
+    margin-top: 0;
+}
+
+.content-card p {
+    color: #475569;
+    line-height: 1.6;
+}
+
+.content-card ul,
+.content-card ol {
+    color: #334155;
+}
+
+.insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.insight-card {
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+}
+
+.insight-card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.insight-card p {
+    margin: 0;
+}
+
+.sql-query {
+    margin: 0;
+    padding: 14px 16px;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.json-block {
+    margin: 0;
+    padding: 16px;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .results {

@@ -85,6 +85,8 @@ def index(request: Request) -> HTMLResponse:
     form_data = build_ui_form_data(request)
     score_result: ScoreResponse | None = None
     explain_result: ExplainResponse | None = None
+    score_result_json: dict[str, object] | None = None
+    explain_result_json: dict[str, object] | None = None
     error_message: str | None = None
 
     if request.query_params:
@@ -93,6 +95,8 @@ def index(request: Request) -> HTMLResponse:
             bundle = get_model_bundle()
             score_result = score_transaction(request=score_request, bundle=bundle)
             explain_result = explain_transaction(request=score_request, bundle=bundle)
+            score_result_json = score_result.model_dump(mode="json")
+            explain_result_json = explain_result.model_dump(mode="json")
         except FileNotFoundError as exc:
             error_message = str(exc)
         except ValidationError as exc:
@@ -106,6 +110,8 @@ def index(request: Request) -> HTMLResponse:
             "form_data": form_data,
             "score_result": score_result,
             "explain_result": explain_result,
+            "score_result_json": score_result_json,
+            "explain_result_json": explain_result_json,
             "error_message": error_message,
             "demo_payloads": load_demo_payloads(),
         },

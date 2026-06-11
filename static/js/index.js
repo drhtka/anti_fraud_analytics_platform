@@ -1,11 +1,33 @@
 const transactionForm = document.getElementById('transaction-form');
 const clearFormButton = document.getElementById('clear-form');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
+const screenTabs = document.querySelectorAll('[data-screen-target]');
+const screens = document.querySelectorAll('[data-screen-name]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
 
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
     : [];
+
+function activateScreen(screenName) {
+    screenTabs.forEach((tab) => {
+        const isActive = tab.dataset.screenTarget === screenName;
+        tab.classList.toggle('is-active', isActive);
+        tab.setAttribute('aria-pressed', String(isActive));
+    });
+
+    screens.forEach((screen) => {
+        screen.hidden = screen.dataset.screenName !== screenName;
+    });
+}
+
+screenTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+        activateScreen(tab.dataset.screenTarget);
+    });
+});
+
+activateScreen('score');
 
 demoButtons.forEach((button) => {
     button.addEventListener('click', () => {
