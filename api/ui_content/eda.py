@@ -60,55 +60,20 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             """,
         )
 
-        missing_columns, missing_rows = run_query(
+        email_domain_columns, email_domain_rows = run_query(
             connection,
             """
-            SELECT 'TransactionAmt' AS field_name,
-              SUM(CASE WHEN TransactionAmt IS NULL THEN 1 ELSE 0 END) AS missing_count
-            FROM train_transaction
-            UNION ALL
-            SELECT 'ProductCD', SUM(CASE WHEN ProductCD IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'card4', SUM(CASE WHEN card4 IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'card6', SUM(CASE WHEN card6 IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'P_emaildomain', SUM(CASE WHEN P_emaildomain IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'R_emaildomain', SUM(CASE WHEN R_emaildomain IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'addr1', SUM(CASE WHEN addr1 IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            UNION ALL
-            SELECT 'TransactionDT', SUM(CASE WHEN TransactionDT IS NULL THEN 1 ELSE 0 END)
-            FROM train_transaction
-            ORDER BY missing_count DESC, field_name
-            """,
-        )
-
-        amount_bucket_columns, amount_bucket_rows = run_query(
-            connection,
-            """
-            SELECT CASE
-                WHEN TransactionAmt < 50 THEN 'lt_50'
-                WHEN TransactionAmt < 100 THEN '50_100'
-                WHEN TransactionAmt < 500 THEN '100_500'
-                WHEN TransactionAmt < 1000 THEN '500_1000'
-                ELSE 'ge_1000'
-              END AS amount_bucket,
+            SELECT COALESCE(R_emaildomain, 'missing') AS recipient_email_domain,
               COUNT(*) AS tx_count,
               ROUND(
                 100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
                 2
               ) AS fraud_rate_pct
             FROM train_transaction
-            GROUP BY amount_bucket
+            GROUP BY recipient_email_domain
+            HAVING COUNT(*) >= 100
             ORDER BY fraud_rate_pct DESC, tx_count DESC
+            LIMIT 12
             """,
         )
 
@@ -127,25 +92,11 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             """,
         )
 
-        time_columns, time_rows = run_query(
-            connection,
-            """
-            SELECT FLOOR(TransactionDT / 86400) AS day_bucket,
-              COUNT(*) AS tx_count,
-              ROUND(
-                100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
-                2
-              ) AS fraud_rate_pct
-            FROM train_transaction
-            GROUP BY day_bucket
-            ORDER BY day_bucket
-            LIMIT 15
-            """,
-        )
-
         return [
             {
                 "title": "1. Quick data overview",
+                "table_name": "eda_dataset_overview",
+                "description": "A first orientation block with dataset size, amount scale, and customer-proxy coverage.",
                 "notes": build_notes(
                     "Start with table size, rough amount metrics, and the number of customer proxies.",
                     f"train_transaction has {transaction_columns} columns, and train_identity has {identity_columns} columns.",
@@ -157,6 +108,8 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             },
             {
                 "title": "2. Target and class imbalance",
+                "table_name": "eda_target_imbalance",
+                "description": "A compact view of fraud rarity that explains why anti-fraud evaluation cannot rely on accuracy alone.",
                 "notes": build_notes(
                     "For anti-fraud, this is a mandatory early check because fraud is usually rare.",
                     "This block explains why threshold tuning and review load matter later in the project.",
@@ -175,35 +128,9 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                 ],
             },
             {
-                "title": "3. Missing values in key columns",
-                "notes": build_notes(
-                    "Look only at the fields that matter for the first anti-fraud pass.",
-                    "This block helps decide which columns are interpretable and safe for the first feature set.",
-                ),
-                "outputs": [
-                    {"kind": "html", "content": render_html_table(missing_columns, missing_rows, displayed_rows=12)},
-                ],
-            },
-            {
-                "title": "4. Transaction amount patterns",
-                "notes": build_notes(
-                    "TransactionAmt is one of the first useful numerical signals in fraud analysis.",
-                    "Instead of plotting every raw row, the UI shows compact bucket-level patterns and fraud rate.",
-                ),
-                "outputs": [
-                    {"kind": "html", "content": render_html_table(amount_bucket_columns, amount_bucket_rows, displayed_rows=10)},
-                    {
-                        "kind": "image",
-                        "content": render_chart(
-                            [str(row[0]) for row in amount_bucket_rows],
-                            [float(row[2]) for row in amount_bucket_rows],
-                            "Fraud rate by transaction amount bucket",
-                        ),
-                    },
-                ],
-            },
-            {
-                "title": "5. Product segment patterns",
+                "title": "3. Product segment patterns",
+                "table_name": "eda_product_segment_risk",
+                "description": "A segment-level table that shows which ProductCD groups look riskier before any model is trained.",
                 "notes": build_notes(
                     "This block shows which product segments stand out before any model is trained.",
                     "ProductCD later becomes part of both anti-fraud hypotheses and MVP features.",
@@ -221,19 +148,21 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                 ],
             },
             {
-                "title": "6. Time-based fraud pattern preview",
+                "title": "4. Recipient email domain patterns",
+                "table_name": "eda_recipient_email_domain_risk",
+                "description": "A domain-level cut that helps explain why some recipient domains became strong suspicious signals.",
                 "notes": build_notes(
-                    "TransactionDT is relative time, not a calendar timestamp, so the first pass uses coarse buckets.",
-                    "This helps explain why temporal reasoning matters in later SQL and feature engineering.",
+                    "Email domain analysis is useful because it is readable both for analysts and for business stakeholders.",
+                    "This block also links directly to later rule ideas and MVP scoring signals.",
                 ),
                 "outputs": [
-                    {"kind": "html", "content": render_html_table(time_columns, time_rows, displayed_rows=15)},
+                    {"kind": "html", "content": render_html_table(email_domain_columns, email_domain_rows, displayed_rows=12)},
                     {
                         "kind": "image",
                         "content": render_chart(
-                            [str(int(row[0])) for row in time_rows],
-                            [float(row[2]) for row in time_rows],
-                            "Fraud rate by relative day bucket",
+                            [str(row[0]) for row in email_domain_rows[:8]],
+                            [float(row[2]) for row in email_domain_rows[:8]],
+                            "Fraud rate by recipient email domain",
                             color="#7c3aed",
                         ),
                     },

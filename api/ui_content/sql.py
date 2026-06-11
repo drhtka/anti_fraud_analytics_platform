@@ -70,29 +70,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             ],
         },
         {
-            "title": "3. Fraud rate by card4",
-            "table_name": "fraud_rate_by_card4",
-            "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "Card network segmentation helps identify whether some payment channels look riskier than others.",
-            "query": """
-                SELECT card4,
-                  COUNT(*) AS tx_count,
-                  SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS fraud_tx_count,
-                  ROUND(
-                    100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
-                    2
-                  ) AS fraud_rate_pct
-                FROM train_transaction
-                GROUP BY card4
-                ORDER BY fraud_rate_pct DESC, tx_count DESC
-            """,
-            "reading_notes": [
-                "Use this table to explain why card network became part of the MVP feature set.",
-                "This also supports anti-fraud storytelling in business language.",
-            ],
-        },
-        {
-            "title": "4. Fraud rate by recipient email domain",
+            "title": "3. Fraud rate by recipient email domain",
             "table_name": "fraud_rate_by_r_emaildomain",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
             "description": "Recipient email domains can expose suspicious routing patterns and weak trust signals.",
@@ -116,7 +94,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             ],
         },
         {
-            "title": "5. Large transactions vs customer baseline",
+            "title": "4. Large transactions vs customer baseline",
             "table_name": "amount_anomalies_vs_customer_baseline",
             "source_file": "sql/02_suspicious_patterns.sql",
             "description": "This query looks for transactions that are unusually large compared with a customer proxy history.",
@@ -142,45 +120,6 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "reading_notes": [
                 "This is a classic anti-fraud idea: compare current amount with a personal baseline.",
                 "Later the same logic appears as `feat_amount_gt_card1_avg_plus_3std` in the MVP scoring flow.",
-            ],
-        },
-        {
-            "title": "6. Region changes within one hour",
-            "table_name": "rapid_region_changes",
-            "source_file": "sql/02_suspicious_patterns.sql",
-            "description": "This block catches fast changes in region-like proxy values for the same customer proxy.",
-            "query": """
-                SELECT customer_proxy,
-                  TransactionID,
-                  TransactionDT,
-                  region_proxy,
-                  prev_region,
-                  dt_delta_seconds
-                FROM (
-                    SELECT TransactionID,
-                      card1 AS customer_proxy,
-                      TransactionDT,
-                      addr1 AS region_proxy,
-                      LAG(addr1) OVER (
-                        PARTITION BY card1
-                        ORDER BY TransactionDT
-                      ) AS prev_region,
-                      TransactionDT - LAG(TransactionDT) OVER (
-                        PARTITION BY card1
-                        ORDER BY TransactionDT
-                      ) AS dt_delta_seconds
-                    FROM train_transaction
-                  ) region_changes
-                WHERE prev_region IS NOT NULL
-                  AND region_proxy IS NOT NULL
-                  AND prev_region != region_proxy
-                  AND dt_delta_seconds <= 3600
-                ORDER BY dt_delta_seconds ASC, customer_proxy
-                LIMIT 15
-            """,
-            "reading_notes": [
-                "This is a good example of a temporal anti-fraud hypothesis translated into SQL.",
-                "It shows how user behavior and short-term inconsistency can become suspicious patterns.",
             ],
         },
     ]

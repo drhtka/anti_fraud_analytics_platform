@@ -1,0 +1,49 @@
+<section class="screen" data-screen-name="sql" hidden>
+    <article class="content-card">
+        <h2>SQL Findings</h2>
+        <p>
+            This screen runs the strongest SQL investigation blocks from
+            <code>sql/</code> on the local IEEE-CIS CSV files and keeps only the
+            best demo-friendly result tables.
+        </p>
+        {% for section in sql_sections %}
+        <section class="learning-block">
+            <div class="learning-block-header">
+                <p class="learning-step">SQL Step {{ loop.index }}</p>
+                <h3>{{ section.title }}</h3>
+            </div>
+
+            <div class="sql-meta">
+                <div class="metric">
+                    <span class="metric-label">Source File</span>
+                    <span class="metric-value">{{ section.source_file }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Result Table</span>
+                    <span class="metric-value">{{ section.table_name }}</span>
+                </div>
+            </div>
+
+            <p>{{ section.description }}</p>
+
+            <pre class="sql-query"><code>{{ section.query.strip() }}</code></pre>
+
+            {% if section.result_html %}
+            <div class="sql-result-block">
+                {{ section.result_html | safe }}
+            </div>
+            {% endif %}
+
+            {% if section.reading_notes %}
+            <div class="learning-notes">
+                <ul>
+                    {% for note in section.reading_notes %}
+                    <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </article>
+</section>

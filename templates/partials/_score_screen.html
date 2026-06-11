@@ -1,0 +1,212 @@
+<section class="screen" data-screen-name="score">
+    <section class="demo-actions">
+        <h2>Demo Scenarios</h2>
+        <p>
+            Use one of the prepared payloads from <code>api/payloads</code> to
+            fill the form in one click, then run the same scoring flow on this
+            page.
+        </p>
+        <div class="demo-buttons">
+            {% for demo_payload in demo_payloads %}
+            <button
+                type="button"
+                class="demo-button"
+                data-demo-key="{{ demo_payload.filename }}"
+            >
+                {{ demo_payload.label }}
+            </button>
+            {% endfor %}
+        </div>
+    </section>
+
+    <form method="get" action="/" id="transaction-form">
+        <div class="grid">
+            <label>
+                Transaction ID
+                <input
+                    type="number"
+                    name="transaction_id"
+                    placeholder="1000001"
+                    value="{{ form_data.transaction_id if form_data else '' }}"
+                />
+            </label>
+
+            <label>
+                Transaction Amount
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="transaction_amount"
+                    placeholder="350.75"
+                    value="{{ form_data.transaction_amount if form_data else '' }}"
+                    required
+                />
+            </label>
+
+            <label>
+                ProductCD
+                <input
+                    type="text"
+                    name="product_cd"
+                    placeholder="C"
+                    value="{{ form_data.product_cd if form_data else '' }}"
+                    required
+                />
+            </label>
+
+            <label>
+                card1
+                <input
+                    type="number"
+                    name="card1"
+                    placeholder="13926"
+                    value="{{ form_data.card1 if form_data else '' }}"
+                    required
+                />
+            </label>
+
+            <label>
+                card4
+                <input
+                    type="text"
+                    name="card4"
+                    placeholder="discover"
+                    value="{{ form_data.card4 if form_data else '' }}"
+                />
+            </label>
+
+            <label>
+                card6
+                <input
+                    type="text"
+                    name="card6"
+                    placeholder="credit"
+                    value="{{ form_data.card6 if form_data else '' }}"
+                />
+            </label>
+
+            <label>
+                Purchaser Email Domain
+                <input
+                    type="text"
+                    name="p_emaildomain"
+                    placeholder="outlook.com"
+                    value="{{ form_data.p_emaildomain if form_data else '' }}"
+                />
+            </label>
+
+            <label>
+                Recipient Email Domain
+                <input
+                    type="text"
+                    name="r_emaildomain"
+                    placeholder="gmail.com"
+                    value="{{ form_data.r_emaildomain if form_data else '' }}"
+                />
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-button">Score transaction</button>
+            <button type="button" class="secondary-button" id="clear-form">
+                Clear form
+            </button>
+        </div>
+    </form>
+
+    {% if error_message %}
+    <section class="message error">{{ error_message }}</section>
+    {% endif %}
+
+    {% if score_result and explain_result %}
+    <section class="results">
+        <article class="result-card">
+            <div class="result-header">
+                <h2>Score Result</h2>
+                <div class="result-badges">
+                    <span class="badge badge-{{ score_result.risk_label }}">
+                        {{ score_result.risk_label | upper }} RISK
+                    </span>
+                </div>
+            </div>
+
+            <div
+                class="review-banner {% if score_result.needs_manual_review %}review-yes{% else %}review-no{% endif %}"
+            >
+                {% if score_result.needs_manual_review %} Manual review is
+                required for this transaction. {% else %} Manual review is not
+                required for this transaction. {% endif %}
+            </div>
+
+            <div class="result-grid">
+                <div class="metric">
+                    <span class="metric-label">Fraud Score</span>
+                    <span class="metric-value">{{ score_result.fraud_score }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Risk Label</span>
+                    <span class="metric-value">{{ score_result.risk_label }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Manual Review</span>
+                    <span class="metric-value"
+                        >{{ score_result.needs_manual_review }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Threshold Used</span>
+                    <span class="metric-value"
+                        >{{ score_result.threshold_used }}</span
+                    >
+                </div>
+            </div>
+
+            <div class="meta-grid">
+                <div class="metric">
+                    <span class="metric-label">Model Name</span>
+                    <span class="metric-value">{{ score_result.model_name }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Model Version</span>
+                    <span class="metric-value"
+                        >{{ score_result.model_version }}</span
+                    >
+                </div>
+            </div>
+
+            <h3>Active Signals</h3>
+            <ul class="signals-list">
+                {% for signal in score_result.active_signals %}
+                <li class="signal-pill">{{ signal }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article class="result-card">
+            <h2>Risk Explanation</h2>
+            <div class="explanation-callout">
+                <p>{{ explain_result.explanation_text }}</p>
+            </div>
+
+            <h3>Explanation Points</h3>
+            <ol>
+                {% for point in explain_result.explanation_points %}
+                <li>{{ point }}</li>
+                {% endfor %}
+            </ol>
+        </article>
+    </section>
+    {% else %}
+    <section class="placeholder">
+        <h2>Result Preview</h2>
+        <ul>
+            <li>fraud_score</li>
+            <li>risk_label</li>
+            <li>needs_manual_review</li>
+            <li>active_signals</li>
+            <li>explanation_text</li>
+        </ul>
+    </section>
+    {% endif %}
+</section>

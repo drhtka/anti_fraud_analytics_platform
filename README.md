@@ -22,6 +22,18 @@
 - `api/` - `FastAPI` приложение и схемы запросов;
 - `docs/` - рабочие материалы, разложенные по проектам и неделям.
 
+## Local Data
+
+Large `IEEE-CIS` CSV files are kept locally and are not committed to GitHub.
+
+Put the raw files here:
+
+- `data/raw/train_transaction.csv`
+- `data/raw/train_identity.csv`
+
+The UI reads these files on the backend through `DuckDB` and only renders
+small result tables, summaries, and charts in the browser.
+
 ## API Scoring Examples
 
 The MVP API exposes two endpoints:

@@ -1,0 +1,27 @@
+<section class="screen" data-screen-name="json" hidden>
+    <article class="content-card">
+        <h2>Raw API Output</h2>
+        <p>
+            This screen keeps the technical API view next to the human-readable
+            scoring demo.
+        </p>
+
+        <h3>/score Response</h3>
+        {% if score_result_json %}
+        <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
+        {% else %}
+        <pre class="json-block"><code>{
+  "message": "Run Score transaction to see the raw /score response here."
+}</code></pre>
+        {% endif %}
+
+        <h3>/explain Response</h3>
+        {% if explain_result_json %}
+        <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
+        {% else %}
+        <pre class="json-block"><code>{
+  "message": "Run Score transaction to see the raw /explain response here."
+}</code></pre>
+        {% endif %}
+    </article>
+</section>
