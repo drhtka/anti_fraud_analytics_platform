@@ -56,3 +56,29 @@
 - базовые `SQL`-метрики;
 - 5-10 антифрод-гипотез;
 - описание следующих шагов для признаков и модели.
+
+## API Scoring Examples
+
+The MVP API exposes two endpoints:
+
+- `GET /health`
+- `POST /score`
+
+To validate the scoring behavior, I tested three predefined transaction scenarios through the `requests` client.
+
+| Scenario   | Active Signals                                                                                        | Fraud Score | Risk Label | Manual Review |
+| ---------- | ----------------------------------------------------------------------------------------------------- | ----------: | ---------- | ------------- |
+| Low risk   | No binary risk flags triggered                                                                        |  `0.430693` | `low`      | `false`       |
+| Medium-ish | `card6=credit`, high-risk `P_emaildomain`, missing `R_emaildomain`                                    |  `0.667183` | `low`      | `false`       |
+| High risk  | `ProductCD=C`, high-risk `R_emaildomain`, `card6=credit`, high-risk `P_emaildomain`, `card4=discover` |  `0.885149` | `high`     | `true`        |
+
+### Interpretation
+
+These examples show that the model behaves consistently with the anti-fraud logic used in the MVP:
+
+- more risk signals lead to a higher `fraud_score`;
+- the API does not return only a score, but also a business action through `needs_manual_review`;
+- the threshold (`0.7`) converts model output into an operational review decision;
+- `active_signals` make the response easier to interpret for a fraud analyst.
+
+This makes the project more than a notebook-based experiment: it demonstrates a working scoring API that can be queried from both Swagger UI and a Python client.
