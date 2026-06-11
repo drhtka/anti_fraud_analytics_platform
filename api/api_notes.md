@@ -6,7 +6,20 @@
 - `/score` - скоринг транзакции;
 - `/explain` - объяснение, какие признаки и правила повлияли на риск.
 
-На первом этапе достаточно `Swagger/OpenAPI` и простого Python-клиента через `requests`.
+Сейчас уже доступны:
+
+- `GET /health`
+- `POST /score`
+- `POST /explain`
+
+`/explain` использует тот же payload, что и `/score`, но возвращает:
+
+- `explanation_text` - короткое человекочитаемое объяснение;
+- `explanation_points` - список ключевых причин;
+- `active_signals` - какие risk signals сработали;
+- `feature_values` - какие признаки реально ушли в модель.
+
+На текущем этапе достаточно `Swagger/OpenAPI` и простого Python-клиента через `requests`.
 
 Запуск клиента:
 

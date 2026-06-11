@@ -5,15 +5,15 @@ from functools import lru_cache
 from fastapi import FastAPI, HTTPException
 
 from api.model_bundle import ModelBundle, load_model_bundle
-from api.schemas import HealthResponse, ScoreRequest, ScoreResponse
-from api.scoring import score_transaction
+from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
+from api.scoring import explain_transaction, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
 
 
 app = FastAPI(
     title="Anti-Fraud Analytics Platform API",
     version="0.1.0",
-    description="Week 4 MVP API with /health and /score endpoints.",
+    description="Week 4 MVP API with /health, /score, and /explain endpoints.",
 )
 
 
@@ -50,3 +50,13 @@ def score(request: ScoreRequest) -> ScoreResponse:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
     return score_transaction(request=request, bundle=bundle)
+
+
+@app.post("/explain", response_model=ExplainResponse)
+def explain(request: ScoreRequest) -> ExplainResponse:
+    try:
+        bundle = get_model_bundle()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    return explain_transaction(request=request, bundle=bundle)

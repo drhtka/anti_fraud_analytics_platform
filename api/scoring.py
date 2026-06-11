@@ -5,7 +5,7 @@ import math
 import pandas as pd
 
 from api.model_bundle import ModelBundle
-from api.schemas import ScoreRequest, ScoreResponse
+from api.schemas import ExplainResponse, ScoreRequest, ScoreResponse
 
 
 SIGNAL_LABELS = {
@@ -95,4 +95,70 @@ def score_transaction(request: ScoreRequest, bundle: ModelBundle) -> ScoreRespon
         model_version=bundle.model_version,
         active_signals=build_active_signals(feature_values),
         feature_values=feature_values,
+    )
+
+
+def build_explanation_points(score_response: ScoreResponse) -> list[str]:
+    explanation_points = [
+        f"The model returned fraud_score={score_response.fraud_score}, while threshold={score_response.threshold_used}.",
+    ]
+
+    if score_response.needs_manual_review:
+        explanation_points.append(
+            "The transaction is above the current decision threshold and should be sent to manual review."
+        )
+    else:
+        explanation_points.append(
+            "The transaction is below the current decision threshold and does not require manual review."
+        )
+
+    if score_response.active_signals == ["No binary risk flags were triggered by the current request"]:
+        explanation_points.append(
+            "No binary risk flags were triggered, so the score is mostly driven by the baseline model pattern."
+        )
+    else:
+        explanation_points.append(
+            "The strongest visible contributors come from the active binary risk signals returned by the API."
+        )
+        explanation_points.extend(
+            [f"Active signal: {signal}." for signal in score_response.active_signals]
+        )
+
+    return explanation_points
+
+
+def build_explanation_text(score_response: ScoreResponse) -> str:
+    if score_response.needs_manual_review:
+        review_sentence = "This transaction should be routed to manual review."
+    else:
+        review_sentence = "This transaction stays below the manual review threshold."
+
+    signal_summary = (
+        "No binary risk flags were triggered."
+        if score_response.active_signals == ["No binary risk flags were triggered by the current request"]
+        else f"Triggered signals: {', '.join(score_response.active_signals)}."
+    )
+
+    return (
+        f"The model produced fraud_score={score_response.fraud_score} "
+        f"against threshold={score_response.threshold_used}, so risk_label={score_response.risk_label}. "
+        f"{review_sentence} {signal_summary}"
+    )
+
+
+def explain_transaction(request: ScoreRequest, bundle: ModelBundle) -> ExplainResponse:
+    score_response = score_transaction(request=request, bundle=bundle)
+
+    return ExplainResponse(
+        transaction_id=score_response.transaction_id,
+        fraud_score=score_response.fraud_score,
+        threshold_used=score_response.threshold_used,
+        risk_label=score_response.risk_label,
+        needs_manual_review=score_response.needs_manual_review,
+        model_name=score_response.model_name,
+        model_version=score_response.model_version,
+        active_signals=score_response.active_signals,
+        explanation_text=build_explanation_text(score_response),
+        explanation_points=build_explanation_points(score_response),
+        feature_values=score_response.feature_values,
     )

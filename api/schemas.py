@@ -40,3 +40,17 @@ class ScoreResponse(BaseModel):
     model_version: str
     active_signals: list[str]
     feature_values: dict[str, float]
+
+
+class ExplainResponse(BaseModel):
+    transaction_id: int | None = None
+    fraud_score: float
+    threshold_used: float
+    risk_label: Literal["low", "medium", "high"]
+    needs_manual_review: bool
+    model_name: str
+    model_version: str
+    active_signals: list[str]
+    explanation_text: str
+    explanation_points: list[str]
+    feature_values: dict[str, float]
