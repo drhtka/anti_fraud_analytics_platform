@@ -1,24 +1,28 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from pathlib import Path
 
 from api.ui_content.shared import (
     build_duckdb_connection,
     build_notes,
+    load_cached_payload,
     render_chart,
     render_html_table,
     resolve_dataset_dir,
     run_query,
+    store_cached_payload,
 )
 
 
-@lru_cache(maxsize=1)
 def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
     base_data_path = Path(data_dir)
     dataset_dir = resolve_dataset_dir(base_data_path)
     if dataset_dir is None:
         return []
+
+    cached_payload = load_cached_payload(base_data_path, "eda_summary")
+    if isinstance(cached_payload, list):
+        return cached_payload
 
     connection = build_duckdb_connection(dataset_dir)
     try:
@@ -51,7 +55,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
 
     summary_row = summary_rows[0]
     identity_row = identity_rows[0]
-    return [
+    payload = [
         {
             "label": "Total Transactions",
             "value": f"{int(summary_row[0]):,}",
@@ -78,9 +82,10 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
             "description": "Share of transactions that have a linked row in `train_identity`.",
         },
     ]
+    store_cached_payload(base_data_path, "eda_summary", payload)
+    return payload
 
 
-@lru_cache(maxsize=1)
 def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
     base_data_path = Path(data_dir)
     dataset_dir = resolve_dataset_dir(base_data_path)
@@ -96,6 +101,10 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                 "outputs": [],
             }
         ]
+
+    cached_payload = load_cached_payload(base_data_path, "eda_sections")
+    if isinstance(cached_payload, list):
+        return cached_payload
 
     connection = build_duckdb_connection(dataset_dir)
     try:
@@ -159,7 +168,7 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             """,
         )
 
-        return [
+        payload = [
             {
                 "title": "1. Quick data overview",
                 "table_name": "eda_dataset_overview",
@@ -238,3 +247,6 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
         ]
     finally:
         connection.close()
+
+    store_cached_payload(base_data_path, "eda_sections", payload)
+    return payload

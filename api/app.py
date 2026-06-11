@@ -116,8 +116,28 @@ def index(request: Request) -> HTMLResponse:
             "explain_result_json": explain_result_json,
             "error_message": error_message,
             "demo_payloads": load_demo_payloads(),
+        },
+    )
+
+
+@app.get("/ui/eda", response_class=HTMLResponse, name="eda_screen")
+def eda_screen(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/_eda_screen.html",
+        context={
             "eda_summary": load_eda_summary(str(DATA_DIR)),
             "eda_sections": load_eda_sections(str(DATA_DIR)),
+        },
+    )
+
+
+@app.get("/ui/sql", response_class=HTMLResponse, name="sql_screen")
+def sql_screen(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/_sql_screen.html",
+        context={
             "sql_sections": load_sql_sections(str(DATA_DIR)),
         },
     )

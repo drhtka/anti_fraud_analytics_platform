@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from pathlib import Path
 
-from api.ui_content.shared import build_duckdb_connection, render_html_table, resolve_dataset_dir
+from api.ui_content.shared import (
+    build_duckdb_connection,
+    load_cached_payload,
+    render_html_table,
+    resolve_dataset_dir,
+    store_cached_payload,
+)
 
 
-@lru_cache(maxsize=1)
 def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
     base_data_path = Path(data_dir)
     dataset_dir = resolve_dataset_dir(base_data_path)
@@ -26,6 +30,10 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 "result_html": None,
             }
         ]
+
+    cached_payload = load_cached_payload(base_data_path, "sql_sections")
+    if isinstance(cached_payload, list):
+        return cached_payload
 
     sql_sections = [
         {
@@ -138,4 +146,5 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
     finally:
         connection.close()
 
+    store_cached_payload(base_data_path, "sql_sections", sql_sections)
     return sql_sections

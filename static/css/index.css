@@ -198,6 +198,15 @@ button {
     color: #334155;
 }
 
+.deferred-card {
+    border-style: dashed;
+}
+
+.deferred-hint {
+    margin: 0;
+    color: #64748b;
+}
+
 .summary-block {
     margin-top: 20px;
     margin-bottom: 20px;

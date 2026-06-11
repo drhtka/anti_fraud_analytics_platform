@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from html import escape
 from io import BytesIO
 from pathlib import Path
@@ -13,6 +14,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 DATA_FILE_NAMES = ("train_transaction.csv", "train_identity.csv")
+CACHE_SCHEMA_VERSION = 1
 
 
 def build_notes(*items: str) -> list[dict[str, str]]:
@@ -82,6 +84,60 @@ def resolve_dataset_dir(data_dir: Path) -> Path | None:
             return candidate_dir
 
     return None
+
+
+def get_ui_cache_dir(data_dir: Path) -> Path:
+    return data_dir.parent / ".cache" / "ui_content"
+
+
+def build_dataset_fingerprint(dataset_dir: Path) -> dict[str, object]:
+    return {
+        "schema_version": CACHE_SCHEMA_VERSION,
+        "dataset_dir": str(dataset_dir.resolve()),
+        "files": {
+            file_name: {
+                "size": (dataset_dir / file_name).stat().st_size,
+                "mtime_ns": (dataset_dir / file_name).stat().st_mtime_ns,
+            }
+            for file_name in DATA_FILE_NAMES
+        },
+    }
+
+
+def load_cached_payload(data_dir: Path, cache_name: str) -> object | None:
+    dataset_dir = resolve_dataset_dir(data_dir)
+    if dataset_dir is None:
+        return None
+
+    cache_file = get_ui_cache_dir(data_dir) / f"{cache_name}.json"
+    if not cache_file.exists():
+        return None
+
+    try:
+        cached_document = json.loads(cache_file.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    expected_fingerprint = build_dataset_fingerprint(dataset_dir)
+    if cached_document.get("fingerprint") != expected_fingerprint:
+        return None
+
+    return cached_document.get("payload")
+
+
+def store_cached_payload(data_dir: Path, cache_name: str, payload: object) -> None:
+    dataset_dir = resolve_dataset_dir(data_dir)
+    if dataset_dir is None:
+        return
+
+    cache_dir = get_ui_cache_dir(data_dir)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = cache_dir / f"{cache_name}.json"
+    cache_document = {
+        "fingerprint": build_dataset_fingerprint(dataset_dir),
+        "payload": payload,
+    }
+    cache_file.write_text(json.dumps(cache_document), encoding="utf-8")
 
 
 def build_duckdb_connection(data_dir: Path) -> duckdb.DuckDBPyConnection:

@@ -1,0 +1,16 @@
+<section
+    class="screen"
+    data-screen-name="sql"
+    data-deferred-url="{{ request.url_for('sql_screen') }}"
+    data-loaded="false"
+    hidden
+>
+    <article class="content-card deferred-card">
+        <h2>SQL Findings</h2>
+        <p>
+            This screen runs the heavier SQL investigation blocks only when you
+            open the SQL tab.
+        </p>
+        <p class="deferred-hint">Open the tab to load the result tables.</p>
+    </article>
+</section>

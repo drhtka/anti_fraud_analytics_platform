@@ -34,6 +34,12 @@ Put the raw files here:
 The UI reads these files on the backend through `DuckDB` and only renders
 small result tables, summaries, and charts in the browser.
 
+To precompute the heavier `EDA` and `SQL` UI cache before starting the server:
+
+```bash
+.venv/bin/python scripts/precompute_ui_cache.py
+```
+
 ## API Scoring Examples
 
 The MVP API exposes two endpoints:
