@@ -14,6 +14,7 @@ from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
 from api.scoring import explain_transaction, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
+from api.ui_content import load_eda_sections, load_sql_sections
 
 
 app = FastAPI(
@@ -25,6 +26,8 @@ app = FastAPI(
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
+DATA_DIR = BASE_DIR / "data"
+EDA_NOTEBOOK_PATH = BASE_DIR / "notebooks" / "01_eda.ipynb"
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
@@ -114,6 +117,8 @@ def index(request: Request) -> HTMLResponse:
             "explain_result_json": explain_result_json,
             "error_message": error_message,
             "demo_payloads": load_demo_payloads(),
+            "eda_sections": load_eda_sections(str(EDA_NOTEBOOK_PATH)),
+            "sql_sections": load_sql_sections(str(DATA_DIR)),
         },
     )
 

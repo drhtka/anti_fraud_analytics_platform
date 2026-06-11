@@ -280,33 +280,55 @@
                 <article class="content-card">
                     <h2>EDA Insights</h2>
                     <p>
-                        This screen will summarize the strongest exploratory
-                        data analysis findings behind the anti-fraud case.
+                        This screen follows the same learning flow as
+                        <code>notebooks/01_eda.ipynb</code> and shows the
+                        analysis block by block instead of dumping everything at
+                        once.
                     </p>
-                    <div class="insight-grid">
-                        <section class="insight-card">
-                            <h3>Transaction Amount</h3>
-                            <p>
-                                Add amount distribution charts, outlier
-                                patterns, and notes about suspicious transaction
-                                ranges.
+                    {% for section in eda_sections %}
+                    <section class="learning-block">
+                        <div class="learning-block-header">
+                            <p class="learning-step">
+                                EDA Step {{ loop.index }}
                             </p>
-                        </section>
-                        <section class="insight-card">
-                            <h3>ProductCD Patterns</h3>
-                            <p>
-                                Show which product segments look riskier and how
-                                fraud rate changes across categories.
-                            </p>
-                        </section>
-                        <section class="insight-card">
-                            <h3>Email Domains</h3>
-                            <p>
-                                Summarize risky purchaser and recipient domains
-                                that later became features and signals.
-                            </p>
-                        </section>
-                    </div>
+                            <h3>{{ section.title }}</h3>
+                        </div>
+
+                        {% if section.notes %}
+                        <div class="learning-notes">
+                            {% for note in section.notes %} {% if note.kind ==
+                            "paragraph" %}
+                            <p>{{ note.text }}</p>
+                            {% else %}
+                            <ul>
+                                <li>{{ note.text }}</li>
+                            </ul>
+                            {% endif %} {% endfor %}
+                        </div>
+                        {% endif %} {% if section.outputs %}
+                        <div class="notebook-output-stack">
+                            {% for output in section.outputs %} {% if
+                            output.kind == "html" %}
+                            <div class="notebook-html-output">
+                                {{ output.content | safe }}
+                            </div>
+                            {% elif output.kind == "image" %}
+                            <figure class="chart-card">
+                                <img
+                                    src="{{ output.content }}"
+                                    alt="{{ section.title }} chart"
+                                    class="eda-chart"
+                                />
+                            </figure>
+                            {% elif output.kind == "text" %}
+                            <pre
+                                class="text-output"
+                            ><code>{{ output.content }}</code></pre>
+                            {% endif %} {% endfor %}
+                        </div>
+                        {% endif %}
+                    </section>
+                    {% endfor %}
                 </article>
             </section>
 
@@ -314,21 +336,56 @@
                 <article class="content-card">
                     <h2>SQL Findings</h2>
                     <p>
-                        This screen is for the strongest SQL checks that support
-                        your anti-fraud narrative and business interpretation.
+                        This screen follows the learning path from the
+                        <code>sql/</code> folder and renders the analysis as
+                        sequential investigation blocks with query text, result
+                        table name, and interpretation.
                     </p>
-                    <h3>Example Query Block</h3>
-                    <pre class="sql-query"><code>SELECT product_cd,
-       COUNT(*) AS transactions,
-       AVG(is_fraud) AS fraud_rate
-FROM ieee_cis_transactions
-GROUP BY product_cd
-ORDER BY fraud_rate DESC;</code></pre>
-                    <ol>
-                        <li>Show the final SQL query used in analysis.</li>
-                        <li>Render the key output table or top rows.</li>
-                        <li>Explain the business meaning in 2-3 lines.</li>
-                    </ol>
+                    {% for section in sql_sections %}
+                    <section class="learning-block">
+                        <div class="learning-block-header">
+                            <p class="learning-step">
+                                SQL Step {{ loop.index }}
+                            </p>
+                            <h3>{{ section.title }}</h3>
+                        </div>
+
+                        <div class="sql-meta">
+                            <div class="metric">
+                                <span class="metric-label">Source File</span>
+                                <span class="metric-value"
+                                    >{{ section.source_file }}</span
+                                >
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Result Table</span>
+                                <span class="metric-value"
+                                    >{{ section.table_name }}</span
+                                >
+                            </div>
+                        </div>
+
+                        <p>{{ section.description }}</p>
+
+                        <pre
+                            class="sql-query"
+                        ><code>{{ section.query.strip() }}</code></pre>
+
+                        {% if section.result_html %}
+                        <div class="sql-result-block">
+                            {{ section.result_html | safe }}
+                        </div>
+                        {% endif %} {% if section.reading_notes %}
+                        <div class="learning-notes">
+                            <ul>
+                                {% for note in section.reading_notes %}
+                                <li>{{ note }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </section>
+                    {% endfor %}
                 </article>
             </section>
 
