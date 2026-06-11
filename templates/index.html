@@ -1,165 +1,336 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }}</title>
-    <style>
-        :root {
-            color-scheme: light;
-            font-family: Arial, sans-serif;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ page_title }}</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: Arial, sans-serif;
+            }
 
-        body {
-            margin: 0;
-            background: #f5f7fb;
-            color: #1f2937;
-        }
+            body {
+                margin: 0;
+                background: #f5f7fb;
+                color: #1f2937;
+            }
 
-        main {
-            max-width: 760px;
-            margin: 0 auto;
-            padding: 32px 20px 48px;
-        }
+            main {
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 32px 20px 48px;
+            }
 
-        h1 {
-            margin-bottom: 8px;
-        }
+            h1 {
+                margin-bottom: 8px;
+            }
 
-        .intro {
-            margin-bottom: 24px;
-            color: #4b5563;
-        }
+            .intro {
+                margin-bottom: 24px;
+                color: #4b5563;
+            }
 
-        form {
-            display: grid;
-            gap: 16px;
-            padding: 24px;
-            background: #ffffff;
-            border: 1px solid #dbe3ee;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-        }
+            form {
+                display: grid;
+                gap: 16px;
+                padding: 24px;
+                background: #ffffff;
+                border: 1px solid #dbe3ee;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-        }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 16px;
+            }
 
-        label {
-            display: grid;
-            gap: 6px;
-            font-size: 14px;
-            font-weight: 600;
-        }
+            label {
+                display: grid;
+                gap: 6px;
+                font-size: 14px;
+                font-weight: 600;
+            }
 
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #fff;
-        }
+            input {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 10px 12px;
+                border: 1px solid #cbd5e1;
+                border-radius: 8px;
+                font-size: 14px;
+                background: #fff;
+            }
 
-        button {
-            width: fit-content;
-            padding: 10px 16px;
-            border: 0;
-            border-radius: 8px;
-            background: #2563eb;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+            button {
+                width: fit-content;
+                padding: 10px 16px;
+                border: 0;
+                border-radius: 8px;
+                background: #2563eb;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 700;
+                cursor: pointer;
+            }
 
-        .placeholder {
-            margin-top: 20px;
-            padding: 20px;
-            background: #ffffff;
-            border: 1px dashed #cbd5e1;
-            border-radius: 12px;
-        }
+            .placeholder {
+                margin-top: 20px;
+                padding: 20px;
+                background: #ffffff;
+                border: 1px dashed #cbd5e1;
+                border-radius: 12px;
+            }
 
-        .placeholder h2 {
-            margin-top: 0;
-            margin-bottom: 12px;
-        }
+            .placeholder h2 {
+                margin-top: 0;
+                margin-bottom: 12px;
+            }
 
-        .placeholder ul {
-            margin: 0;
-            padding-left: 20px;
-            color: #4b5563;
-        }
-    </style>
-</head>
-<body>
-    <main>
-        <h1>Anti-Fraud Transaction Scoring</h1>
-        <p class="intro">
-            Week 4 UI MVP starts with a single page form. In the next step, this form will submit data to
-            the existing <code>/score</code> and <code>/explain</code> endpoints.
-        </p>
+            .placeholder ul {
+                margin: 0;
+                padding-left: 20px;
+                color: #4b5563;
+            }
 
-        <form>
-            <div class="grid">
-                <label>
-                    Transaction ID
-                    <input type="number" name="transaction_id" placeholder="1000001">
-                </label>
+            .message {
+                margin-top: 20px;
+                padding: 14px 16px;
+                border-radius: 10px;
+            }
 
-                <label>
-                    Transaction Amount
-                    <input type="number" step="0.01" min="0" name="transaction_amount" placeholder="350.75" required>
-                </label>
+            .message.error {
+                background: #fee2e2;
+                border: 1px solid #fca5a5;
+                color: #991b1b;
+            }
 
-                <label>
-                    ProductCD
-                    <input type="text" name="product_cd" placeholder="C" required>
-                </label>
+            .results {
+                display: grid;
+                gap: 20px;
+                margin-top: 20px;
+            }
 
-                <label>
-                    card1
-                    <input type="number" name="card1" placeholder="13926" required>
-                </label>
+            .result-card {
+                padding: 20px;
+                background: #ffffff;
+                border: 1px solid #dbe3ee;
+                border-radius: 12px;
+            }
 
-                <label>
-                    card4
-                    <input type="text" name="card4" placeholder="discover">
-                </label>
+            .result-card h2 {
+                margin-top: 0;
+                margin-bottom: 12px;
+            }
 
-                <label>
-                    card6
-                    <input type="text" name="card6" placeholder="credit">
-                </label>
+            .result-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 12px;
+                margin-bottom: 16px;
+            }
 
-                <label>
-                    Purchaser Email Domain
-                    <input type="text" name="p_emaildomain" placeholder="outlook.com">
-                </label>
+            .metric {
+                padding: 12px;
+                background: #f8fafc;
+                border-radius: 10px;
+            }
 
-                <label>
-                    Recipient Email Domain
-                    <input type="text" name="r_emaildomain" placeholder="gmail.com">
-                </label>
-            </div>
+            .metric-label {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 12px;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
 
-            <button type="submit">Score transaction</button>
-        </form>
+            .metric-value {
+                font-size: 18px;
+                font-weight: 700;
+            }
 
-        <section class="placeholder">
-            <h2>Result Preview</h2>
-            <ul>
-                <li>fraud_score</li>
-                <li>risk_label</li>
-                <li>needs_manual_review</li>
-                <li>active_signals</li>
-                <li>explanation_text</li>
-            </ul>
-        </section>
-    </main>
-</body>
+            .result-card ul,
+            .result-card ol {
+                margin: 0;
+                padding-left: 20px;
+                color: #334155;
+            }
+
+            .result-card p {
+                margin: 0;
+                color: #334155;
+                line-height: 1.5;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Anti-Fraud Transaction Scoring</h1>
+            <p class="intro">
+                Week 4 UI MVP uses a single page form and renders the scoring
+                result on the same page with the backend logic that powers
+                <code>/score</code> and <code>/explain</code>.
+            </p>
+
+            <form method="get" action="/">
+                <div class="grid">
+                    <label>
+                        Transaction ID
+                        <input
+                            type="number"
+                            name="transaction_id"
+                            placeholder="1000001"
+                            value="{{ form_data.transaction_id if form_data else '' }}"
+                        />
+                    </label>
+
+                    <label>
+                        Transaction Amount
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            name="transaction_amount"
+                            placeholder="350.75"
+                            value="{{ form_data.transaction_amount if form_data else '' }}"
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        ProductCD
+                        <input
+                            type="text"
+                            name="product_cd"
+                            placeholder="C"
+                            value="{{ form_data.product_cd if form_data else '' }}"
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        card1
+                        <input
+                            type="number"
+                            name="card1"
+                            placeholder="13926"
+                            value="{{ form_data.card1 if form_data else '' }}"
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        card4
+                        <input
+                            type="text"
+                            name="card4"
+                            placeholder="discover"
+                            value="{{ form_data.card4 if form_data else '' }}"
+                        />
+                    </label>
+
+                    <label>
+                        card6
+                        <input
+                            type="text"
+                            name="card6"
+                            placeholder="credit"
+                            value="{{ form_data.card6 if form_data else '' }}"
+                        />
+                    </label>
+
+                    <label>
+                        Purchaser Email Domain
+                        <input
+                            type="text"
+                            name="p_emaildomain"
+                            placeholder="outlook.com"
+                            value="{{ form_data.p_emaildomain if form_data else '' }}"
+                        />
+                    </label>
+
+                    <label>
+                        Recipient Email Domain
+                        <input
+                            type="text"
+                            name="r_emaildomain"
+                            placeholder="gmail.com"
+                            value="{{ form_data.r_emaildomain if form_data else '' }}"
+                        />
+                    </label>
+                </div>
+
+                <button type="submit">Score transaction</button>
+            </form>
+
+            {% if error_message %}
+            <section class="message error">{{ error_message }}</section>
+            {% endif %} {% if score_result and explain_result %}
+            <section class="results">
+                <article class="result-card">
+                    <h2>Score Result</h2>
+                    <div class="result-grid">
+                        <div class="metric">
+                            <span class="metric-label">Fraud Score</span>
+                            <span class="metric-value"
+                                >{{ score_result.fraud_score }}</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Risk Label</span>
+                            <span class="metric-value"
+                                >{{ score_result.risk_label }}</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Manual Review</span>
+                            <span class="metric-value"
+                                >{{ score_result.needs_manual_review }}</span
+                            >
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Threshold Used</span>
+                            <span class="metric-value"
+                                >{{ score_result.threshold_used }}</span
+                            >
+                        </div>
+                    </div>
+
+                    <h3>Active Signals</h3>
+                    <ul>
+                        {% for signal in score_result.active_signals %}
+                        <li>{{ signal }}</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+
+                <article class="result-card">
+                    <h2>Risk Explanation</h2>
+                    <p>{{ explain_result.explanation_text }}</p>
+
+                    <h3>Explanation Points</h3>
+                    <ol>
+                        {% for point in explain_result.explanation_points %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ol>
+                </article>
+            </section>
+            {% else %}
+            <section class="placeholder">
+                <h2>Result Preview</h2>
+                <ul>
+                    <li>fraud_score</li>
+                    <li>risk_label</li>
+                    <li>needs_manual_review</li>
+                    <li>active_signals</li>
+                    <li>explanation_text</li>
+                </ul>
+            </section>
+            {% endif %}
+        </main>
+    </body>
 </html>

@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import ValidationError
 
 from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
@@ -27,13 +28,54 @@ def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
 
 
+def build_ui_form_data(request: Request) -> dict[str, str]:
+    return {
+        "transaction_id": request.query_params.get("transaction_id", ""),
+        "transaction_amount": request.query_params.get("transaction_amount", ""),
+        "product_cd": request.query_params.get("product_cd", ""),
+        "card1": request.query_params.get("card1", ""),
+        "card4": request.query_params.get("card4", ""),
+        "card6": request.query_params.get("card6", ""),
+        "p_emaildomain": request.query_params.get("p_emaildomain", ""),
+        "r_emaildomain": request.query_params.get("r_emaildomain", ""),
+    }
+
+
+def build_score_request(form_data: dict[str, str]) -> ScoreRequest:
+    normalized_payload = {
+        key: (value if value != "" else None)
+        for key, value in form_data.items()
+    }
+    return ScoreRequest(**normalized_payload)
+
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
+    form_data = build_ui_form_data(request)
+    score_result: ScoreResponse | None = None
+    explain_result: ExplainResponse | None = None
+    error_message: str | None = None
+
+    if request.query_params:
+        try:
+            score_request = build_score_request(form_data)
+            bundle = get_model_bundle()
+            score_result = score_transaction(request=score_request, bundle=bundle)
+            explain_result = explain_transaction(request=score_request, bundle=bundle)
+        except FileNotFoundError as exc:
+            error_message = str(exc)
+        except ValidationError as exc:
+            error_message = exc.errors()[0]["msg"]
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "page_title": "Anti-Fraud Analytics Platform",
+            "form_data": form_data,
+            "score_result": score_result,
+            "explain_result": explain_result,
+            "error_message": error_message,
         },
     )
 
