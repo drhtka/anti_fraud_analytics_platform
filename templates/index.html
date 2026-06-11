@@ -41,6 +41,31 @@
                 box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
             }
 
+            .demo-actions {
+                margin-bottom: 16px;
+                padding: 18px 20px;
+                background: #eef4ff;
+                border: 1px solid #c7d7fe;
+                border-radius: 12px;
+            }
+
+            .demo-actions h2 {
+                margin: 0 0 8px;
+                font-size: 18px;
+            }
+
+            .demo-actions p {
+                margin: 0 0 14px;
+                color: #475569;
+                line-height: 1.5;
+            }
+
+            .demo-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
             .grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -74,6 +99,16 @@
                 font-size: 14px;
                 font-weight: 700;
                 cursor: pointer;
+            }
+
+            .demo-button {
+                background: #ffffff;
+                color: #1d4ed8;
+                border: 1px solid #93c5fd;
+            }
+
+            .submit-button {
+                margin-top: 4px;
             }
 
             .placeholder {
@@ -125,6 +160,68 @@
                 margin-bottom: 12px;
             }
 
+            .result-header {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .result-header h2 {
+                margin: 0;
+            }
+
+            .result-badges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 7px 12px;
+                border-radius: 999px;
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .badge-low {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .badge-medium {
+                background: #fef3c7;
+                color: #92400e;
+            }
+
+            .badge-high {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+            .review-banner {
+                margin-bottom: 16px;
+                padding: 14px 16px;
+                border-radius: 12px;
+                font-weight: 700;
+            }
+
+            .review-yes {
+                background: #fff1f2;
+                border: 1px solid #fda4af;
+                color: #9f1239;
+            }
+
+            .review-no {
+                background: #ecfdf5;
+                border: 1px solid #86efac;
+                color: #166534;
+            }
+
             .result-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -152,10 +249,36 @@
                 font-weight: 700;
             }
 
+            .signals-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin: 0;
+                padding-left: 0;
+                list-style: none;
+            }
+
+            .signal-pill {
+                display: inline-flex;
+                padding: 8px 12px;
+                border-radius: 999px;
+                background: #eff6ff;
+                color: #1d4ed8;
+                border: 1px solid #bfdbfe;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .explanation-callout {
+                margin-bottom: 16px;
+                padding: 14px 16px;
+                background: #f8fafc;
+                border-left: 4px solid #2563eb;
+                border-radius: 10px;
+            }
+
             .result-card ul,
             .result-card ol {
-                margin: 0;
-                padding-left: 20px;
                 color: #334155;
             }
 
@@ -175,7 +298,28 @@
                 <code>/score</code> and <code>/explain</code>.
             </p>
 
-            <form method="get" action="/">
+            <section class="demo-actions">
+                <h2>Demo Scenarios</h2>
+                <p>
+                    Use one of the prepared payloads from
+                    <code>api/payloads</code>
+                    to fill the form in one click, then run the same scoring
+                    flow on this page.
+                </p>
+                <div class="demo-buttons">
+                    {% for demo_payload in demo_payloads %}
+                    <button
+                        type="button"
+                        class="demo-button"
+                        data-demo-payload="{{ demo_payload.payload | tojson }}"
+                    >
+                        {{ demo_payload.label }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <form method="get" action="/" id="transaction-form">
                 <div class="grid">
                     <label>
                         Transaction ID
@@ -263,7 +407,9 @@
                     </label>
                 </div>
 
-                <button type="submit">Score transaction</button>
+                <button type="submit" class="submit-button">
+                    Score transaction
+                </button>
             </form>
 
             {% if error_message %}
@@ -271,7 +417,25 @@
             {% endif %} {% if score_result and explain_result %}
             <section class="results">
                 <article class="result-card">
-                    <h2>Score Result</h2>
+                    <div class="result-header">
+                        <h2>Score Result</h2>
+                        <div class="result-badges">
+                            <span
+                                class="badge badge-{{ score_result.risk_label }}"
+                            >
+                                {{ score_result.risk_label | upper }} RISK
+                            </span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="review-banner {% if score_result.needs_manual_review %}review-yes{% else %}review-no{% endif %}"
+                    >
+                        {% if score_result.needs_manual_review %} Manual review
+                        is required for this transaction. {% else %} Manual
+                        review is not required for this transaction. {% endif %}
+                    </div>
+
                     <div class="result-grid">
                         <div class="metric">
                             <span class="metric-label">Fraud Score</span>
@@ -300,16 +464,18 @@
                     </div>
 
                     <h3>Active Signals</h3>
-                    <ul>
+                    <ul class="signals-list">
                         {% for signal in score_result.active_signals %}
-                        <li>{{ signal }}</li>
+                        <li class="signal-pill">{{ signal }}</li>
                         {% endfor %}
                     </ul>
                 </article>
 
                 <article class="result-card">
                     <h2>Risk Explanation</h2>
-                    <p>{{ explain_result.explanation_text }}</p>
+                    <div class="explanation-callout">
+                        <p>{{ explain_result.explanation_text }}</p>
+                    </div>
 
                     <h3>Explanation Points</h3>
                     <ol>
@@ -332,5 +498,30 @@
             </section>
             {% endif %}
         </main>
+        <script>
+            const transactionForm = document.getElementById('transaction-form');
+            const demoButtons = document.querySelectorAll(
+                '[data-demo-payload]',
+            );
+
+            demoButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const payload = JSON.parse(button.dataset.demoPayload);
+
+                    Object.entries(payload).forEach(
+                        ([fieldName, fieldValue]) => {
+                            const input =
+                                transactionForm.elements.namedItem(fieldName);
+
+                            if (!input) {
+                                return;
+                            }
+
+                            input.value = fieldValue ?? '';
+                        },
+                    );
+                });
+            });
+        </script>
     </body>
 </html>

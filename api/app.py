@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,6 +22,7 @@ app = FastAPI(
 )
 
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent.parent / "templates"))
+PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
 
 
 @lru_cache(maxsize=1)
@@ -47,6 +49,28 @@ def build_score_request(form_data: dict[str, str]) -> ScoreRequest:
         for key, value in form_data.items()
     }
     return ScoreRequest(**normalized_payload)
+
+
+def load_demo_payloads() -> list[dict[str, object]]:
+    payload_specs = [
+        ("High Risk", "high_risk.json"),
+        ("Medium-ish", "medium_ish.json"),
+        ("Low Risk", "low_risk.json"),
+    ]
+    demo_payloads: list[dict[str, object]] = []
+
+    for label, filename in payload_specs:
+        payload_path = PAYLOADS_DIR / filename
+        with payload_path.open("r", encoding="utf-8") as file:
+            demo_payloads.append(
+                {
+                    "label": label,
+                    "filename": filename,
+                    "payload": json.load(file),
+                }
+            )
+
+    return demo_payloads
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -76,6 +100,7 @@ def index(request: Request) -> HTMLResponse:
             "score_result": score_result,
             "explain_result": explain_result,
             "error_message": error_message,
+            "demo_payloads": load_demo_payloads(),
         },
     )
 
