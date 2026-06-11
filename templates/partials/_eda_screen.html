@@ -6,7 +6,26 @@
             IEEE-CIS CSV files in <code>data/raw/</code> and keeps only the
             strongest demo sections.
         </p>
-        {% for section in eda_sections %}
+        {% if eda_summary %}
+        <section class="summary-block">
+            <div class="summary-block-header">
+                <h3>Dataset Snapshot</h3>
+                <p>
+                    A quick top-level view before you go into individual EDA
+                    cuts and fraud patterns.
+                </p>
+            </div>
+            <div class="summary-grid">
+                {% for item in eda_summary %}
+                <article class="summary-card">
+                    <span class="summary-label">{{ item.label }}</span>
+                    <strong class="summary-value">{{ item.value }}</strong>
+                    <p class="summary-description">{{ item.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %} {% for section in eda_sections %}
         <section class="learning-block">
             <div class="learning-block-header">
                 <p class="learning-step">EDA Step {{ loop.index }}</p>
@@ -20,34 +39,28 @@
                     <span class="metric-label">Result Table</span>
                     <span class="metric-value">{{ section.table_name }}</span>
                 </div>
-                {% endif %}
-                {% if section.description %}
+                {% endif %} {% if section.description %}
                 <div class="metric">
                     <span class="metric-label">What We See</span>
                     <span class="metric-value">{{ section.description }}</span>
                 </div>
                 {% endif %}
             </div>
-            {% endif %}
-
-            {% if section.notes %}
+            {% endif %} {% if section.notes %}
             <div class="learning-notes">
-                {% for note in section.notes %}
-                {% if note.kind == "paragraph" %}
+                {% for note in section.notes %} {% if note.kind == "paragraph"
+                %}
                 <p>{{ note.text }}</p>
                 {% else %}
                 <ul>
                     <li>{{ note.text }}</li>
                 </ul>
-                {% endif %}
-                {% endfor %}
+                {% endif %} {% endfor %}
             </div>
-            {% endif %}
-
-            {% if section.outputs %}
+            {% endif %} {% if section.outputs %}
             <div class="notebook-output-stack">
-                {% for output in section.outputs %}
-                {% if output.kind == "html" %}
+                {% for output in section.outputs %} {% if output.kind == "html"
+                %}
                 <div class="notebook-html-output">
                     {{ output.content | safe }}
                 </div>
@@ -61,8 +74,7 @@
                 </figure>
                 {% elif output.kind == "text" %}
                 <pre class="text-output"><code>{{ output.content }}</code></pre>
-                {% endif %}
-                {% endfor %}
+                {% endif %} {% endfor %}
             </div>
             {% endif %}
         </section>

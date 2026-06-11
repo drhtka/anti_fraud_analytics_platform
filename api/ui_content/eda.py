@@ -14,6 +14,73 @@ from api.ui_content.shared import (
 
 
 @lru_cache(maxsize=1)
+def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
+    base_data_path = Path(data_dir)
+    dataset_dir = resolve_dataset_dir(base_data_path)
+    if dataset_dir is None:
+        return []
+
+    connection = build_duckdb_connection(dataset_dir)
+    try:
+        summary_columns, summary_rows = run_query(
+            connection,
+            """
+            SELECT COUNT(*) AS total_transactions,
+              ROUND(
+                100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
+                4
+              ) AS fraud_rate_pct,
+              ROUND(AVG(TransactionAmt), 2) AS avg_transaction_amount,
+              COUNT(DISTINCT card1) AS customer_proxy_count
+            FROM train_transaction
+            """,
+        )
+        identity_columns, identity_rows = run_query(
+            connection,
+            """
+            SELECT ROUND(
+                100.0 * COUNT(i.TransactionID) / COUNT(t.TransactionID),
+                2
+              ) AS identity_match_rate_pct
+            FROM train_transaction t
+              LEFT JOIN train_identity i USING (TransactionID)
+            """,
+        )
+    finally:
+        connection.close()
+
+    summary_row = summary_rows[0]
+    identity_row = identity_rows[0]
+    return [
+        {
+            "label": "Total Transactions",
+            "value": f"{int(summary_row[0]):,}",
+            "description": "The full transaction table used in the current demo flow.",
+        },
+        {
+            "label": "Fraud Rate",
+            "value": f"{summary_row[1]}%",
+            "description": "The target imbalance that shapes threshold and review decisions.",
+        },
+        {
+            "label": "Avg Transaction Amt",
+            "value": f"{summary_row[2]}",
+            "description": "A quick baseline for judging whether current amounts look unusual.",
+        },
+        {
+            "label": "Customer Proxies",
+            "value": f"{int(summary_row[3]):,}",
+            "description": "Distinct `card1` values used as a lightweight customer proxy.",
+        },
+        {
+            "label": "Identity Match Rate",
+            "value": f"{identity_row[0]}%",
+            "description": "Share of transactions that have a linked row in `train_identity`.",
+        },
+    ]
+
+
+@lru_cache(maxsize=1)
 def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
     base_data_path = Path(data_dir)
     dataset_dir = resolve_dataset_dir(base_data_path)

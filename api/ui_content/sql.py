@@ -33,6 +33,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "table_name": "overall_fraud_rate",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
             "description": "This is the first sanity-check table: how many transactions exist and how rare the fraud class is.",
+            "business_takeaway": "Fraud is rare, so the team needs threshold-based review logic instead of naive pass/fail rules based on raw volume.",
             "query": """
                 SELECT COUNT(*) AS total_transactions,
                   SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS fraud_transactions,
@@ -52,6 +53,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "table_name": "fraud_rate_by_productcd",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
             "description": "This segment table shows which product groups behave like higher-risk transaction buckets.",
+            "business_takeaway": "Some product segments deserve closer monitoring because they concentrate more fraud than the portfolio average.",
             "query": """
                 SELECT ProductCD,
                   COUNT(*) AS tx_count,
@@ -74,6 +76,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "table_name": "fraud_rate_by_r_emaildomain",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
             "description": "Recipient email domains can expose suspicious routing patterns and weak trust signals.",
+            "business_takeaway": "High-risk recipient domains can be turned into analyst watchlists or lightweight scoring signals without waiting for a full model retrain.",
             "query": """
                 SELECT R_emaildomain,
                   COUNT(*) AS tx_count,
@@ -98,6 +101,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "table_name": "amount_anomalies_vs_customer_baseline",
             "source_file": "sql/02_suspicious_patterns.sql",
             "description": "This query looks for transactions that are unusually large compared with a customer proxy history.",
+            "business_takeaway": "Customer-relative amount spikes are strong candidates for manual review because they are easier to justify operationally than absolute amount rules.",
             "query": """
                 WITH customer_stats AS (
                   SELECT card1 AS customer_proxy,

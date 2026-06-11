@@ -14,7 +14,7 @@ from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
 from api.scoring import explain_transaction, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
-from api.ui_content import load_eda_sections, load_sql_sections
+from api.ui_content import load_eda_sections, load_eda_summary, load_sql_sections
 
 
 app = FastAPI(
@@ -116,6 +116,7 @@ def index(request: Request) -> HTMLResponse:
             "explain_result_json": explain_result_json,
             "error_message": error_message,
             "demo_payloads": load_demo_payloads(),
+            "eda_summary": load_eda_summary(str(DATA_DIR)),
             "eda_sections": load_eda_sections(str(DATA_DIR)),
             "sql_sections": load_sql_sections(str(DATA_DIR)),
         },

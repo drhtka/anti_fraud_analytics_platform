@@ -26,21 +26,24 @@
 
             <p>{{ section.description }}</p>
 
-            <pre class="sql-query"><code>{{ section.query.strip() }}</code></pre>
+            <pre
+                class="sql-query"
+            ><code>{{ section.query.strip() }}</code></pre>
 
             {% if section.result_html %}
-            <div class="sql-result-block">
-                {{ section.result_html | safe }}
-            </div>
-            {% endif %}
-
-            {% if section.reading_notes %}
+            <div class="sql-result-block">{{ section.result_html | safe }}</div>
+            {% endif %} {% if section.reading_notes %}
             <div class="learning-notes">
                 <ul>
                     {% for note in section.reading_notes %}
                     <li>{{ note }}</li>
                     {% endfor %}
                 </ul>
+            </div>
+            {% endif %} {% if section.business_takeaway %}
+            <div class="takeaway-card">
+                <span class="takeaway-label">Business Takeaway</span>
+                <p>{{ section.business_takeaway }}</p>
             </div>
             {% endif %}
         </section>
