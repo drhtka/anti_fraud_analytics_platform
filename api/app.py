@@ -14,7 +14,7 @@ from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
 from api.scoring import explain_transaction, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
-from api.ui_content import load_eda_sections, load_eda_summary, load_sql_sections
+from api.ui_content import load_eda_sections, load_eda_summary, load_ml_content, load_sql_sections
 
 
 app = FastAPI(
@@ -27,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
+NOTEBOOKS_DIR = BASE_DIR / "notebooks"
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
@@ -139,6 +140,17 @@ def sql_screen(request: Request) -> HTMLResponse:
         name="partials/_sql_screen.html",
         context={
             "sql_sections": load_sql_sections(str(DATA_DIR)),
+        },
+    )
+
+
+@app.get("/ui/ml", response_class=HTMLResponse, name="ml_screen")
+def ml_screen(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/_ml_screen.html",
+        context={
+            "ml_content": load_ml_content(str(NOTEBOOKS_DIR / "05_model_comparison.ipynb")),
         },
     )
 

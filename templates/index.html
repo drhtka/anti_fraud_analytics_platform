@@ -42,6 +42,13 @@
                 <button
                     type="button"
                     class="screen-tab"
+                    data-screen-target="ml"
+                >
+                    ML
+                </button>
+                <button
+                    type="button"
+                    class="screen-tab"
                     data-screen-target="json"
                 >
                     JSON
@@ -51,6 +58,7 @@
             {% include "partials/_score_screen.html" %} {% include
             "partials/_eda_screen_placeholder.html" %} {% include
             "partials/_sql_screen_placeholder.html" %} {% include
+            "partials/_ml_screen_placeholder.html" %} {% include
             "partials/_json_screen.html" %}
         </main>
         <script id="demo-payloads-json" type="application/json">

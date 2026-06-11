@@ -1,0 +1,76 @@
+<section class="screen" data-screen-name="ml" hidden>
+    <article class="content-card">
+        <h2>ML Comparison</h2>
+        <p>
+            This screen turns the Week 3 training results into a demo-friendly
+            comparison between <code>LogisticRegression</code> and
+            <code>RandomForestClassifier</code>.
+        </p>
+
+        <section class="summary-block">
+            <div class="summary-block-header">
+                <h3>Model Selection Snapshot</h3>
+                <p>
+                    Source notebook:
+                    <code>{{ ml_content.source_notebook }}</code>
+                </p>
+            </div>
+            <div class="summary-grid">
+                {% for item in ml_content.overview_cards %}
+                <article class="summary-card">
+                    <span class="summary-label">{{ item.label }}</span>
+                    <strong class="summary-value">{{ item.value }}</strong>
+                    <p class="summary-description">{{ item.description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="takeaway-card">
+            <span class="takeaway-label">Why RandomForest Won</span>
+            <p>{{ ml_content.winner_note }}</p>
+        </div>
+
+        {% for table in ml_content.tables %}
+        <section class="learning-block">
+            <div class="learning-block-header">
+                <p class="learning-step">ML Step {{ loop.index }}</p>
+                <h3>{{ table.title }}</h3>
+            </div>
+
+            <div class="sql-meta">
+                <div class="metric">
+                    <span class="metric-label">Notebook Table</span>
+                    <span class="metric-value">{{ table.table_name }}</span>
+                </div>
+            </div>
+
+            <p>{{ table.description }}</p>
+
+            {% if table.html %}
+            <div class="notebook-html-output">
+                {{ table.html | safe }}
+            </div>
+            {% else %}
+            <p class="deferred-hint">Notebook output is not available for this block.</p>
+            {% endif %}
+        </section>
+        {% endfor %}
+
+        {% if ml_content.final_summary %}
+        <section class="learning-block">
+            <div class="learning-block-header">
+                <p class="learning-step">ML Final Takeaway</p>
+                <h3>Week 3 Summary</h3>
+            </div>
+            <div class="learning-notes">
+                <ul>
+                    {% for note in ml_content.final_summary %}
+                    <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% endif %}
+    </article>
+</section>
