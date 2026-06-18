@@ -31,8 +31,11 @@ Put the raw files here:
 - `data/raw/train_transaction.csv`
 - `data/raw/train_identity.csv`
 
-The UI reads these files on the backend through `DuckDB` and only renders
-small result tables, summaries, and charts in the browser.
+The current MVP UI reads these files on the backend through `DuckDB` and only
+renders small result tables, summaries, and charts in the browser.
+
+The current UI is still server-rendered through `FastAPI` templates, while the
+target dedicated frontend stack for the project is `SvelteKit`.
 
 To precompute the heavier `EDA` and `SQL` UI cache before starting the server:
 
