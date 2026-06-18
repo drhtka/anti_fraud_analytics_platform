@@ -196,6 +196,51 @@
                 {% endfor %}
             </ol>
         </article>
+
+        <article class="result-card">
+            <h2>Evidence From Raw Tables</h2>
+            <p class="evidence-intro">
+                These blocks connect the current scoring result with live
+                evidence from <code>data/raw/train_transaction.csv</code>.
+            </p>
+
+            {% if score_evidence_blocks %}
+            <div class="evidence-stack">
+                {% for block in score_evidence_blocks %}
+                <section class="evidence-block">
+                    <div class="evidence-header">
+                        <h3>{{ block.title }}</h3>
+                        <p>{{ block.intro }}</p>
+                    </div>
+
+                    {% if block.summary_items %}
+                    <div class="evidence-summary-grid">
+                        {% for item in block.summary_items %}
+                        <div class="metric">
+                            <span class="metric-label">{{ item.label }}</span>
+                            <span class="metric-value">{{ item.value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %} {% if block.result_html %}
+                    <div class="sql-result-block">
+                        {{ block.result_html | safe }}
+                    </div>
+                    {% endif %} {% if block.business_note %}
+                    <div class="takeaway-card">
+                        <span class="takeaway-label">Why It Matters</span>
+                        <p>{{ block.business_note }}</p>
+                    </div>
+                    {% endif %}
+                </section>
+                {% endfor %}
+            </div>
+            {% elif score_evidence_note %}
+            <div class="evidence-note">
+                <p>{{ score_evidence_note }}</p>
+            </div>
+            {% endif %}
+        </article>
     </section>
     {% else %}
     <section class="placeholder">

@@ -14,7 +14,13 @@ from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
 from api.scoring import explain_transaction, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
-from api.ui_content import load_eda_sections, load_eda_summary, load_ml_content, load_sql_sections
+from api.ui_content import (
+    load_eda_sections,
+    load_eda_summary,
+    load_ml_content,
+    load_score_evidence,
+    load_sql_sections,
+)
 
 
 app = FastAPI(
@@ -88,6 +94,8 @@ def index(request: Request) -> HTMLResponse:
     form_data = build_ui_form_data(request)
     score_result: ScoreResponse | None = None
     explain_result: ExplainResponse | None = None
+    score_evidence_blocks: list[dict[str, object]] = []
+    score_evidence_note: str | None = None
     score_result_json: dict[str, object] | None = None
     explain_result_json: dict[str, object] | None = None
     error_message: str | None = None
@@ -98,6 +106,17 @@ def index(request: Request) -> HTMLResponse:
             bundle = get_model_bundle()
             score_result = score_transaction(request=score_request, bundle=bundle)
             explain_result = explain_transaction(request=score_request, bundle=bundle)
+            score_evidence_blocks = load_score_evidence(
+                str(DATA_DIR),
+                score_request=score_request,
+                feature_values=score_result.feature_values,
+            )
+            if not score_evidence_blocks:
+                score_evidence_note = (
+                    "Current MVP evidence blocks cover ProductCD, email domains, "
+                    "and amount anomalies. This request did not trigger one of "
+                    "those supported table-backed signals."
+                )
             score_result_json = score_result.model_dump(mode="json")
             explain_result_json = explain_result.model_dump(mode="json")
         except FileNotFoundError as exc:
@@ -113,6 +132,8 @@ def index(request: Request) -> HTMLResponse:
             "form_data": form_data,
             "score_result": score_result,
             "explain_result": explain_result,
+            "score_evidence_blocks": score_evidence_blocks,
+            "score_evidence_note": score_evidence_note,
             "score_result_json": score_result_json,
             "explain_result_json": explain_result_json,
             "error_message": error_message,

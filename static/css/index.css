@@ -595,3 +595,41 @@ button {
     color: #334155;
     line-height: 1.5;
 }
+
+.evidence-intro {
+    margin-bottom: 16px;
+}
+
+.evidence-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.evidence-block {
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+}
+
+.evidence-header {
+    margin-bottom: 14px;
+}
+
+.evidence-header h3 {
+    margin: 0 0 8px;
+}
+
+.evidence-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.evidence-note {
+    padding: 14px 16px;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 12px;
+}
