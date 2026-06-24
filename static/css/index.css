@@ -256,6 +256,10 @@ button {
     z-index: 50;
 }
 
+.modal-backdrop[hidden] {
+    display: none;
+}
+
 .modal-dialog {
     width: min(420px, 100%);
     padding: 22px 20px;
