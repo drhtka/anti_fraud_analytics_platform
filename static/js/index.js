@@ -10,6 +10,25 @@ const demoPayloads = demoPayloadsElement
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
 
+function hideDashboardLoading(frameCard) {
+    if (!(frameCard instanceof HTMLElement) || frameCard.dataset.ready === 'true') {
+        return;
+    }
+
+    frameCard.dataset.ready = 'true';
+    frameCard.classList.remove('is-loading');
+}
+
+function iframeHasStartedLoading(iframe) {
+    try {
+        const currentHref = iframe.contentWindow?.location?.href;
+        return Boolean(currentHref && currentHref !== 'about:blank');
+    } catch (error) {
+        // Cross-origin access starts throwing once the iframe navigates away from about:blank.
+        return true;
+    }
+}
+
 function getScreens() {
     return document.querySelectorAll('[data-screen-name]');
 }
@@ -18,15 +37,33 @@ function initDashboardEmbeds() {
     const dashboardIframes = document.querySelectorAll('.dashboard-iframe');
 
     dashboardIframes.forEach((iframe) => {
-        if (!(iframe instanceof HTMLIFrameElement) || iframe.dataset.bound === 'true') {
+        if (!(iframe instanceof HTMLIFrameElement)) {
             return;
         }
 
-        iframe.dataset.bound = 'true';
-        iframe.addEventListener('load', () => {
-            const frameCard = iframe.closest('.dashboard-frame-card');
-            frameCard?.classList.remove('is-loading');
-        });
+        const frameCard = iframe.closest('.dashboard-frame-card');
+
+        if (!(frameCard instanceof HTMLElement)) {
+            return;
+        }
+
+        const finishLoading = () => {
+            hideDashboardLoading(frameCard);
+        };
+
+        if (iframeHasStartedLoading(iframe)) {
+            finishLoading();
+        }
+
+        if (iframe.dataset.bound !== 'true') {
+            iframe.dataset.bound = 'true';
+            iframe.addEventListener('load', finishLoading, { once: true });
+        }
+
+        if (frameCard.dataset.fallbackScheduled !== 'true') {
+            frameCard.dataset.fallbackScheduled = 'true';
+            window.setTimeout(finishLoading, 4500);
+        }
     });
 }
 

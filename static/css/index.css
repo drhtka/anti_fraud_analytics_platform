@@ -741,10 +741,15 @@ button {
     align-items: center;
     justify-content: center;
     margin: 0;
+    padding: 16px;
     color: #94a3b8;
     font-size: 14px;
     text-align: center;
     pointer-events: none;
+    background: rgba(248, 250, 252, 0.88);
+    border-radius: 8px;
+    transition: opacity 0.2s ease;
+    z-index: 1;
 }
 
 .dashboard-iframe {
@@ -757,9 +762,9 @@ button {
 }
 
 .dashboard-frame-card.is-loading .dashboard-iframe {
-    opacity: 0;
+    opacity: 0.35;
 }
 
 .dashboard-frame-card:not(.is-loading) .dashboard-loading-note {
-    display: none;
+    opacity: 0;
 }
