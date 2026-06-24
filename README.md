@@ -63,14 +63,59 @@ The Docker stack is designed for the heavier demo mode:
 ### Prepare BigQuery Credentials
 
 1. Copy `.env.docker.example` to `.env`.
-2. Put your Google service account key at `secrets/gcp-service-account.json`.
-3. Fill in `BIGQUERY_PROJECT_ID`, and optionally adjust `BIGQUERY_DATASET` / `BIGQUERY_TABLE`.
+2. Create the secrets directory structure if it is still empty:
+
+```bash
+mkdir -p secrets
+```
+
+3. Put your Google service account key at `secrets/gcp-service-account.json`.
+4. Fill in `BIGQUERY_PROJECT_ID`, and optionally adjust `BIGQUERY_DATASET` / `BIGQUERY_TABLE`.
+
+Expected local structure:
+
+```text
+.
+├── .env
+└── secrets/
+    ├── .gitignore
+    ├── README.md
+    └── gcp-service-account.json
+```
+
+Minimal `.env` example:
+
+```env
+BIGQUERY_PROJECT_ID=your-gcp-project-id
+BIGQUERY_DATASET=anti_fraud_analytics
+BIGQUERY_TABLE=scoring_events
+BIGQUERY_AUTO_CREATE=true
+REDIS_SCORE_CACHE_TTL_SECONDS=900
+ENABLE_BIGQUERY_EVENT_SINK=true
+ENABLE_REDIS_SCORE_CACHE=true
+```
 
 ### Start Docker Mode
 
 ```bash
 docker compose up --build
 ```
+
+### BigQuery Smoke Check Inside Docker
+
+Run this after `.env` and `secrets/gcp-service-account.json` are in place:
+
+```bash
+docker compose run --rm app python scripts/bigquery_smoke_check.py
+```
+
+If everything is configured correctly, the command prints:
+
+- `BigQuery smoke check passed`
+- active `project_id`
+- target `dataset`
+- target `table`
+- `checked_at` timestamp from BigQuery
 
 Then open:
 
