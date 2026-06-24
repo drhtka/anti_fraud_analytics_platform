@@ -172,10 +172,20 @@ button {
     margin-bottom: 12px;
 }
 
+.placeholder p {
+    margin: 0 0 12px;
+    color: #475569;
+    line-height: 1.6;
+}
+
 .placeholder ul {
     margin: 0;
     padding-left: 20px;
     color: #4b5563;
+}
+
+.placeholder li + li {
+    margin-top: 6px;
 }
 
 .message {
