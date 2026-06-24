@@ -1,26 +1,26 @@
 # Anti-Fraud Analytics Platform
 
-Портфельный проект под вакансию в аналитике, рисках и антифроде.
+A portfolio project focused on risk analytics and anti-fraud workflows.
 
-## Цель проекта
+## Project Goal
 
-Показать на одном кейсе:
+Demonstrate in one end-to-end case how to:
 
-- работать с транзакционными данными;
-- делать `SQL` и `EDA`;
-- формировать антифрод-гипотезы;
-- строить признаки и baseline `ML`-модель;
-- объяснять результат в бизнес-контексте;
-- упаковывать решение в `FastAPI`.
+- work with transactional data;
+- perform `SQL` analysis and `EDA`;
+- formulate anti-fraud hypotheses;
+- build features and a baseline `ML` model;
+- explain results in business terms;
+- package the solution with `FastAPI`.
 
-## Структура проекта
+## Project Structure
 
-- `data/` - описание источника данных и локальные датасеты;
-- `sql/` - аналитические запросы и витрины признаков;
-- `notebooks/` - `EDA` и исследовательские ноутбуки;
-- `src/` - подготовка данных, признаки, правила и модель;
-- `api/` - `FastAPI` приложение и схемы запросов;
-- `docs/` - рабочие материалы, разложенные по проектам и неделям.
+- `data/` - source data notes and local datasets;
+- `sql/` - analytical queries and feature marts;
+- `notebooks/` - `EDA` and exploratory notebooks;
+- `src/` - data preparation, features, rules, and model code;
+- `api/` - `FastAPI` app and request/response schemas;
+- `docs/` - working materials organized by project and week.
 
 ## Local Data
 
