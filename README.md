@@ -15,6 +15,7 @@ A portfolio project focused on anti-fraud analytics, risk scoring, and decision-
 - [UI Walkthrough](#ui-walkthrough)
 - [API Docs Preview](#api-docs-preview)
 - [Architecture](#architecture)
+- [Source Materials](#source-materials)
 - [API Scoring Snapshot](#api-scoring-snapshot)
 - [Runtime Modes](#runtime-modes)
 - [Docker Stack](#docker-stack)
@@ -98,6 +99,16 @@ flowchart LR
     J -->|docker| M[Celery worker]
     M --> N[BigQuery scoring events]
 ```
+
+## Source Materials
+
+This MVP is built on top of the public `IEEE-CIS Fraud Detection` dataset and the local raw CSV files derived from it.
+
+- Kaggle dataset source: [IEEE-CIS Fraud Detection](https://www.kaggle.com/datasets/lnasiri007/ieeecis-fraud-detection?resource=download&select=train_identity.csv)
+- Primary raw files used in the project:
+  - `data/raw/train_transaction.csv`
+  - `data/raw/train_identity.csv`
+- These files power the local `DuckDB` exploration flow, the browser `EDA` views, and the anti-fraud scoring demo inputs.
 
 ## What This Project Shows
 
