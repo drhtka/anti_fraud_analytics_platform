@@ -18,7 +18,7 @@ def _build_product_evidence(connection, score_request: ScoreRequest) -> dict[str
     current_product = score_request.product_cd.strip().upper()
     safe_product = _sql_literal(current_product)
 
-    _, rows = run_query(
+    columns, rows = run_query(
         connection,
         f"""
         SELECT ProductCD,
@@ -78,7 +78,7 @@ def _build_email_evidence(
     current_domain = (field_value or "missing").strip().lower() or "missing"
     safe_domain = _sql_literal(current_domain)
 
-    _, rows = run_query(
+    columns, rows = run_query(
         connection,
         f"""
         SELECT COALESCE(LOWER({field_name}), 'missing') AS email_domain,
