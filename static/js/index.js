@@ -14,6 +14,22 @@ function getScreens() {
     return document.querySelectorAll('[data-screen-name]');
 }
 
+function initDashboardEmbeds() {
+    const dashboardIframes = document.querySelectorAll('.dashboard-iframe');
+
+    dashboardIframes.forEach((iframe) => {
+        if (!(iframe instanceof HTMLIFrameElement) || iframe.dataset.bound === 'true') {
+            return;
+        }
+
+        iframe.dataset.bound = 'true';
+        iframe.addEventListener('load', () => {
+            const frameCard = iframe.closest('.dashboard-frame-card');
+            frameCard?.classList.remove('is-loading');
+        });
+    });
+}
+
 async function ensureScreenLoaded(screenName) {
     const screen = document.querySelector(`[data-screen-name="${screenName}"]`);
 
@@ -49,6 +65,7 @@ async function ensureScreenLoaded(screenName) {
 
         const html = await response.text();
         screen.outerHTML = html;
+        initDashboardEmbeds();
     } catch (error) {
         screen.dataset.loaded = 'error';
         screen.innerHTML = `
@@ -117,6 +134,7 @@ window.addEventListener('hashchange', async () => {
 });
 
 activateScreen(getInitialScreenName());
+initDashboardEmbeds();
 
 demoButtons.forEach((button) => {
     button.addEventListener('click', () => {

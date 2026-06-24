@@ -41,20 +41,37 @@ h1 {
 
 .screen-tab {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-width: 100px;
     min-height: 44px;
+    gap: 2px;
     background: #ffffff;
     color: #334155;
     border: 1px solid #cbd5e1;
     text-align: center;
 }
 
+.screen-tab-label {
+    line-height: 1.1;
+}
+
+.screen-tab-subtitle {
+    font-size: 11px;
+    line-height: 1.1;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
 .screen-tab.is-active {
     background: #2563eb;
     color: #ffffff;
     border-color: #2563eb;
+}
+
+.screen-tab.is-active .screen-tab-subtitle {
+    color: rgba(255, 255, 255, 0.82);
 }
 
 .screen {
@@ -709,11 +726,25 @@ button {
 }
 
 .dashboard-frame-card {
+    position: relative;
     margin-top: 16px;
     padding: 12px;
     background: #f8fafc;
     border: 1px solid #dbe3ee;
     border-radius: 12px;
+}
+
+.dashboard-loading-note {
+    position: absolute;
+    inset: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    color: #94a3b8;
+    font-size: 14px;
+    text-align: center;
+    pointer-events: none;
 }
 
 .dashboard-iframe {
@@ -723,4 +754,12 @@ button {
     border: 0;
     border-radius: 8px;
     background: #ffffff;
+}
+
+.dashboard-frame-card.is-loading .dashboard-iframe {
+    opacity: 0;
+}
+
+.dashboard-frame-card:not(.is-loading) .dashboard-loading-note {
+    display: none;
 }
