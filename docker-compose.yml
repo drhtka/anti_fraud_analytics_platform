@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: uvicorn api.app:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      SCORING_RUNTIME_MODE: docker
+      ENABLE_REDIS_SCORE_CACHE: "true"
+      ENABLE_BIGQUERY_EVENT_SINK: "true"
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      REDIS_SCORE_CACHE_TTL_SECONDS: ${REDIS_SCORE_CACHE_TTL_SECONDS:-900}
+      BIGQUERY_PROJECT_ID: ${BIGQUERY_PROJECT_ID:-}
+      BIGQUERY_DATASET: ${BIGQUERY_DATASET:-anti_fraud_analytics}
+      BIGQUERY_TABLE: ${BIGQUERY_TABLE:-scoring_events}
+      BIGQUERY_AUTO_CREATE: ${BIGQUERY_AUTO_CREATE:-true}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp-service-account.json
+      MODEL_ARTIFACT_PATH: /app/api/artifacts/random_forest_mvp.joblib
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/app/data
+      - ./secrets:/run/secrets:ro
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A api.celery_app.celery_app worker --loglevel=info
+    environment:
+      SCORING_RUNTIME_MODE: docker
+      ENABLE_REDIS_SCORE_CACHE: "true"
+      ENABLE_BIGQUERY_EVENT_SINK: "true"
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      REDIS_SCORE_CACHE_TTL_SECONDS: ${REDIS_SCORE_CACHE_TTL_SECONDS:-900}
+      BIGQUERY_PROJECT_ID: ${BIGQUERY_PROJECT_ID:-}
+      BIGQUERY_DATASET: ${BIGQUERY_DATASET:-anti_fraud_analytics}
+      BIGQUERY_TABLE: ${BIGQUERY_TABLE:-scoring_events}
+      BIGQUERY_AUTO_CREATE: ${BIGQUERY_AUTO_CREATE:-true}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp-service-account.json
+      MODEL_ARTIFACT_PATH: /app/api/artifacts/random_forest_mvp.joblib
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/app/data
+      - ./secrets:/run/secrets:ro
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import asynccontextmanager
 from functools import lru_cache
 from pathlib import Path
 
@@ -10,10 +11,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
 
+from api.cache import load_cached_score_response, store_cached_score_response
+from api.event_sink import enqueue_score_event
 from api.model_bundle import ModelBundle, load_model_bundle
 from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
-from api.scoring import explain_transaction, score_transaction
-from api.settings import DEFAULT_MODEL_ARTIFACT_PATH
+from api.scoring import explain_from_score_response, score_transaction
+from api.settings import DEFAULT_MODEL_ARTIFACT_PATH, get_runtime_settings
 from api.ui_content import (
     load_eda_sections,
     load_eda_summary,
@@ -23,10 +26,21 @@ from api.ui_content import (
 )
 
 
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    if get_runtime_settings().runtime_mode == "docker":
+        try:
+            get_model_bundle()
+        except FileNotFoundError:
+            pass
+    yield
+
+
 app = FastAPI(
     title="Anti-Fraud Analytics Platform API",
     version="0.1.0",
     description="Week 4 MVP API with /health, /score, and /explain endpoints.",
+    lifespan=lifespan,
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +62,17 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 @lru_cache(maxsize=1)
 def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
+
+
+def get_score_response(request: ScoreRequest) -> ScoreResponse:
+    cached_response = load_cached_score_response(request)
+    if cached_response is not None:
+        return cached_response
+
+    bundle = get_model_bundle()
+    score_response = score_transaction(request=request, bundle=bundle)
+    store_cached_score_response(request, score_response)
+    return score_response
 
 
 def build_ui_form_data(request: Request) -> dict[str, str]:
@@ -107,9 +132,8 @@ def index(request: Request) -> HTMLResponse:
     if request.query_params:
         try:
             score_request = build_score_request(form_data)
-            bundle = get_model_bundle()
-            score_result = score_transaction(request=score_request, bundle=bundle)
-            explain_result = explain_transaction(request=score_request, bundle=bundle)
+            score_result = get_score_response(score_request)
+            explain_result = explain_from_score_response(score_result)
             score_evidence_blocks = load_score_evidence(
                 str(DATA_DIR),
                 score_request=score_request,
@@ -194,6 +218,7 @@ def dashboard_screen(request: Request) -> HTMLResponse:
 
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
+    settings = get_runtime_settings()
     try:
         bundle = get_model_bundle()
     except FileNotFoundError:
@@ -201,6 +226,10 @@ def health() -> HealthResponse:
             status="degraded",
             ready_for_scoring=False,
             artifact_path=str(DEFAULT_MODEL_ARTIFACT_PATH),
+            runtime_mode=settings.runtime_mode,
+            redis_score_cache_enabled=settings.redis_score_cache_enabled,
+            bigquery_event_sink_enabled=settings.celery_event_sink_enabled,
+            bigquery_configured=settings.bigquery_configured,
         )
 
     return HealthResponse(
@@ -209,24 +238,29 @@ def health() -> HealthResponse:
         model_name=bundle.model_name,
         model_version=bundle.model_version,
         artifact_path=str(DEFAULT_MODEL_ARTIFACT_PATH),
+        runtime_mode=settings.runtime_mode,
+        redis_score_cache_enabled=settings.redis_score_cache_enabled,
+        bigquery_event_sink_enabled=settings.celery_event_sink_enabled,
+        bigquery_configured=settings.bigquery_configured,
     )
 
 
 @app.post("/score", response_model=ScoreResponse)
 def score(request: ScoreRequest) -> ScoreResponse:
     try:
-        bundle = get_model_bundle()
+        score_response = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    return score_transaction(request=request, bundle=bundle)
+    enqueue_score_event(request, score_response)
+    return score_response
 
 
 @app.post("/explain", response_model=ExplainResponse)
 def explain(request: ScoreRequest) -> ExplainResponse:
     try:
-        bundle = get_model_bundle()
+        score_response = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    return explain_transaction(request=request, bundle=bundle)
+    return explain_from_score_response(score_response)

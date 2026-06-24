@@ -146,9 +146,7 @@ def build_explanation_text(score_response: ScoreResponse) -> str:
     )
 
 
-def explain_transaction(request: ScoreRequest, bundle: ModelBundle) -> ExplainResponse:
-    score_response = score_transaction(request=request, bundle=bundle)
-
+def explain_from_score_response(score_response: ScoreResponse) -> ExplainResponse:
     return ExplainResponse(
         transaction_id=score_response.transaction_id,
         fraud_score=score_response.fraud_score,
@@ -162,3 +160,8 @@ def explain_transaction(request: ScoreRequest, bundle: ModelBundle) -> ExplainRe
         explanation_points=build_explanation_points(score_response),
         feature_values=score_response.feature_values,
     )
+
+
+def explain_transaction(request: ScoreRequest, bundle: ModelBundle) -> ExplainResponse:
+    score_response = score_transaction(request=request, bundle=bundle)
+    return explain_from_score_response(score_response)

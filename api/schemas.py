@@ -11,6 +11,10 @@ class HealthResponse(BaseModel):
     model_name: str | None = None
     model_version: str | None = None
     artifact_path: str
+    runtime_mode: Literal["local", "docker"] = "local"
+    redis_score_cache_enabled: bool = False
+    bigquery_event_sink_enabled: bool = False
+    bigquery_configured: bool = False
 
 
 class ScoreRequest(BaseModel):

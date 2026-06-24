@@ -43,6 +43,47 @@ To precompute the heavier `EDA` and `SQL` UI cache before starting the server:
 .venv/bin/python scripts/precompute_ui_cache.py
 ```
 
+## Runtime Modes
+
+The project now supports two infrastructure modes:
+
+- `local` - default mode, no `Celery`, no `Redis`, no `BigQuery`; scoring stays synchronous inside `FastAPI`.
+- `docker` - container mode with `Redis` response cache and background `Celery` worker that pushes scoring events into `BigQuery`.
+
+If you run the app locally outside Docker, nothing changes: you can keep using the existing local workflow without queue or cache infrastructure.
+
+## Docker Stack
+
+The Docker stack is designed for the heavier demo mode:
+
+- `app` - `FastAPI` scoring API and server-rendered UI;
+- `redis` - cache for repeated `/score` requests;
+- `worker` - `Celery` worker that writes score events into `BigQuery` asynchronously.
+
+### Prepare BigQuery Credentials
+
+1. Copy `.env.docker.example` to `.env`.
+2. Put your Google service account key at `secrets/gcp-service-account.json`.
+3. Fill in `BIGQUERY_PROJECT_ID`, and optionally adjust `BIGQUERY_DATASET` / `BIGQUERY_TABLE`.
+
+### Start Docker Mode
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+- `http://localhost:8000/`
+- `http://localhost:8000/health`
+
+### Docker Notes
+
+- `POST /score` stays synchronous and returns immediately from the API process.
+- Repeated identical score requests can be served from `Redis`.
+- `BigQuery` persistence is offloaded to `Celery`, so the request path is not blocked by warehouse writes.
+- If `BigQuery` variables are missing, the API still scores normally, but background export is skipped.
+
 ## API Scoring Examples
 
 The MVP API exposes two endpoints:

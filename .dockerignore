@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+__pycache__
+.cache
+.dbg
+.vscode
+node_modules
+*.pyc
+*.pyo
+*.pyd
+data/raw
+notebooks
+docs
