@@ -24,7 +24,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 "query": "Поклади train_transaction.csv і train_identity.csv у data/raw/, щоб увімкнути live SQL-блоки.",
                 "reading_notes": [
                     "UI вже готовий до live SQL-блоків на базі DuckDB.",
-                    "Як fallback ті самі файли також можна покласти безпосередньо в data/.",
+                    "Як запасний варіант ті самі файли також можна покласти безпосередньо в data/.",
                     "Коли локальні CSV-файли будуть доступні, цей самий екран покаже реальні таблиці результатів.",
                 ],
                 "result_html": None,
@@ -60,7 +60,7 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             "title": "2. Fraud rate за ProductCD",
             "table_name": "fraud_rate_by_productcd",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "Ця сегментна таблиця показує, які продуктові групи поводяться як higher-risk transaction buckets.",
+            "description": "Ця сегментна таблиця показує, які продуктові групи виглядають ризикованішими за інші.",
             "business_takeaway": "Деякі продуктові сегменти потребують пильнішого моніторингу, бо концентрують більше фроду, ніж середній рівень по портфелю.",
             "query": """
                 SELECT ProductCD,
@@ -76,15 +76,15 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             """,
             "reading_notes": [
                 "Це один із перших бізнес-зрозумілих сегментних зрізів у проєкті.",
-                "Пізніше цей патерн підживлює і fraud-гіпотези, і lightweight scoring signals.",
+                "Пізніше цей патерн підживлює і fraud-гіпотези, і легкі сигнали скорингу.",
             ],
         },
         {
             "title": "3. Fraud rate за доменом email отримувача",
             "table_name": "fraud_rate_by_r_emaildomain",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "Домени email отримувача можуть виявляти suspicious routing patterns і слабкі trust-сигнали.",
-            "business_takeaway": "Домени отримувача з високим ризиком можна перетворити на watchlist для аналітика або lightweight scoring signals без повного retrain моделі.",
+            "description": "Домени email отримувача можуть виявляти підозрілі маршрутизаційні патерни та слабкі сигнали довіри.",
+            "business_takeaway": "Домени отримувача з високим ризиком можна перетворити на список спостереження для аналітика або легкі сигнали скорингу без повного перенавчання моделі.",
             "query": """
                 SELECT R_emaildomain,
                   COUNT(*) AS tx_count,
@@ -101,15 +101,15 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
             """,
             "reading_notes": [
                 "Цей блок добре пояснює, чому деякі домени стали кандидатами високого ризику.",
-                "Він напряму пов'язує SQL-дослідження з подальшими model signals і rules.",
+                "Він напряму пов'язує SQL-дослідження з подальшими сигналами моделі та правилами.",
             ],
         },
         {
-            "title": "4. Великі транзакції проти customer baseline",
+            "title": "4. Великі транзакції проти базового рівня клієнта",
             "table_name": "amount_anomalies_vs_customer_baseline",
             "source_file": "sql/02_suspicious_patterns.sql",
-            "description": "Цей запит шукає транзакції, які є незвично великими порівняно з історією customer proxy.",
-            "business_takeaway": "Сплески суми відносно customer baseline є сильними кандидатами на ручну перевірку, бо їх простіше обгрунтувати операційно, ніж абсолютні правила по сумі.",
+            "description": "Цей запит шукає транзакції, які є незвично великими порівняно з історією проксі клієнта.",
+            "business_takeaway": "Сплески суми відносно базового рівня клієнта є сильними кандидатами на ручну перевірку, бо їх простіше обгрунтувати операційно, ніж абсолютні правила по сумі.",
             "query": """
                 WITH customer_stats AS (
                   SELECT card1 AS customer_proxy,
@@ -130,8 +130,8 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 LIMIT 15
             """,
             "reading_notes": [
-                "Це класична anti-fraud ідея: порівняти поточну суму з персональним baseline.",
-                "Пізніше ця сама логіка з'являється як `feat_amount_gt_card1_avg_plus_3std` у MVP scoring flow.",
+                "Це класична anti-fraud ідея: порівняти поточну суму з персональним базовим рівнем.",
+                "Пізніше ця сама логіка з'являється як `feat_amount_gt_card1_avg_plus_3std` у MVP-сценарії скорингу.",
             ],
         },
     ]

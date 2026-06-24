@@ -26,7 +26,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
 
     connection = build_duckdb_connection(dataset_dir)
     try:
-        summary_columns, summary_rows = run_query(
+        _, summary_rows = run_query(
             connection,
             """
             SELECT COUNT(*) AS total_transactions,
@@ -39,7 +39,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
             FROM train_transaction
             """,
         )
-        identity_columns, identity_rows = run_query(
+        _, identity_rows = run_query(
             connection,
             """
             SELECT ROUND(
@@ -59,7 +59,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
         {
             "label": "Усього транзакцій",
             "value": f"{int(summary_row[0]):,}",
-            "description": "Повна таблиця транзакцій, яка використовується в поточному demo-flow.",
+            "description": "Повна таблиця транзакцій, яка використовується в поточному демонстраційному сценарії.",
         },
         {
             "label": "Доля фроду",
@@ -69,12 +69,12 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
         {
             "label": "Середня сума транзакції",
             "value": f"{summary_row[2]}",
-            "description": "Швидкий baseline, щоб оцінити, чи виглядає поточна сума нетипово.",
+            "description": "Швидкий базовий орієнтир, щоб оцінити, чи виглядає поточна сума нетипово.",
         },
         {
-            "label": "Customer proxies",
+            "label": "Проксі клієнтів",
             "value": f"{int(summary_row[3]):,}",
-            "description": "Унікальні значення `card1`, які використовуються як lightweight customer proxy.",
+            "description": "Унікальні значення `card1`, які використовуються як спрощене проксі клієнта.",
         },
         {
             "label": "Рівень збігу identity",
@@ -95,7 +95,7 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                 "title": "EDA-дані недоступні",
                 "notes": build_notes(
                     "Поклади train_transaction.csv і train_identity.csv у data/raw/, щоб побудувати EDA-екран.",
-                    "Як fallback застосунок також підтримує ті самі файли безпосередньо в data/.",
+                    "Як запасний варіант застосунок також підтримує ті самі файли безпосередньо в data/.",
                     "EDA-інтерфейс читає локальні CSV-файли напряму, а не виводи ноутбуків.",
                 ),
                 "outputs": [],
@@ -172,9 +172,9 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             {
                 "title": "1. Швидкий огляд даних",
                 "table_name": "eda_dataset_overview",
-                "description": "Перший орієнтаційний блок із розміром датасету, масштабом сум і покриттям customer proxy.",
+                "description": "Перший орієнтаційний блок із розміром датасету, масштабом сум і покриттям проксі клієнтів.",
                 "notes": build_notes(
-                    "Починаємо з розміру таблиці, базових метрик по сумах і кількості customer proxy.",
+                    "Починаємо з розміру таблиці, базових метрик по сумах і кількості проксі клієнтів.",
                     f"У train_transaction {transaction_columns} колонок, а у train_identity {identity_columns} колонок.",
                     "Це перший крок орієнтації перед fraud-специфічними зрізами.",
                 ),
@@ -226,10 +226,10 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             {
                 "title": "4. Патерни доменів email отримувача",
                 "table_name": "eda_recipient_email_domain_risk",
-                "description": "Зріз на рівні доменів, який допомагає пояснити, чому деякі домени отримувача стали сильними suspicious-сигналами.",
+                "description": "Зріз на рівні доменів, який допомагає пояснити, чому деякі домени отримувача стали сильними підозрілими сигналами.",
                 "notes": build_notes(
                     "Аналіз email-доменів корисний, бо він зрозумілий і аналітикам, і бізнес-стейкхолдерам.",
-                    "Цей блок також напряму пов'язаний із подальшими rule-ідеями та MVP scoring signals.",
+                    "Цей блок також напряму пов'язаний із подальшими ідеями правил та MVP-сигналами скорингу.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(email_domain_columns, email_domain_rows, displayed_rows=12)},

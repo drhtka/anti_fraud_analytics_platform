@@ -18,7 +18,7 @@ def _build_product_evidence(connection, score_request: ScoreRequest) -> dict[str
     current_product = score_request.product_cd.strip().upper()
     safe_product = _sql_literal(current_product)
 
-    columns, rows = run_query(
+    _, rows = run_query(
         connection,
         f"""
         SELECT ProductCD,
@@ -57,14 +57,14 @@ def _build_product_evidence(connection, score_request: ScoreRequest) -> dict[str
         ),
         "summary_items": [
             {"label": "Поточний ProductCD", "value": current_product},
-            {"label": "Fraud rate сегмента", "value": _format_pct(current_row[3])},
-            {"label": "Fraud rate портфеля", "value": _format_pct(overall_rate)},
+            {"label": "Рівень фроду сегмента", "value": _format_pct(current_row[3])},
+            {"label": "Рівень фроду портфеля", "value": _format_pct(overall_rate)},
             {"label": "Обсяг сегмента", "value": f"{int(current_row[1]):,}"},
         ],
         "result_html": render_html_table(columns, rows, displayed_rows=10),
         "business_note": (
             "Якщо поточний продуктовий сегмент має показник вище за базовий "
-            "рівень портфеля, він стає зрозумілим домодельним ризик-сигналом для аналітика."
+            "рівень портфеля, він стає зрозумілим сигналом ризику для аналітика ще до моделі."
         ),
     }
 
@@ -78,7 +78,7 @@ def _build_email_evidence(
     current_domain = (field_value or "missing").strip().lower() or "missing"
     safe_domain = _sql_literal(current_domain)
 
-    columns, rows = run_query(
+    _, rows = run_query(
         connection,
         f"""
         SELECT COALESCE(LOWER({field_name}), 'missing') AS email_domain,
@@ -117,20 +117,20 @@ def _build_email_evidence(
         ),
         "summary_items": [
             {"label": "Поточний домен", "value": current_domain},
-            {"label": "Fraud rate домену", "value": _format_pct(current_row[3])},
-            {"label": "Fraud rate портфеля", "value": _format_pct(overall_rate)},
+            {"label": "Рівень фроду домену", "value": _format_pct(current_row[3])},
+            {"label": "Рівень фроду портфеля", "value": _format_pct(overall_rate)},
             {"label": "Обсяг домену", "value": f"{int(current_row[1]):,}"},
         ],
         "result_html": render_html_table(columns, rows, displayed_rows=12),
         "business_note": (
             "Зрізи на рівні доменів корисні, бо вони зрозумілі і для аналітиків, "
-            "і для бізнес-стейкхолдерів та можуть стати легкими watchlist-сигналами."
+            "і для бізнес-стейкхолдерів та можуть стати легкими сигналами для списку спостереження."
         ),
     }
 
 
 def _build_amount_evidence(connection, score_request: ScoreRequest) -> dict[str, object]:
-    columns, rows = run_query(
+    _, rows = run_query(
         connection,
         f"""
         WITH customer_stats AS (
@@ -189,7 +189,7 @@ def _build_amount_evidence(connection, score_request: ScoreRequest) -> dict[str,
         "intro": (
             f"Поточний запит використовує card1={score_request.card1} і "
             f"TransactionAmt={score_request.transaction_amount}. "
-            "Цей блок порівнює суму з історичним baseline для того самого customer proxy."
+            "Цей блок порівнює суму з історичним базовим рівнем для того самого проксі клієнта."
         ),
         "summary_items": [
             {"label": "card1", "value": str(score_request.card1)},
@@ -211,7 +211,7 @@ def _build_amount_evidence(connection, score_request: ScoreRequest) -> dict[str,
             displayed_rows=1,
         ),
         "business_note": (
-            "Сплески суми відносно customer baseline простіше обгрунтувати "
+            "Сплески суми відносно базового рівня клієнта простіше обгрунтувати "
             "операційно, ніж сирі абсолютні правила по сумі, тому це хороший сигнал для ручної перевірки."
         ),
     }

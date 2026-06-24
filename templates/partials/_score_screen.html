@@ -143,7 +143,7 @@
 
             <div class="result-grid">
                 <div class="metric">
-                    <span class="metric-label">Fraud Score</span>
+                <span class="metric-label">Fraud score</span>
                     <span class="metric-value">{{ score_result.fraud_score }}</span>
                 </div>
                 <div class="metric">
@@ -157,7 +157,8 @@
                 <div class="metric">
                     <span class="metric-label">Ручна перевірка</span>
                     <span class="metric-value"
-                        >{{ score_result.needs_manual_review }}</span
+                        >{% if score_result.needs_manual_review %}так{% else
+                        %}ні{% endif %}</span
                     >
                 </div>
                 <div class="metric">
@@ -170,11 +171,11 @@
 
             <div class="meta-grid">
                 <div class="metric">
-                    <span class="metric-label">Назва моделі</span>
+                    <span class="metric-label">Модель</span>
                     <span class="metric-value">{{ score_result.model_name }}</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Версія моделі</span>
+                    <span class="metric-label">Версія</span>
                     <span class="metric-value"
                         >{{ score_result.model_version }}</span
                     >

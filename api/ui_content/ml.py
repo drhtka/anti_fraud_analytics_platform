@@ -86,28 +86,28 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
             {
                 "label": "Обрана MVP-модель",
                 "value": "RandomForestClassifier",
-                "description": "Поточний production-like кандидат для demo-скорингу.",
+                "description": "Поточний найбільш придатний кандидат для демонстраційного скорингу.",
             },
             {
                 "label": "Референсна модель",
                 "value": "LogisticRegression",
-                "description": "Baseline, який збережено для чесного порівняння у Week 3.",
+                "description": "Базова модель, яку збережено для чесного порівняння у Week 3.",
             },
             {
                 "label": "Поріг перевірки",
                 "value": "0.7",
-                "description": "Найреалістичніший поточний кандидат для manual review flow.",
+                "description": "Найреалістичніший поточний кандидат для сценарію ручної перевірки.",
             },
             {
-                "label": "Live artifact",
+                "label": "Робочий артефакт",
                 "value": "RandomForest only",
-                "description": "Поточний API scoring artifact - це MVP bundle на RandomForest.",
+                "description": "Поточний артефакт API-скорингу - це MVP-набір на RandomForest.",
             },
         ],
         "winner_note": (
             "Проєкт залишає RandomForestClassifier як поточну MVP-модель, "
             "тому що вона покращила precision, recall, f1 і roc_auc та водночас "
-            "утримала lower manual review load на тих самих порогах."
+            "зберегла нижче навантаження на ручну перевірку на тих самих порогах."
         ),
         "final_summary": final_summary,
         "tables": [
