@@ -638,6 +638,10 @@ button {
     word-break: break-word;
 }
 
+.content-card .json-block + h3 {
+    margin-top: 24px;
+}
+
 .results {
     display: grid;
     gap: 20px;
