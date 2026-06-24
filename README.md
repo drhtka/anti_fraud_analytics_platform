@@ -1,17 +1,35 @@
 # Anti-Fraud Analytics Platform
 
-A portfolio project focused on risk analytics and anti-fraud workflows.
+A portfolio project focused on anti-fraud analytics, risk scoring, and decision-ready backend delivery.
 
-## Project Goal
+## Overview
 
-Demonstrate in one end-to-end case how to:
+This repository demonstrates an end-to-end anti-fraud workflow on top of the `IEEE-CIS` transaction dataset:
 
-- work with transactional data;
-- perform `SQL` analysis and `EDA`;
-- formulate anti-fraud hypotheses;
-- build features and a baseline `ML` model;
-- explain results in business terms;
-- package the solution with `FastAPI`.
+- exploratory analysis with `SQL`, `DuckDB`, and lightweight browser-ready `EDA`;
+- anti-fraud hypothesis generation and interpretable risk signals;
+- baseline `ML` scoring with business-facing review decisions;
+- `FastAPI` delivery with a UI, API endpoints, and optional Docker infrastructure;
+- Docker-only background export with `Redis`, `Celery`, and `BigQuery`.
+
+## Visual Snapshot
+
+The charts below are generated from the documented MVP scoring scenarios and are included to make the repository easier to scan as an analytics portfolio project.
+
+<p align="center">
+  <img src="docs/assets/readme/scoring-scenarios.png" alt="Fraud score by scenario" width="49%" />
+  <img src="docs/assets/readme/risk-signal-profile.png" alt="Risk signal density by scenario" width="49%" />
+</p>
+
+## What This Project Shows
+
+| Layer                 | What it demonstrates                                                                   |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| Data analysis         | Transaction-level exploration, `EDA`, and suspicious pattern discovery                 |
+| Analytics engineering | Reusable `SQL` slices and feature-oriented data marts                                  |
+| ML baseline           | Fraud scoring, thresholds, and interpretable active risk signals                       |
+| Product thinking      | Business-friendly UI cards, review decisions, and analyst-facing outputs               |
+| Delivery              | `FastAPI` app, Docker packaging, async event export, and operational status monitoring |
 
 ## Project Structure
 
@@ -20,7 +38,8 @@ Demonstrate in one end-to-end case how to:
 - `notebooks/` - `EDA` and exploratory notebooks;
 - `src/` - data preparation, features, rules, and model code;
 - `api/` - `FastAPI` app and request/response schemas;
-- `docs/` - working materials organized by project and week.
+- `docs/` - supporting materials and generated README assets;
+- `scripts/` - helper scripts for cache preparation, exports, and environment smoke checks.
 
 ## Local Data
 
@@ -31,11 +50,9 @@ Put the raw files here:
 - `data/raw/train_transaction.csv`
 - `data/raw/train_identity.csv`
 
-The current MVP UI reads these files on the backend through `DuckDB` and only
-renders small result tables, summaries, and charts in the browser.
+The current MVP UI reads these files on the backend through `DuckDB` and renders compact result tables, summaries, and charts in the browser.
 
-The current UI is still server-rendered through `FastAPI` templates, while the
-target dedicated frontend stack for the project is `SvelteKit`.
+The current interface is server-rendered through `FastAPI` templates, while the longer-term target frontend stack for the project is `SvelteKit`.
 
 To precompute the heavier `EDA` and `SQL` UI cache before starting the server:
 
@@ -43,14 +60,40 @@ To precompute the heavier `EDA` and `SQL` UI cache before starting the server:
 .venv/bin/python scripts/precompute_ui_cache.py
 ```
 
+## API Scoring Snapshot
+
+The MVP API exposes two main endpoints:
+
+- `GET /health`
+- `POST /score`
+
+To validate scoring behavior, I tested three predefined transaction scenarios through a Python `requests` client.
+
+| Scenario   | Active Signals                                                                                        | Fraud Score | Risk Label | Manual Review |
+| ---------- | ----------------------------------------------------------------------------------------------------- | ----------: | ---------- | ------------- |
+| Low risk   | No binary risk flags triggered                                                                        |  `0.430693` | `low`      | `false`       |
+| Medium-ish | `card6=credit`, high-risk `P_emaildomain`, missing `R_emaildomain`                                    |  `0.667183` | `low`      | `false`       |
+| High risk  | `ProductCD=C`, high-risk `R_emaildomain`, `card6=credit`, high-risk `P_emaildomain`, `card4=discover` |  `0.885149` | `high`     | `true`        |
+
+### Interpretation
+
+These scenarios show that the MVP behaves consistently with the anti-fraud logic built into the project:
+
+- more risk signals lead to a higher `fraud_score`;
+- the API returns both a score and an operational action through `needs_manual_review`;
+- the threshold (`0.7`) converts model output into a concrete review decision;
+- `active_signals` make the response easier to interpret for a fraud analyst.
+
+This moves the project beyond a notebook-only experiment and turns it into a working scoring service with both human-facing and API-facing outputs.
+
 ## Runtime Modes
 
-The project now supports two infrastructure modes:
+The project supports two infrastructure modes:
 
-- `local` - default mode, no `Celery`, no `Redis`, no `BigQuery`; scoring stays synchronous inside `FastAPI`.
-- `docker` - container mode with `Redis` response cache and background `Celery` worker that pushes scoring events into `BigQuery`.
+- `local` - default mode, no `Celery`, no `Redis`, no `BigQuery`; scoring stays synchronous inside `FastAPI`;
+- `docker` - container mode with `Redis` response cache and a background `Celery` worker that pushes scoring events into `BigQuery`.
 
-If you run the app locally outside Docker, nothing changes: you can keep using the existing local workflow without queue or cache infrastructure.
+If you run the app locally outside Docker, nothing changes: the existing local workflow still works without queue or cache infrastructure.
 
 ## Docker Stack
 
@@ -70,7 +113,7 @@ mkdir -p secrets
 ```
 
 3. Put your Google service account key at `secrets/gcp-service-account.json`.
-4. Fill in `BIGQUERY_PROJECT_ID`, and optionally adjust `BIGQUERY_DATASET` / `BIGQUERY_TABLE`.
+4. Fill in `BIGQUERY_PROJECT_ID`, and optionally adjust `BIGQUERY_DATASET` and `BIGQUERY_TABLE`.
 
 Expected local structure:
 
@@ -125,34 +168,8 @@ Then open:
 
 ### Docker Notes
 
-- `POST /score` stays synchronous and returns immediately from the API process.
-- Repeated identical score requests can be served from `Redis`.
-- `BigQuery` persistence is offloaded to `Celery`, so the request path is not blocked by warehouse writes.
-- If `BigQuery` variables are missing, the API still scores normally, but background export is skipped.
-- The `Score` page also shows a live infrastructure status card powered by `GET /ops/status`.
-
-## API Scoring Examples
-
-The MVP API exposes two endpoints:
-
-- `GET /health`
-- `POST /score`
-
-To validate the scoring behavior, I tested three predefined transaction scenarios through the `requests` client.
-
-| Scenario   | Active Signals                                                                                        | Fraud Score | Risk Label | Manual Review |
-| ---------- | ----------------------------------------------------------------------------------------------------- | ----------: | ---------- | ------------- |
-| Low risk   | No binary risk flags triggered                                                                        |  `0.430693` | `low`      | `false`       |
-| Medium-ish | `card6=credit`, high-risk `P_emaildomain`, missing `R_emaildomain`                                    |  `0.667183` | `low`      | `false`       |
-| High risk  | `ProductCD=C`, high-risk `R_emaildomain`, `card6=credit`, high-risk `P_emaildomain`, `card4=discover` |  `0.885149` | `high`     | `true`        |
-
-### Interpretation
-
-These examples show that the model behaves consistently with the anti-fraud logic used in the MVP:
-
-- more risk signals lead to a higher `fraud_score`;
-- the API does not return only a score, but also a business action through `needs_manual_review`;
-- the threshold (`0.7`) converts model output into an operational review decision;
-- `active_signals` make the response easier to interpret for a fraud analyst.
-
-This makes the project more than a notebook-based experiment: it demonstrates a working scoring API that can be queried from both Swagger UI and a Python client.
+- `POST /score` stays synchronous and returns immediately from the API process;
+- repeated identical score requests can be served from `Redis`;
+- `BigQuery` persistence is offloaded to `Celery`, so the request path is not blocked by warehouse writes;
+- if `BigQuery` variables are missing, the API still scores normally, but background export is skipped;
+- the `Score` page shows the status of the latest scoring operation, while `GET /ops/status` exposes the broader runtime infrastructure state.
