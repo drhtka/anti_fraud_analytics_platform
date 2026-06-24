@@ -62,7 +62,7 @@ function initDashboardEmbeds() {
 
         if (frameCard.dataset.fallbackScheduled !== 'true') {
             frameCard.dataset.fallbackScheduled = 'true';
-            window.setTimeout(finishLoading, 4500);
+            window.setTimeout(finishLoading, 1400);
         }
     });
 }

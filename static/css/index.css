@@ -873,10 +873,11 @@ button {
     border: 0;
     border-radius: 8px;
     background: #ffffff;
+    transition: opacity 0.12s ease;
 }
 
 .dashboard-frame-card.is-loading .dashboard-iframe {
-    opacity: 0.35;
+    opacity: 0.72;
 }
 
 .dashboard-frame-card:not(.is-loading) .dashboard-loading-note {
