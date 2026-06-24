@@ -18,8 +18,48 @@
             </div>
         </div>
 
+        <div class="insight-grid">
+            <section class="insight-card">
+                <h3>Що тут показано</h3>
+                <p>
+                    Дашборд зводить в одному місці ключові anti-fraud сигнали,
+                    сегменти ризику та вплив вибраного ML-порога на ручну
+                    перевірку.
+                </p>
+            </section>
+            <section class="insight-card">
+                <h3>Як читати демо</h3>
+                <p>
+                    Спочатку звертай увагу на підозрілі патерни, а потім на блок
+                    з ML threshold impact, щоб швидко пояснити компроміс між
+                    fraud capture і review load.
+                </p>
+            </section>
+        </div>
+
         <div class="dashboard-frame-card is-loading">
-            <p class="dashboard-loading-note">Дочекайтеся завантаження дашборда</p>
+            <div class="dashboard-loading-note" aria-hidden="true">
+                <div class="dashboard-loading-preview">
+                    <div class="dashboard-loading-header">
+                        <span class="dashboard-loading-chip"></span>
+                        <span class="dashboard-loading-chip dashboard-loading-chip-wide"></span>
+                    </div>
+                    <div class="dashboard-loading-kpis">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="dashboard-loading-chart">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <p class="dashboard-loading-text">
+                    Очікуйте: графіки дашборда вже промальовуються.
+                </p>
+            </div>
             <iframe
                 class="dashboard-iframe"
                 src="{{ dashboard_embed_url }}"

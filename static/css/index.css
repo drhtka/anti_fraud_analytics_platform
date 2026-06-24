@@ -750,10 +750,12 @@ button {
     position: absolute;
     inset: 12px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 16px;
     margin: 0;
-    padding: 16px;
+    padding: 24px;
     color: #94a3b8;
     font-size: 14px;
     text-align: center;
@@ -762,6 +764,106 @@ button {
     border-radius: 8px;
     transition: opacity 0.2s ease;
     z-index: 1;
+}
+
+.dashboard-loading-preview {
+    display: grid;
+    gap: 14px;
+    width: min(440px, 100%);
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid #dbe3ee;
+    border-radius: 14px;
+    box-sizing: border-box;
+}
+
+.dashboard-loading-header {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.dashboard-loading-chip {
+    display: block;
+    width: 84px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: dashboard-skeleton 1.4s ease-in-out infinite;
+}
+
+.dashboard-loading-chip-wide {
+    width: 132px;
+}
+
+.dashboard-loading-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dashboard-loading-kpis span,
+.dashboard-loading-chart span {
+    display: block;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: dashboard-skeleton 1.4s ease-in-out infinite;
+}
+
+.dashboard-loading-kpis span {
+    height: 56px;
+    border-radius: 12px;
+}
+
+.dashboard-loading-chart {
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 12px;
+    height: 120px;
+    padding: 12px 10px 0;
+    border-radius: 12px;
+    background: rgba(239, 246, 255, 0.72);
+}
+
+.dashboard-loading-chart span {
+    width: 64px;
+    border-radius: 10px 10px 0 0;
+}
+
+.dashboard-loading-chart span:nth-child(1) {
+    height: 56px;
+}
+
+.dashboard-loading-chart span:nth-child(2) {
+    height: 88px;
+}
+
+.dashboard-loading-chart span:nth-child(3) {
+    height: 72px;
+}
+
+.dashboard-loading-chart span:nth-child(4) {
+    height: 102px;
+}
+
+.dashboard-loading-text {
+    margin: 0;
+    max-width: 460px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+}
+
+@keyframes dashboard-skeleton {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 .dashboard-iframe {
