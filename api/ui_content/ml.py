@@ -51,26 +51,6 @@ def _extract_named_table_outputs(cells: list[dict[str, object]]) -> dict[str, st
     return named_tables
 
 
-def _extract_week3_summary(cells: list[dict[str, object]]) -> list[str]:
-    for cell in cells:
-        if cell.get("cell_type") != "markdown":
-            continue
-
-        source = _join_notebook_value(cell.get("source"))
-        if "## Week 3 Final Summary" not in source:
-            continue
-
-        summary_lines: list[str] = []
-        for raw_line in source.splitlines():
-            line = raw_line.strip()
-            if not line or line.startswith("## "):
-                continue
-            summary_lines.append(line.removeprefix("- ").strip())
-        return summary_lines
-
-    return []
-
-
 def load_ml_content(notebook_path: str) -> dict[str, object]:
     notebook = json.loads(Path(notebook_path).read_text(encoding="utf-8"))
     cells = notebook.get("cells", [])
@@ -78,7 +58,6 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
         cells = []
 
     named_tables = _extract_named_table_outputs(cells)
-    final_summary = _extract_week3_summary(cells)
 
     return {
         "source_notebook": Path(notebook_path).name,
@@ -100,16 +79,15 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
             },
             {
                 "label": "Робочий артефакт",
-                "value": "RandomForest only",
+                "value": "Лише RandomForest",
                 "description": "Поточний артефакт API-скорингу - це MVP-набір на RandomForest.",
             },
         ],
         "winner_note": (
             "Проєкт залишає RandomForestClassifier як поточну MVP-модель, "
             "тому що вона покращила precision, recall, f1 і roc_auc та водночас "
-            "зберегла нижче навантаження на ручну перевірку на тих самих порогах."
+            "забезпечила нижче навантаження на ручну перевірку на тих самих порогах."
         ),
-        "final_summary": final_summary,
         "tables": [
             {
                 "title": "Метрики моделей",

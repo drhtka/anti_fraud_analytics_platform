@@ -57,20 +57,5 @@
         </section>
         {% endfor %}
 
-        {% if ml_content.final_summary %}
-        <section class="learning-block">
-            <div class="learning-block-header">
-                <p class="learning-step">Підсумок ML</p>
-                <h3>Підсумок Week 3</h3>
-            </div>
-            <div class="learning-notes">
-                <ul>
-                    {% for note in ml_content.final_summary %}
-                    <li>{{ note }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-        {% endif %}
     </article>
 </section>
