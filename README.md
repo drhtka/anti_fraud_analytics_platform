@@ -12,6 +12,8 @@ A portfolio project focused on anti-fraud analytics, risk scoring, and decision-
 
 - [Overview](#overview)
 - [Visual Snapshot](#visual-snapshot)
+- [UI Walkthrough](#ui-walkthrough)
+- [API Docs Preview](#api-docs-preview)
 - [Architecture](#architecture)
 - [API Scoring Snapshot](#api-scoring-snapshot)
 - [Runtime Modes](#runtime-modes)
@@ -34,6 +36,48 @@ The charts below are generated from the documented MVP scoring scenarios and are
 <p align="center">
   <img src="docs/assets/readme/scoring-scenarios.png" alt="Fraud score by scenario" width="49%" />
   <img src="docs/assets/readme/risk-signal-profile.png" alt="Risk signal density by scenario" width="49%" />
+</p>
+
+## UI Walkthrough
+
+The current MVP ships with a server-rendered analyst-facing interface that combines guided demo scenarios, live scoring feedback, and lightweight `EDA` slices sourced from local data.
+
+### Score Screen
+
+<p align="center">
+  <img src="docs/assets/readme/ui-score-result.png" alt="Score screen with fraud result and active signals" width="70%" />
+</p>
+
+<p align="center">
+  <img src="docs/assets/readme/ui-score-status.png" alt="Latest scoring operation status card" width="70%" />
+</p>
+
+The score flow is designed to show more than a raw probability:
+
+- a business-facing risk label;
+- the manual review decision;
+- active fraud signals behind the prediction;
+- the operational status of the most recent scoring request.
+
+### EDA Screen
+
+<p align="center">
+  <img src="docs/assets/readme/ui-eda-summary.png" alt="EDA dataset summary cards" width="64%" />
+  <img src="docs/assets/readme/ui-eda-chart.png" alt="EDA fraud chart by recipient email domain" width="60%" />
+</p>
+
+The `EDA` screen keeps the demo compact while still surfacing live backend-generated insights from the local `IEEE-CIS` CSV files.
+
+## API Docs Preview
+
+The repository also includes a browsable `FastAPI` documentation surface that makes the scoring API easy to inspect during demos and interviews.
+
+<p align="center">
+  <img src="docs/assets/readme/swagger-overview.png" alt="Swagger overview with available endpoints" width="82%" />
+</p>
+
+<p align="center">
+  <img src="docs/assets/readme/swagger-score-response.png" alt="Swagger POST score example with response body" width="82%" />
 </p>
 
 ## Architecture
