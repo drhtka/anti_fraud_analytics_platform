@@ -17,6 +17,22 @@ class HealthResponse(BaseModel):
     bigquery_configured: bool = False
 
 
+class RuntimeStatusResponse(BaseModel):
+    runtime_mode: Literal["local", "docker"]
+    scoring_ready: bool
+    model_name: str | None = None
+    model_version: str | None = None
+    redis_score_cache_enabled: bool
+    redis_status: Literal["ok", "disabled", "not_installed", "error"]
+    redis_queue_depth: int | None = None
+    celery_event_sink_enabled: bool
+    celery_worker_status: Literal["ok", "disabled", "not_installed", "offline", "error"]
+    celery_worker_count: int = 0
+    bigquery_configured: bool
+    bigquery_status: Literal["ready", "disabled", "not_configured"]
+    last_checked_at: str
+
+
 class ScoreRequest(BaseModel):
     transaction_id: int | None = Field(default=None, description="Optional transaction identifier.")
     transaction_amount: float = Field(..., ge=0, description="Transaction amount.")

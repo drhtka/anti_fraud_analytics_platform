@@ -791,6 +791,29 @@ button {
     line-height: 1.5;
 }
 
+.infra-status-card {
+    margin-top: 20px;
+}
+
+.infra-status-intro,
+.infra-status-note {
+    color: #475569;
+}
+
+.infra-status-intro {
+    margin-bottom: 16px;
+}
+
+.infra-status-note {
+    margin-top: 16px;
+    font-size: 13px;
+}
+
+.infra-status-grid .metric-value {
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
 .evidence-intro {
     margin-bottom: 16px;
 }

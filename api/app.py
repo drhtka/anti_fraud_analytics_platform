@@ -14,7 +14,14 @@ from pydantic import ValidationError
 from api.cache import load_cached_score_response, store_cached_score_response
 from api.event_sink import enqueue_score_event
 from api.model_bundle import ModelBundle, load_model_bundle
-from api.schemas import ExplainResponse, HealthResponse, ScoreRequest, ScoreResponse
+from api.runtime_status import build_runtime_status
+from api.schemas import (
+    ExplainResponse,
+    HealthResponse,
+    RuntimeStatusResponse,
+    ScoreRequest,
+    ScoreResponse,
+)
 from api.scoring import explain_from_score_response, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH, get_runtime_settings
 from api.ui_content import (
@@ -243,6 +250,11 @@ def health() -> HealthResponse:
         bigquery_event_sink_enabled=settings.celery_event_sink_enabled,
         bigquery_configured=settings.bigquery_configured,
     )
+
+
+@app.get("/ops/status", response_model=RuntimeStatusResponse, name="ops_status")
+def ops_status() -> RuntimeStatusResponse:
+    return build_runtime_status()
 
 
 @app.post("/score", response_model=ScoreResponse)

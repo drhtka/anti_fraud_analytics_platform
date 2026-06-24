@@ -5,6 +5,7 @@ const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
 const scenarioModal = document.getElementById('scenario-modal');
 const closeScenarioModalButton = document.getElementById('close-scenario-modal');
+const runtimeStatusCard = document.querySelector('[data-runtime-status-card]');
 
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
@@ -12,6 +13,76 @@ const demoPayloads = demoPayloadsElement
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
 let selectedDemoKey = '';
+
+function formatStatusValue(value, fallback = 'n/a') {
+    if (value === null || value === undefined || value === '') {
+        return fallback;
+    }
+
+    return String(value);
+}
+
+function updateRuntimeStatusCard(payload) {
+    if (!(runtimeStatusCard instanceof HTMLElement) || !payload) {
+        return;
+    }
+
+    const mappings = [
+        ['[data-status-runtime-mode]', payload.runtime_mode],
+        ['[data-status-redis]', payload.redis_status],
+        ['[data-status-celery]', payload.celery_worker_status],
+        ['[data-status-bigquery]', payload.bigquery_status],
+        ['[data-status-queue-depth]', payload.redis_queue_depth],
+        ['[data-status-worker-count]', payload.celery_worker_count],
+        ['[data-status-last-checked]', payload.last_checked_at],
+    ];
+
+    mappings.forEach(([selector, value]) => {
+        const element = runtimeStatusCard.querySelector(selector);
+        if (element instanceof HTMLElement) {
+            element.textContent = formatStatusValue(value);
+        }
+    });
+
+    const badge = runtimeStatusCard.querySelector('[data-status-badge]');
+    if (badge instanceof HTMLElement) {
+        badge.textContent = payload.scoring_ready
+            ? 'СКОРИНГ ГОТОВИЙ'
+            : 'СКОРИНГ НЕДОСТУПНИЙ';
+        badge.classList.toggle('badge-low', Boolean(payload.scoring_ready));
+        badge.classList.toggle('badge-high', !payload.scoring_ready);
+    }
+}
+
+async function refreshRuntimeStatus() {
+    if (!(runtimeStatusCard instanceof HTMLElement)) {
+        return;
+    }
+
+    const statusUrl = runtimeStatusCard.dataset.statusUrl;
+    if (!statusUrl) {
+        return;
+    }
+
+    try {
+        const response = await fetch(statusUrl, {
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+        updateRuntimeStatusCard(payload);
+    } catch (error) {
+        const lastChecked = runtimeStatusCard.querySelector('[data-status-last-checked]');
+        if (lastChecked instanceof HTMLElement) {
+            lastChecked.textContent = 'не удалось обновить';
+        }
+    }
+}
 
 function showScenarioModal() {
     if (!(scenarioModal instanceof HTMLDivElement)) {
@@ -210,6 +281,8 @@ window.addEventListener('hashchange', async () => {
 
 activateScreen(getInitialScreenName());
 initDashboardEmbeds();
+refreshRuntimeStatus();
+window.setInterval(refreshRuntimeStatus, 15000);
 
 demoButtons.forEach((button) => {
     button.addEventListener('click', () => {

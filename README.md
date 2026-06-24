@@ -76,6 +76,7 @@ Then open:
 
 - `http://localhost:8000/`
 - `http://localhost:8000/health`
+- `http://localhost:8000/ops/status`
 
 ### Docker Notes
 
@@ -83,6 +84,7 @@ Then open:
 - Repeated identical score requests can be served from `Redis`.
 - `BigQuery` persistence is offloaded to `Celery`, so the request path is not blocked by warehouse writes.
 - If `BigQuery` variables are missing, the API still scores normally, but background export is skipped.
+- The `Score` page also shows a live infrastructure status card powered by `GET /ops/status`.
 
 ## API Scoring Examples
 
