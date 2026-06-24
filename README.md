@@ -2,6 +2,21 @@
 
 A portfolio project focused on anti-fraud analytics, risk scoring, and decision-ready backend delivery.
 
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![DuckDB](https://img.shields.io/badge/DuckDB-Analytics-FFF000?logo=duckdb&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![BigQuery](https://img.shields.io/badge/BigQuery-Optional-4285F4?logo=googlebigquery&logoColor=white)
+
+## Quick Links
+
+- [Overview](#overview)
+- [Visual Snapshot](#visual-snapshot)
+- [Architecture](#architecture)
+- [API Scoring Snapshot](#api-scoring-snapshot)
+- [Runtime Modes](#runtime-modes)
+- [Docker Stack](#docker-stack)
+
 ## Overview
 
 This repository demonstrates an end-to-end anti-fraud workflow on top of the `IEEE-CIS` transaction dataset:
@@ -20,6 +35,25 @@ The charts below are generated from the documented MVP scoring scenarios and are
   <img src="docs/assets/readme/scoring-scenarios.png" alt="Fraud score by scenario" width="49%" />
   <img src="docs/assets/readme/risk-signal-profile.png" alt="Risk signal density by scenario" width="49%" />
 </p>
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[IEEE-CIS CSV files<br/>data/raw/] --> B[DuckDB exploration layer]
+    B --> C[EDA and SQL insights]
+    A --> D[Feature preparation and anti-fraud logic]
+    D --> E[Baseline ML model]
+    E --> F[FastAPI scoring service]
+    F --> G[Score UI and JSON output]
+    F --> H[Latest scoring operation status]
+    F --> I[POST /score and /explain]
+    F --> J{Runtime mode}
+    J -->|local| K[Synchronous scoring only]
+    J -->|docker| L[Redis cache]
+    J -->|docker| M[Celery worker]
+    M --> N[BigQuery scoring events]
+```
 
 ## What This Project Shows
 
