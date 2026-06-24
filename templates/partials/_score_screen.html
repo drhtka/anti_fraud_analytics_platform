@@ -6,17 +6,6 @@
             <code>api/payloads</code>, щоб заповнити форму в один клік, а потім
             запустити той самий сценарій скорингу на цій сторінці.
         </p>
-        <div class="demo-buttons">
-            {% for demo_payload in demo_payloads %}
-            <button
-                type="button"
-                class="demo-button"
-                data-demo-key="{{ demo_payload.filename }}"
-            >
-                {{ demo_payload.label }}
-            </button>
-            {% endfor %}
-        </div>
     </section>
 
     <form method="get" action="/" id="transaction-form">
@@ -107,11 +96,24 @@
             </label>
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="submit-button">Виконати скоринг</button>
-            <button type="button" class="secondary-button" id="clear-form">
-                Очистити
-            </button>
+        <div class="score-actions-panel">
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Виконати скоринг</button>
+                <button type="button" class="secondary-button" id="clear-form">
+                    Очистити
+                </button>
+            </div>
+            <div class="demo-buttons demo-buttons-inline">
+                {% for demo_payload in demo_payloads %}
+                <button
+                    type="button"
+                    class="demo-button"
+                    data-demo-key="{{ demo_payload.filename }}"
+                >
+                    {{ demo_payload.label }}
+                </button>
+                {% endfor %}
+            </div>
         </div>
     </form>
 

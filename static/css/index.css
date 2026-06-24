@@ -76,29 +76,11 @@ form {
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
-.demo-actions {
-    margin-bottom: 16px;
-    padding: 18px 20px;
-    background: #eef4ff;
-    border: 1px solid #c7d7fe;
-    border-radius: 12px;
-}
-
-.demo-actions h2 {
-    margin: 0 0 8px;
-    font-size: 18px;
-}
-
-.demo-actions p {
-    margin: 0 0 14px;
-    color: #475569;
-    line-height: 1.5;
-}
-
 .demo-buttons {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
 }
 
 .grid {
@@ -151,6 +133,18 @@ button {
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 4px;
+    justify-content: center;
+}
+
+.score-actions-panel {
+    display: grid;
+    gap: 12px;
+    margin-top: 8px;
+    justify-items: center;
+}
+
+.demo-buttons-inline {
+    width: 100%;
 }
 
 .secondary-button {
