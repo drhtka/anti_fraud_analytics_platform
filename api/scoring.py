@@ -9,13 +9,13 @@ from api.schemas import ExplainResponse, ScoreRequest, ScoreResponse
 
 
 SIGNAL_LABELS = {
-    "feat_productcd_c_flag": "ProductCD is C",
-    "feat_high_risk_r_email_flag": "R_emaildomain is in the high-risk domain list",
-    "feat_card6_credit_flag": "card6 is credit",
-    "feat_high_risk_p_email_flag": "P_emaildomain is in the high-risk domain list",
-    "feat_card4_discover_flag": "card4 is discover",
-    "feat_missing_r_email_flag": "R_emaildomain is missing",
-    "feat_amount_gt_card1_avg_plus_3std": "Transaction amount is above the card1 mean plus 3 std",
+    "feat_productcd_c_flag": "ProductCD = C",
+    "feat_high_risk_r_email_flag": "R_emaildomain входить до списку доменів високого ризику",
+    "feat_card6_credit_flag": "card6 = credit",
+    "feat_high_risk_p_email_flag": "P_emaildomain входить до списку доменів високого ризику",
+    "feat_card4_discover_flag": "card4 = discover",
+    "feat_missing_r_email_flag": "R_emaildomain відсутній",
+    "feat_amount_gt_card1_avg_plus_3std": "Сума транзакції перевищує середнє для card1 + 3 std",
 }
 
 
@@ -67,7 +67,7 @@ def build_active_signals(feature_values: dict[str, float]) -> list[str]:
         for feature_name, value in feature_values.items()
         if feature_name in SIGNAL_LABELS and value >= 1.0
     ]
-    return signals or ["No binary risk flags were triggered by the current request"]
+    return signals or ["Для поточного запиту не спрацювали бінарні ризик-сигнали"]
 
 
 def resolve_risk_label(fraud_score: float, threshold: float) -> str:
@@ -100,28 +100,28 @@ def score_transaction(request: ScoreRequest, bundle: ModelBundle) -> ScoreRespon
 
 def build_explanation_points(score_response: ScoreResponse) -> list[str]:
     explanation_points = [
-        f"The model returned fraud_score={score_response.fraud_score}, while threshold={score_response.threshold_used}.",
+        f"Модель повернула fraud_score={score_response.fraud_score}, а поріг рішення дорівнює {score_response.threshold_used}.",
     ]
 
     if score_response.needs_manual_review:
         explanation_points.append(
-            "The transaction is above the current decision threshold and should be sent to manual review."
+            "Транзакція перевищує поточний поріг рішення і має бути відправлена на ручну перевірку."
         )
     else:
         explanation_points.append(
-            "The transaction is below the current decision threshold and does not require manual review."
+            "Транзакція нижче поточного порогу рішення і не потребує ручної перевірки."
         )
 
-    if score_response.active_signals == ["No binary risk flags were triggered by the current request"]:
+    if score_response.active_signals == ["Для поточного запиту не спрацювали бінарні ризик-сигнали"]:
         explanation_points.append(
-            "No binary risk flags were triggered, so the score is mostly driven by the baseline model pattern."
+            "Бінарні ризик-сигнали не спрацювали, тому score переважно формується базовим патерном моделі."
         )
     else:
         explanation_points.append(
-            "The strongest visible contributors come from the active binary risk signals returned by the API."
+            "Найпомітніші видимі фактори походять з активних бінарних ризик-сигналів, які повернув API."
         )
         explanation_points.extend(
-            [f"Active signal: {signal}." for signal in score_response.active_signals]
+            [f"Активний сигнал: {signal}." for signal in score_response.active_signals]
         )
 
     return explanation_points
@@ -129,19 +129,19 @@ def build_explanation_points(score_response: ScoreResponse) -> list[str]:
 
 def build_explanation_text(score_response: ScoreResponse) -> str:
     if score_response.needs_manual_review:
-        review_sentence = "This transaction should be routed to manual review."
+        review_sentence = "Цю транзакцію слід направити на ручну перевірку."
     else:
-        review_sentence = "This transaction stays below the manual review threshold."
+        review_sentence = "Ця транзакція залишається нижче порогу ручної перевірки."
 
     signal_summary = (
-        "No binary risk flags were triggered."
-        if score_response.active_signals == ["No binary risk flags were triggered by the current request"]
-        else f"Triggered signals: {', '.join(score_response.active_signals)}."
+        "Бінарні ризик-сигнали не спрацювали."
+        if score_response.active_signals == ["Для поточного запиту не спрацювали бінарні ризик-сигнали"]
+        else f"Спрацювали сигнали: {', '.join(score_response.active_signals)}."
     )
 
     return (
-        f"The model produced fraud_score={score_response.fraud_score} "
-        f"against threshold={score_response.threshold_used}, so risk_label={score_response.risk_label}. "
+        f"Модель сформувала fraud_score={score_response.fraud_score} "
+        f"при threshold={score_response.threshold_used}, тому risk_label={score_response.risk_label}. "
         f"{review_sentence} {signal_summary}"
     )
 

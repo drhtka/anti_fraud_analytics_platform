@@ -84,65 +84,65 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
         "source_notebook": Path(notebook_path).name,
         "overview_cards": [
             {
-                "label": "Selected MVP Model",
+                "label": "Обрана MVP-модель",
                 "value": "RandomForestClassifier",
-                "description": "Current production-like candidate for the scoring demo.",
+                "description": "Поточний production-like кандидат для demo-скорингу.",
             },
             {
-                "label": "Reference Model",
+                "label": "Референсна модель",
                 "value": "LogisticRegression",
-                "description": "Baseline kept for honest comparison during Week 3.",
+                "description": "Baseline, який збережено для чесного порівняння у Week 3.",
             },
             {
-                "label": "Review Threshold",
+                "label": "Поріг перевірки",
                 "value": "0.7",
-                "description": "Most realistic current candidate for manual review flow.",
+                "description": "Найреалістичніший поточний кандидат для manual review flow.",
             },
             {
-                "label": "Live Artifact",
+                "label": "Live artifact",
                 "value": "RandomForest only",
-                "description": "The current API scoring artifact is the RandomForest MVP bundle.",
+                "description": "Поточний API scoring artifact - це MVP bundle на RandomForest.",
             },
         ],
         "winner_note": (
-            "The project keeps RandomForestClassifier as the current MVP model "
-            "because it improved precision, recall, f1, and roc_auc while also "
-            "keeping manual review load lower at the same thresholds."
+            "Проєкт залишає RandomForestClassifier як поточну MVP-модель, "
+            "тому що вона покращила precision, recall, f1 і roc_auc та водночас "
+            "утримала lower manual review load на тих самих порогах."
         ),
         "final_summary": final_summary,
         "tables": [
             {
-                "title": "Model Metrics",
+                "title": "Метрики моделей",
                 "description": (
-                    "The core validation metrics for the two trained models on "
-                    "the same feature set and the same validation split."
+                    "Ключові валідаційні метрики для двох навчених моделей на "
+                    "одному й тому самому feature set та одному validation split."
                 ),
                 "table_name": "model_metrics_df",
                 "html": named_tables.get("model_metrics_df"),
             },
             {
-                "title": "Metric Delta",
+                "title": "Дельта метрик",
                 "description": (
-                    "A direct delta view that makes the RandomForest uplift over "
-                    "LogisticRegression easy to explain."
+                    "Прямий зріз дельти, який робить uplift RandomForest над "
+                    "LogisticRegression простим для пояснення."
                 ),
                 "table_name": "model_metrics_comparison_df",
                 "html": named_tables.get("model_metrics_comparison_df"),
             },
             {
-                "title": "Threshold Comparison",
+                "title": "Порівняння порогів",
                 "description": (
-                    "Threshold-by-threshold behavior for both models, including "
-                    "precision, recall, f1, fraud count, and manual review rate."
+                    "Поведінка обох моделей на різних порогах, включно з "
+                    "precision, recall, f1, fraud count і manual review rate."
                 ),
                 "table_name": "threshold_df_by_model",
                 "html": named_tables.get("threshold_df_by_model"),
             },
             {
-                "title": "Manual Review Load",
+                "title": "Навантаження ручної перевірки",
                 "description": (
-                    "A focused comparison of manual review rate by threshold for "
-                    "each model and the delta between them."
+                    "Фокусне порівняння manual review rate за порогами для "
+                    "кожної моделі та дельти між ними."
                 ),
                 "table_name": "manual_review_comparison_df",
                 "html": named_tables.get("manual_review_comparison_df"),

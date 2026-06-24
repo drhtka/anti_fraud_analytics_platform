@@ -50,21 +50,21 @@ def _build_product_evidence(connection, score_request: ScoreRequest) -> dict[str
     overall_rate = overall_rows[0][0]
 
     return {
-        "title": "ProductCD evidence",
+        "title": "Підтвердження по ProductCD",
         "intro": (
-            f"The current request uses ProductCD={current_product}. "
-            "The table below shows how this segment behaves against the rest of the dataset."
+            f"Поточний запит використовує ProductCD={current_product}. "
+            "Таблиця нижче показує, як цей сегмент поводиться відносно решти датасету."
         ),
         "summary_items": [
-            {"label": "Current ProductCD", "value": current_product},
-            {"label": "Segment Fraud Rate", "value": _format_pct(current_row[3])},
-            {"label": "Portfolio Fraud Rate", "value": _format_pct(overall_rate)},
-            {"label": "Segment Volume", "value": f"{int(current_row[1]):,}"},
+            {"label": "Поточний ProductCD", "value": current_product},
+            {"label": "Fraud rate сегмента", "value": _format_pct(current_row[3])},
+            {"label": "Fraud rate портфеля", "value": _format_pct(overall_rate)},
+            {"label": "Обсяг сегмента", "value": f"{int(current_row[1]):,}"},
         ],
         "result_html": render_html_table(columns, rows, displayed_rows=10),
         "business_note": (
-            "If the current product segment runs above the portfolio baseline, "
-            "it becomes a readable pre-model risk signal for analysts."
+            "Якщо поточний продуктовий сегмент має показник вище за базовий "
+            "рівень портфеля, він стає зрозумілим домодельним ризик-сигналом для аналітика."
         ),
     }
 
@@ -110,21 +110,21 @@ def _build_email_evidence(
     overall_rate = overall_rows[0][0]
 
     return {
-        "title": f"{field_label} evidence",
+        "title": f"{field_label}: підтвердження",
         "intro": (
-            f"The current request uses {field_name}={current_domain}. "
-            "The table shows whether this domain stands above the portfolio baseline."
+            f"Поточний запит використовує {field_name}={current_domain}. "
+            "Таблиця показує, чи перевищує цей домен базовий рівень портфеля."
         ),
         "summary_items": [
-            {"label": "Current Domain", "value": current_domain},
-            {"label": "Domain Fraud Rate", "value": _format_pct(current_row[3])},
-            {"label": "Portfolio Fraud Rate", "value": _format_pct(overall_rate)},
-            {"label": "Domain Volume", "value": f"{int(current_row[1]):,}"},
+            {"label": "Поточний домен", "value": current_domain},
+            {"label": "Fraud rate домену", "value": _format_pct(current_row[3])},
+            {"label": "Fraud rate портфеля", "value": _format_pct(overall_rate)},
+            {"label": "Обсяг домену", "value": f"{int(current_row[1]):,}"},
         ],
         "result_html": render_html_table(columns, rows, displayed_rows=12),
         "business_note": (
-            "Domain-level cuts are useful because they are readable for both "
-            "analysts and business stakeholders and can become lightweight watchlists."
+            "Зрізи на рівні доменів корисні, бо вони зрозумілі і для аналітиків, "
+            "і для бізнес-стейкхолдерів та можуть стати легкими watchlist-сигналами."
         ),
     }
 
@@ -170,31 +170,31 @@ def _build_amount_evidence(connection, score_request: ScoreRequest) -> dict[str,
             )
         ]
     else:
-        threshold_amount = "n/a"
+        threshold_amount = "н/д"
         result_rows = [
             (
                 score_request.card1,
                 score_request.transaction_amount,
                 0,
-                "n/a",
-                "n/a",
-                "n/a",
-                "n/a",
+                "н/д",
+                "н/д",
+                "н/д",
+                "н/д",
                 False,
             )
         ]
 
     return {
-        "title": "Transaction amount evidence",
+        "title": "Підтвердження по сумі транзакції",
         "intro": (
-            f"The current request uses card1={score_request.card1} with "
+            f"Поточний запит використовує card1={score_request.card1} і "
             f"TransactionAmt={score_request.transaction_amount}. "
-            "This block compares the amount with the historical baseline for the same customer proxy."
+            "Цей блок порівнює суму з історичним baseline для того самого customer proxy."
         ),
         "summary_items": [
             {"label": "card1", "value": str(score_request.card1)},
-            {"label": "Current Amount", "value": str(score_request.transaction_amount)},
-            {"label": "Threshold", "value": str(threshold_amount)},
+            {"label": "Поточна сума", "value": str(score_request.transaction_amount)},
+            {"label": "Поріг", "value": str(threshold_amount)},
         ],
         "result_html": render_html_table(
             [
@@ -211,8 +211,8 @@ def _build_amount_evidence(connection, score_request: ScoreRequest) -> dict[str,
             displayed_rows=1,
         ),
         "business_note": (
-            "Customer-relative amount spikes are easier to justify operationally "
-            "than raw absolute amount rules, which makes them good manual-review signals."
+            "Сплески суми відносно customer baseline простіше обгрунтувати "
+            "операційно, ніж сирі абсолютні правила по сумі, тому це хороший сигнал для ручної перевірки."
         ),
     }
 
@@ -242,7 +242,7 @@ def load_score_evidence(
                 _build_email_evidence(
                     connection,
                     field_name="R_emaildomain",
-                    field_label="Recipient email domain",
+                    field_label="Домен email отримувача",
                     field_value=score_request.r_emaildomain,
                 )
             )
@@ -252,7 +252,7 @@ def load_score_evidence(
                 _build_email_evidence(
                     connection,
                     field_name="P_emaildomain",
-                    field_label="Purchaser email domain",
+                    field_label="Домен email покупця",
                     field_value=score_request.p_emaildomain,
                 )
             )

@@ -1,10 +1,10 @@
 <section class="screen" data-screen-name="score">
     <section class="demo-actions">
-        <h2>Demo Scenarios</h2>
+        <h2>Демо-сценарії</h2>
         <p>
-            Use one of the prepared payloads from <code>api/payloads</code> to
-            fill the form in one click, then run the same scoring flow on this
-            page.
+            Використай один із підготовлених payload-файлів з
+            <code>api/payloads</code>, щоб заповнити форму в один клік, а потім
+            запустити той самий сценарій скорингу на цій сторінці.
         </p>
         <div class="demo-buttons">
             {% for demo_payload in demo_payloads %}
@@ -22,7 +22,7 @@
     <form method="get" action="/" id="transaction-form">
         <div class="grid">
             <label>
-                Transaction ID
+                ID транзакції
                 <input
                     type="number"
                     name="transaction_id"
@@ -32,7 +32,7 @@
             </label>
 
             <label>
-                Transaction Amount
+                Сума транзакції
                 <input
                     type="number"
                     step="0.01"
@@ -87,7 +87,7 @@
             </label>
 
             <label>
-                Purchaser Email Domain
+                Домен email покупця
                 <input
                     type="text"
                     name="p_emaildomain"
@@ -97,7 +97,7 @@
             </label>
 
             <label>
-                Recipient Email Domain
+                Домен email отримувача
                 <input
                     type="text"
                     name="r_emaildomain"
@@ -108,9 +108,9 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="submit-button">Score transaction</button>
+            <button type="submit" class="submit-button">Виконати скоринг</button>
             <button type="button" class="secondary-button" id="clear-form">
-                Clear form
+                Очистити форму
             </button>
         </div>
     </form>
@@ -123,10 +123,12 @@
     <section class="results">
         <article class="result-card">
             <div class="result-header">
-                <h2>Score Result</h2>
+                <h2>Результат скорингу</h2>
                 <div class="result-badges">
                     <span class="badge badge-{{ score_result.risk_label }}">
-                        {{ score_result.risk_label | upper }} RISK
+                        {% if score_result.risk_label == "high" %}ВИСОКИЙ{% elif
+                        score_result.risk_label == "medium" %}СЕРЕДНІЙ{% else
+                        %}НИЗЬКИЙ{% endif %} РИЗИК
                     </span>
                 </div>
             </div>
@@ -134,9 +136,9 @@
             <div
                 class="review-banner {% if score_result.needs_manual_review %}review-yes{% else %}review-no{% endif %}"
             >
-                {% if score_result.needs_manual_review %} Manual review is
-                required for this transaction. {% else %} Manual review is not
-                required for this transaction. {% endif %}
+                {% if score_result.needs_manual_review %} Для цієї транзакції
+                потрібна ручна перевірка. {% else %} Для цієї транзакції ручна
+                перевірка не потрібна. {% endif %}
             </div>
 
             <div class="result-grid">
@@ -145,17 +147,21 @@
                     <span class="metric-value">{{ score_result.fraud_score }}</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Risk Label</span>
-                    <span class="metric-value">{{ score_result.risk_label }}</span>
+                    <span class="metric-label">Рівень ризику</span>
+                    <span class="metric-value"
+                        >{% if score_result.risk_label == "high" %}високий{% elif
+                        score_result.risk_label == "medium" %}середній{% else
+                        %}низький{% endif %}</span
+                    >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Manual Review</span>
+                    <span class="metric-label">Ручна перевірка</span>
                     <span class="metric-value"
                         >{{ score_result.needs_manual_review }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Threshold Used</span>
+                    <span class="metric-label">Поріг рішення</span>
                     <span class="metric-value"
                         >{{ score_result.threshold_used }}</span
                     >
@@ -164,18 +170,18 @@
 
             <div class="meta-grid">
                 <div class="metric">
-                    <span class="metric-label">Model Name</span>
+                    <span class="metric-label">Назва моделі</span>
                     <span class="metric-value">{{ score_result.model_name }}</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Model Version</span>
+                    <span class="metric-label">Версія моделі</span>
                     <span class="metric-value"
                         >{{ score_result.model_version }}</span
                     >
                 </div>
             </div>
 
-            <h3>Active Signals</h3>
+            <h3>Активні сигнали</h3>
             <ul class="signals-list">
                 {% for signal in score_result.active_signals %}
                 <li class="signal-pill">{{ signal }}</li>
@@ -184,12 +190,12 @@
         </article>
 
         <article class="result-card">
-            <h2>Risk Explanation</h2>
+            <h2>Пояснення ризику</h2>
             <div class="explanation-callout">
                 <p>{{ explain_result.explanation_text }}</p>
             </div>
 
-            <h3>Explanation Points</h3>
+            <h3>Ключові пояснення</h3>
             <ol>
                 {% for point in explain_result.explanation_points %}
                 <li>{{ point }}</li>
@@ -198,10 +204,10 @@
         </article>
 
         <article class="result-card">
-            <h2>Evidence From Raw Tables</h2>
+            <h2>Підтвердження з сирих таблиць</h2>
             <p class="evidence-intro">
-                These blocks connect the current scoring result with live
-                evidence from <code>data/raw/train_transaction.csv</code>.
+                Ці блоки пов'язують поточний результат скорингу з живими
+                підтвердженнями з <code>data/raw/train_transaction.csv</code>.
             </p>
 
             {% if score_evidence_blocks %}
@@ -228,7 +234,7 @@
                     </div>
                     {% endif %} {% if block.business_note %}
                     <div class="takeaway-card">
-                        <span class="takeaway-label">Why It Matters</span>
+                        <span class="takeaway-label">Чому це важливо</span>
                         <p>{{ block.business_note }}</p>
                     </div>
                     {% endif %}
@@ -244,7 +250,7 @@
     </section>
     {% else %}
     <section class="placeholder">
-        <h2>Result Preview</h2>
+        <h2>Попередній перегляд результату</h2>
         <ul>
             <li>fraud_score</li>
             <li>risk_label</li>

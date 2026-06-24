@@ -29,8 +29,8 @@ async function ensureScreenLoaded(screenName) {
     screen.dataset.loaded = 'loading';
     screen.innerHTML = `
         <article class="content-card deferred-card">
-            <h2>Loading</h2>
-            <p class="deferred-hint">Rendering ${screenName.toUpperCase()} content...</p>
+            <h2>Завантаження</h2>
+            <p class="deferred-hint">Рендеримо вміст розділу ${screenName.toUpperCase()}...</p>
         </article>
     `;
 
@@ -51,8 +51,8 @@ async function ensureScreenLoaded(screenName) {
         screen.dataset.loaded = 'error';
         screen.innerHTML = `
             <article class="content-card deferred-card">
-                <h2>Load Error</h2>
-                <p class="deferred-hint">Could not load ${screenName.toUpperCase()} content.</p>
+                <h2>Помилка завантаження</h2>
+                <p class="deferred-hint">Не вдалося завантажити вміст розділу ${screenName.toUpperCase()}.</p>
             </article>
         `;
     }

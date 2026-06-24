@@ -1,18 +1,18 @@
 <section class="screen" data-screen-name="eda" hidden>
     <article class="content-card">
-        <h2>EDA Insights</h2>
+        <h2>EDA-інсайти</h2>
         <p>
-            This screen renders live summary tables and charts from the local
-            IEEE-CIS CSV files in <code>data/raw/</code> and keeps only the
-            strongest demo sections.
+            Цей екран показує живі зведені таблиці та графіки з локальних
+            IEEE-CIS CSV-файлів у <code>data/raw/</code> і залишає тільки
+            найсильніші демо-блоки.
         </p>
         {% if eda_summary %}
         <section class="summary-block">
             <div class="summary-block-header">
-                <h3>Dataset Snapshot</h3>
+                <h3>Швидкий знімок датасету</h3>
                 <p>
-                    A quick top-level view before you go into individual EDA
-                    cuts and fraud patterns.
+                    Короткий верхньорівневий огляд перед детальнішими EDA-зрізами
+                    та fraud-патернами.
                 </p>
             </div>
             <div class="summary-grid">
@@ -28,7 +28,7 @@
         {% endif %} {% for section in eda_sections %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">EDA Step {{ loop.index }}</p>
+                <p class="learning-step">EDA-крок {{ loop.index }}</p>
                 <h3>{{ section.title }}</h3>
             </div>
 
@@ -36,12 +36,12 @@
             <div class="sql-meta">
                 {% if section.table_name %}
                 <div class="metric">
-                    <span class="metric-label">Result Table</span>
+                    <span class="metric-label">Таблиця результату</span>
                     <span class="metric-value">{{ section.table_name }}</span>
                 </div>
                 {% endif %} {% if section.description %}
                 <div class="metric">
-                    <span class="metric-label">What We See</span>
+                    <span class="metric-label">Що ми бачимо</span>
                     <span class="metric-value">{{ section.description }}</span>
                 </div>
                 {% endif %}

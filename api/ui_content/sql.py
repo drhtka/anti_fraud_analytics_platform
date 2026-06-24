@@ -17,15 +17,15 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
     if dataset_dir is None:
         return [
             {
-                "title": "SQL results are unavailable",
+                "title": "SQL-результати недоступні",
                 "table_name": "missing_local_data",
                 "source_file": "sql/",
-                "description": "The SQL screen needs local IEEE-CIS CSV files in data/raw/ to render result tables.",
-                "query": "Place train_transaction.csv and train_identity.csv into data/raw/ to enable live SQL sections.",
+                "description": "SQL-екрану потрібні локальні IEEE-CIS CSV-файли в data/raw/, щоб показати таблиці результатів.",
+                "query": "Поклади train_transaction.csv і train_identity.csv у data/raw/, щоб увімкнути live SQL-блоки.",
                 "reading_notes": [
-                    "The UI is ready for live DuckDB-backed SQL blocks.",
-                    "As a fallback, the same files can also be placed directly in data/.",
-                    "Once local CSV files are present, the same screen can show real result tables.",
+                    "UI вже готовий до live SQL-блоків на базі DuckDB.",
+                    "Як fallback ті самі файли також можна покласти безпосередньо в data/.",
+                    "Коли локальні CSV-файли будуть доступні, цей самий екран покаже реальні таблиці результатів.",
                 ],
                 "result_html": None,
             }
@@ -37,11 +37,11 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
 
     sql_sections = [
         {
-            "title": "1. Overall fraud rate",
+            "title": "1. Загальна доля фроду",
             "table_name": "overall_fraud_rate",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "This is the first sanity-check table: how many transactions exist and how rare the fraud class is.",
-            "business_takeaway": "Fraud is rare, so the team needs threshold-based review logic instead of naive pass/fail rules based on raw volume.",
+            "description": "Це перша sanity-check таблиця: скільки всього транзакцій і наскільки рідкісним є fraud-клас.",
+            "business_takeaway": "Фрод рідкісний, тому команді потрібна логіка ручної перевірки на основі порогів, а не наївні pass/fail правила за сирим обсягом.",
             "query": """
                 SELECT COUNT(*) AS total_transactions,
                   SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS fraud_transactions,
@@ -52,16 +52,16 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 FROM train_transaction
             """,
             "reading_notes": [
-                "Use this table to explain class imbalance before any modeling.",
-                "It gives context for why precision, recall, and threshold tuning matter in anti-fraud tasks.",
+                "Використовуй цю таблицю, щоб пояснити дисбаланс класів до будь-якого моделювання.",
+                "Вона дає контекст, чому для anti-fraud важливі precision, recall і tuning порога.",
             ],
         },
         {
-            "title": "2. Fraud rate by ProductCD",
+            "title": "2. Fraud rate за ProductCD",
             "table_name": "fraud_rate_by_productcd",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "This segment table shows which product groups behave like higher-risk transaction buckets.",
-            "business_takeaway": "Some product segments deserve closer monitoring because they concentrate more fraud than the portfolio average.",
+            "description": "Ця сегментна таблиця показує, які продуктові групи поводяться як higher-risk transaction buckets.",
+            "business_takeaway": "Деякі продуктові сегменти потребують пильнішого моніторингу, бо концентрують більше фроду, ніж середній рівень по портфелю.",
             "query": """
                 SELECT ProductCD,
                   COUNT(*) AS tx_count,
@@ -75,16 +75,16 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 ORDER BY fraud_rate_pct DESC, tx_count DESC
             """,
             "reading_notes": [
-                "This is one of the first business-readable segment cuts in the project.",
-                "Later this pattern feeds both fraud hypotheses and lightweight scoring signals.",
+                "Це один із перших бізнес-зрозумілих сегментних зрізів у проєкті.",
+                "Пізніше цей патерн підживлює і fraud-гіпотези, і lightweight scoring signals.",
             ],
         },
         {
-            "title": "3. Fraud rate by recipient email domain",
+            "title": "3. Fraud rate за доменом email отримувача",
             "table_name": "fraud_rate_by_r_emaildomain",
             "source_file": "sql/ieee_cis_week_1_duckdb.sql",
-            "description": "Recipient email domains can expose suspicious routing patterns and weak trust signals.",
-            "business_takeaway": "High-risk recipient domains can be turned into analyst watchlists or lightweight scoring signals without waiting for a full model retrain.",
+            "description": "Домени email отримувача можуть виявляти suspicious routing patterns і слабкі trust-сигнали.",
+            "business_takeaway": "Домени отримувача з високим ризиком можна перетворити на watchlist для аналітика або lightweight scoring signals без повного retrain моделі.",
             "query": """
                 SELECT R_emaildomain,
                   COUNT(*) AS tx_count,
@@ -100,16 +100,16 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 LIMIT 15
             """,
             "reading_notes": [
-                "This block is good for explaining why some domains became high-risk candidates.",
-                "It directly connects SQL exploration to later model signals and rules.",
+                "Цей блок добре пояснює, чому деякі домени стали кандидатами високого ризику.",
+                "Він напряму пов'язує SQL-дослідження з подальшими model signals і rules.",
             ],
         },
         {
-            "title": "4. Large transactions vs customer baseline",
+            "title": "4. Великі транзакції проти customer baseline",
             "table_name": "amount_anomalies_vs_customer_baseline",
             "source_file": "sql/02_suspicious_patterns.sql",
-            "description": "This query looks for transactions that are unusually large compared with a customer proxy history.",
-            "business_takeaway": "Customer-relative amount spikes are strong candidates for manual review because they are easier to justify operationally than absolute amount rules.",
+            "description": "Цей запит шукає транзакції, які є незвично великими порівняно з історією customer proxy.",
+            "business_takeaway": "Сплески суми відносно customer baseline є сильними кандидатами на ручну перевірку, бо їх простіше обгрунтувати операційно, ніж абсолютні правила по сумі.",
             "query": """
                 WITH customer_stats AS (
                   SELECT card1 AS customer_proxy,
@@ -130,8 +130,8 @@ def load_sql_sections(data_dir: str) -> list[dict[str, object]]:
                 LIMIT 15
             """,
             "reading_notes": [
-                "This is a classic anti-fraud idea: compare current amount with a personal baseline.",
-                "Later the same logic appears as `feat_amount_gt_card1_avg_plus_3std` in the MVP scoring flow.",
+                "Це класична anti-fraud ідея: порівняти поточну суму з персональним baseline.",
+                "Пізніше ця сама логіка з'являється як `feat_amount_gt_card1_avg_plus_3std` у MVP scoring flow.",
             ],
         },
     ]

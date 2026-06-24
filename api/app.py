@@ -73,9 +73,9 @@ def build_score_request(form_data: dict[str, str]) -> ScoreRequest:
 
 def load_demo_payloads() -> list[dict[str, object]]:
     payload_specs = [
-        ("High Risk", "high_risk.json"),
-        ("Medium-ish", "medium_ish.json"),
-        ("Low Risk", "low_risk.json"),
+        ("Високий ризик", "high_risk.json"),
+        ("Середній ризик", "medium_ish.json"),
+        ("Низький ризик", "low_risk.json"),
     ]
     demo_payloads: list[dict[str, object]] = []
 
@@ -117,9 +117,9 @@ def index(request: Request) -> HTMLResponse:
             )
             if not score_evidence_blocks:
                 score_evidence_note = (
-                    "Current MVP evidence blocks cover ProductCD, email domains, "
-                    "and amount anomalies. This request did not trigger one of "
-                    "those supported table-backed signals."
+                    "Поточні MVP-блоки підтвердження покривають ProductCD, "
+                    "email-домени та аномалії суми. Цей запит не активував "
+                    "один із підтриманих сигналів із табличним підтвердженням."
                 )
             score_result_json = score_result.model_dump(mode="json")
             explain_result_json = explain_result.model_dump(mode="json")
@@ -132,7 +132,7 @@ def index(request: Request) -> HTMLResponse:
         request=request,
         name="index.html",
         context={
-            "page_title": "Anti-Fraud Analytics Platform",
+            "page_title": "Антифрод аналітика та скоринг",
             "form_data": form_data,
             "score_result": score_result,
             "explain_result": explain_result,

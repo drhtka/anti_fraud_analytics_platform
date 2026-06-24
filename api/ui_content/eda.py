@@ -57,29 +57,29 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
     identity_row = identity_rows[0]
     payload = [
         {
-            "label": "Total Transactions",
+            "label": "Усього транзакцій",
             "value": f"{int(summary_row[0]):,}",
-            "description": "The full transaction table used in the current demo flow.",
+            "description": "Повна таблиця транзакцій, яка використовується в поточному demo-flow.",
         },
         {
-            "label": "Fraud Rate",
+            "label": "Доля фроду",
             "value": f"{summary_row[1]}%",
-            "description": "The target imbalance that shapes threshold and review decisions.",
+            "description": "Дисбаланс target, який впливає на поріг рішення та обсяг ручної перевірки.",
         },
         {
-            "label": "Avg Transaction Amt",
+            "label": "Середня сума транзакції",
             "value": f"{summary_row[2]}",
-            "description": "A quick baseline for judging whether current amounts look unusual.",
+            "description": "Швидкий baseline, щоб оцінити, чи виглядає поточна сума нетипово.",
         },
         {
-            "label": "Customer Proxies",
+            "label": "Customer proxies",
             "value": f"{int(summary_row[3]):,}",
-            "description": "Distinct `card1` values used as a lightweight customer proxy.",
+            "description": "Унікальні значення `card1`, які використовуються як lightweight customer proxy.",
         },
         {
-            "label": "Identity Match Rate",
+            "label": "Рівень збігу identity",
             "value": f"{identity_row[0]}%",
-            "description": "Share of transactions that have a linked row in `train_identity`.",
+            "description": "Частка транзакцій, які мають пов'язаний рядок у `train_identity`.",
         },
     ]
     store_cached_payload(base_data_path, "eda_summary", payload)
@@ -92,11 +92,11 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
     if dataset_dir is None:
         return [
             {
-                "title": "EDA data is unavailable",
+                "title": "EDA-дані недоступні",
                 "notes": build_notes(
-                    "Place train_transaction.csv and train_identity.csv into data/raw/ to build the EDA screen.",
-                    "As a fallback, the app also supports the same files directly in data/.",
-                    "The EDA UI is designed to read directly from local CSV files instead of notebook outputs.",
+                    "Поклади train_transaction.csv і train_identity.csv у data/raw/, щоб побудувати EDA-екран.",
+                    "Як fallback застосунок також підтримує ті самі файли безпосередньо в data/.",
+                    "EDA-інтерфейс читає локальні CSV-файли напряму, а не виводи ноутбуків.",
                 ),
                 "outputs": [],
             }
@@ -170,25 +170,25 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
 
         payload = [
             {
-                "title": "1. Quick data overview",
+                "title": "1. Швидкий огляд даних",
                 "table_name": "eda_dataset_overview",
-                "description": "A first orientation block with dataset size, amount scale, and customer-proxy coverage.",
+                "description": "Перший орієнтаційний блок із розміром датасету, масштабом сум і покриттям customer proxy.",
                 "notes": build_notes(
-                    "Start with table size, rough amount metrics, and the number of customer proxies.",
-                    f"train_transaction has {transaction_columns} columns, and train_identity has {identity_columns} columns.",
-                    "This is the first orientation step before fraud-specific cuts.",
+                    "Починаємо з розміру таблиці, базових метрик по сумах і кількості customer proxy.",
+                    f"У train_transaction {transaction_columns} колонок, а у train_identity {identity_columns} колонок.",
+                    "Це перший крок орієнтації перед fraud-специфічними зрізами.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(overview_columns, overview_rows, displayed_rows=10)},
                 ],
             },
             {
-                "title": "2. Target and class imbalance",
+                "title": "2. Target і дисбаланс класів",
                 "table_name": "eda_target_imbalance",
-                "description": "A compact view of fraud rarity that explains why anti-fraud evaluation cannot rely on accuracy alone.",
+                "description": "Компактний зріз рідкісності фроду, який пояснює, чому в anti-fraud не можна покладатися лише на accuracy.",
                 "notes": build_notes(
-                    "For anti-fraud, this is a mandatory early check because fraud is usually rare.",
-                    "This block explains why threshold tuning and review load matter later in the project.",
+                    "Для anti-fraud це обов'язкова рання перевірка, бо фрод зазвичай є рідкісним.",
+                    "Цей блок пояснює, чому далі в проєкті важливі tuning порога й review load.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(imbalance_columns, imbalance_rows, displayed_rows=10)},
@@ -197,19 +197,19 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                         "content": render_chart(
                             ["non_fraud", "fraud"],
                             [float(imbalance_rows[0][2]), float(imbalance_rows[0][1])],
-                            "Class imbalance in train_transaction",
+                            "Дисбаланс класів у train_transaction",
                             color="#dc2626",
                         ),
                     },
                 ],
             },
             {
-                "title": "3. Product segment patterns",
+                "title": "3. Патерни продуктових сегментів",
                 "table_name": "eda_product_segment_risk",
-                "description": "A segment-level table that shows which ProductCD groups look riskier before any model is trained.",
+                "description": "Таблиця на рівні сегментів, яка показує, які групи ProductCD виглядають ризикованішими ще до навчання моделі.",
                 "notes": build_notes(
-                    "This block shows which product segments stand out before any model is trained.",
-                    "ProductCD later becomes part of both anti-fraud hypotheses and MVP features.",
+                    "Цей блок показує, які продуктові сегменти виділяються ще до навчання моделі.",
+                    "ProductCD далі стає частиною і anti-fraud гіпотез, і MVP-ознак.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(product_columns, product_rows, displayed_rows=10)},
@@ -218,18 +218,18 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                         "content": render_chart(
                             [str(row[0]) for row in product_rows],
                             [float(row[2]) for row in product_rows],
-                            "Fraud rate by ProductCD",
+                            "Fraud rate за ProductCD",
                         ),
                     },
                 ],
             },
             {
-                "title": "4. Recipient email domain patterns",
+                "title": "4. Патерни доменів email отримувача",
                 "table_name": "eda_recipient_email_domain_risk",
-                "description": "A domain-level cut that helps explain why some recipient domains became strong suspicious signals.",
+                "description": "Зріз на рівні доменів, який допомагає пояснити, чому деякі домени отримувача стали сильними suspicious-сигналами.",
                 "notes": build_notes(
-                    "Email domain analysis is useful because it is readable both for analysts and for business stakeholders.",
-                    "This block also links directly to later rule ideas and MVP scoring signals.",
+                    "Аналіз email-доменів корисний, бо він зрозумілий і аналітикам, і бізнес-стейкхолдерам.",
+                    "Цей блок також напряму пов'язаний із подальшими rule-ідеями та MVP scoring signals.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(email_domain_columns, email_domain_rows, displayed_rows=12)},
@@ -238,7 +238,7 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                         "content": render_chart(
                             [str(row[0]) for row in email_domain_rows[:8]],
                             [float(row[2]) for row in email_domain_rows[:8]],
-                            "Fraud rate by recipient email domain",
+                            "Fraud rate за доменом email отримувача",
                             color="#7c3aed",
                         ),
                     },

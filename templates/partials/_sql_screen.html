@@ -1,25 +1,25 @@
 <section class="screen" data-screen-name="sql" hidden>
     <article class="content-card">
-        <h2>SQL Findings</h2>
+        <h2>SQL-знахідки</h2>
         <p>
-            This screen runs the strongest SQL investigation blocks from
-            <code>sql/</code> on the local IEEE-CIS CSV files and keeps only the
-            best demo-friendly result tables.
+            Цей екран запускає найсильніші SQL-блоки дослідження з
+            <code>sql/</code> на локальних IEEE-CIS CSV-файлах і залишає лише
+            найкращі демо-таблиці.
         </p>
         {% for section in sql_sections %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">SQL Step {{ loop.index }}</p>
+                <p class="learning-step">SQL-крок {{ loop.index }}</p>
                 <h3>{{ section.title }}</h3>
             </div>
 
             <div class="sql-meta">
                 <div class="metric">
-                    <span class="metric-label">Source File</span>
+                    <span class="metric-label">Файл-джерело</span>
                     <span class="metric-value">{{ section.source_file }}</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Result Table</span>
+                    <span class="metric-label">Таблиця результату</span>
                     <span class="metric-value">{{ section.table_name }}</span>
                 </div>
             </div>
@@ -42,7 +42,7 @@
             </div>
             {% endif %} {% if section.business_takeaway %}
             <div class="takeaway-card">
-                <span class="takeaway-label">Business Takeaway</span>
+                <span class="takeaway-label">Бізнес-висновок</span>
                 <p>{{ section.business_takeaway }}</p>
             </div>
             {% endif %}

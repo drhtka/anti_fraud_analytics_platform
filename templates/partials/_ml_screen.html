@@ -1,17 +1,17 @@
 <section class="screen" data-screen-name="ml" hidden>
     <article class="content-card">
-        <h2>ML Comparison</h2>
+        <h2>Порівняння ML-моделей</h2>
         <p>
-            This screen turns the Week 3 training results into a demo-friendly
-            comparison between <code>LogisticRegression</code> and
+            Цей екран перетворює результати навчання з Week 3 на зручне демо-
+            порівняння між <code>LogisticRegression</code> та
             <code>RandomForestClassifier</code>.
         </p>
 
         <section class="summary-block">
             <div class="summary-block-header">
-                <h3>Model Selection Snapshot</h3>
+                <h3>Короткий знімок вибору моделі</h3>
                 <p>
-                    Source notebook:
+                    Джерело:
                     <code>{{ ml_content.source_notebook }}</code>
                 </p>
             </div>
@@ -27,20 +27,20 @@
         </section>
 
         <div class="takeaway-card">
-            <span class="takeaway-label">Why RandomForest Won</span>
+            <span class="takeaway-label">Чому переміг RandomForest</span>
             <p>{{ ml_content.winner_note }}</p>
         </div>
 
         {% for table in ml_content.tables %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">ML Step {{ loop.index }}</p>
+                <p class="learning-step">ML-крок {{ loop.index }}</p>
                 <h3>{{ table.title }}</h3>
             </div>
 
             <div class="sql-meta">
                 <div class="metric">
-                    <span class="metric-label">Notebook Table</span>
+                    <span class="metric-label">Таблиця з ноутбука</span>
                     <span class="metric-value">{{ table.table_name }}</span>
                 </div>
             </div>
@@ -52,7 +52,7 @@
                 {{ table.html | safe }}
             </div>
             {% else %}
-            <p class="deferred-hint">Notebook output is not available for this block.</p>
+            <p class="deferred-hint">Вивід ноутбука недоступний для цього блоку.</p>
             {% endif %}
         </section>
         {% endfor %}
@@ -60,8 +60,8 @@
         {% if ml_content.final_summary %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">ML Final Takeaway</p>
-                <h3>Week 3 Summary</h3>
+                <p class="learning-step">Підсумок ML</p>
+                <h3>Підсумок Week 3</h3>
             </div>
             <div class="learning-notes">
                 <ul>
