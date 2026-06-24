@@ -16,6 +16,7 @@ function hideDashboardLoading(frameCard) {
     }
 
     frameCard.dataset.ready = 'true';
+    frameCard.classList.remove('is-soft-loading');
     frameCard.classList.remove('is-loading');
 }
 
@@ -51,6 +52,14 @@ function initDashboardEmbeds() {
             hideDashboardLoading(frameCard);
         };
 
+        const softenLoading = () => {
+            if (frameCard.dataset.ready === 'true') {
+                return;
+            }
+
+            frameCard.classList.add('is-soft-loading');
+        };
+
         if (iframeHasStartedLoading(iframe)) {
             finishLoading();
         }
@@ -62,7 +71,8 @@ function initDashboardEmbeds() {
 
         if (frameCard.dataset.fallbackScheduled !== 'true') {
             frameCard.dataset.fallbackScheduled = 'true';
-            window.setTimeout(finishLoading, 1400);
+            window.setTimeout(softenLoading, 900);
+            window.setTimeout(finishLoading, 6000);
         }
     });
 }
