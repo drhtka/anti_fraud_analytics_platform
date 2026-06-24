@@ -204,6 +204,13 @@ button {
     border: 1px solid #cbd5e1;
 }
 
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
 .placeholder {
     margin-top: 20px;
     padding: 20px;
@@ -594,6 +601,11 @@ button {
     display: grid;
     gap: 20px;
     margin-top: 20px;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .result-card {
