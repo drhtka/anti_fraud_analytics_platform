@@ -379,6 +379,22 @@ button {
     border-radius: 12px;
 }
 
+.screen[data-screen-name="eda"] .summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.screen[data-screen-name="eda"] .summary-card {
+    grid-column: span 2;
+}
+
+.screen[data-screen-name="eda"] .summary-card:nth-child(4):nth-last-child(2) {
+    grid-column: 2 / span 2;
+}
+
+.screen[data-screen-name="eda"] .summary-card:nth-child(5):last-child {
+    grid-column: 4 / span 2;
+}
+
 .screen[data-screen-name="ml"] .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
@@ -405,6 +421,16 @@ button {
 }
 
 @media (max-width: 640px) {
+    .screen[data-screen-name="eda"] .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .screen[data-screen-name="eda"] .summary-card,
+    .screen[data-screen-name="eda"] .summary-card:nth-child(4):nth-last-child(2),
+    .screen[data-screen-name="eda"] .summary-card:nth-child(5):last-child {
+        grid-column: auto;
+    }
+
     .screen[data-screen-name="ml"] .summary-grid {
         grid-template-columns: 1fr;
     }
