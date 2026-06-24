@@ -10,5 +10,4 @@ node_modules
 *.pyo
 *.pyd
 data/raw
-notebooks
 docs

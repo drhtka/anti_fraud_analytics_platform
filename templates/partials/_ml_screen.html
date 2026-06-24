@@ -31,6 +31,10 @@
             <p>{{ ml_content.winner_note }}</p>
         </div>
 
+        {% if ml_content.warning %}
+        <p class="deferred-hint">{{ ml_content.warning }}</p>
+        {% endif %}
+
         {% for table in ml_content.tables %}
         <section class="learning-block">
             <div class="learning-block-header">

@@ -51,15 +51,8 @@ def _extract_named_table_outputs(cells: list[dict[str, object]]) -> dict[str, st
     return named_tables
 
 
-def load_ml_content(notebook_path: str) -> dict[str, object]:
-    notebook = json.loads(Path(notebook_path).read_text(encoding="utf-8"))
-    cells = notebook.get("cells", [])
-    if not isinstance(cells, list):
-        cells = []
-
-    named_tables = _extract_named_table_outputs(cells)
-
-    return {
+def _build_ml_content(notebook_path: str, named_tables: dict[str, str], warning: str | None = None) -> dict[str, object]:
+    content: dict[str, object] = {
         "source_notebook": Path(notebook_path).name,
         "overview_cards": [
             {
@@ -127,3 +120,28 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
             },
         ],
     }
+    if warning:
+        content["warning"] = warning
+    return content
+
+
+def load_ml_content(notebook_path: str) -> dict[str, object]:
+    notebook_file = Path(notebook_path)
+    try:
+        notebook = json.loads(notebook_file.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return _build_ml_content(
+            notebook_path,
+            {},
+            warning=(
+                "Ноутбук із результатами ML недоступний у поточному середовищі. "
+                "Перезберіть контейнер, щоб додати файл 05_model_comparison.ipynb."
+            ),
+        )
+
+    cells = notebook.get("cells", [])
+    if not isinstance(cells, list):
+        cells = []
+
+    named_tables = _extract_named_table_outputs(cells)
+    return _build_ml_content(notebook_path, named_tables)
