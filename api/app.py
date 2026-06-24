@@ -77,6 +77,33 @@ def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
 
 
+def format_ui_datetime(value: str | None) -> str:
+    if not value:
+        return "n/a"
+
+    try:
+        parsed_value = datetime.fromisoformat(value)
+    except ValueError:
+        return value
+
+    month_names = {
+        1: "січня",
+        2: "лютого",
+        3: "березня",
+        4: "квітня",
+        5: "травня",
+        6: "червня",
+        7: "липня",
+        8: "серпня",
+        9: "вересня",
+        10: "жовтня",
+        11: "листопада",
+        12: "грудня",
+    }
+    month_label = month_names.get(parsed_value.month, f"{parsed_value.month:02d}")
+    return f"{parsed_value.day} {month_label} {parsed_value.year}, {parsed_value:%H:%M}"
+
+
 def get_score_response(request: ScoreRequest) -> tuple[ScoreResponse, str]:
     cached_response = load_cached_score_response(request)
     if cached_response is not None:
@@ -207,6 +234,7 @@ def index(request: Request) -> HTMLResponse:
             "score_result_json": score_result_json,
             "explain_result_json": explain_result_json,
             "error_message": error_message,
+            "format_ui_datetime": format_ui_datetime,
             "demo_payloads": load_demo_payloads(),
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },

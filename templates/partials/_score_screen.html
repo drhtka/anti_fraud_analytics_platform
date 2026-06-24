@@ -215,8 +215,10 @@
                 </div>
                 <div class="metric">
                     <span class="metric-label">Час скорингу</span>
-                    <span class="metric-value score-op-timestamp"
-                        >{{ score_result.operation_status.scored_at }}</span
+                    <span
+                        class="metric-value score-op-timestamp"
+                        title="{{ score_result.operation_status.scored_at }}"
+                        >{{ format_ui_datetime(score_result.operation_status.scored_at) }}</span
                     >
                 </div>
             </div>
