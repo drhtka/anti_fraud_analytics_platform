@@ -260,6 +260,22 @@ button {
     border-radius: 12px;
 }
 
+.screen[data-screen-name="ml"] .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+.screen[data-screen-name="ml"] .summary-card {
+    height: 100%;
+}
+
+@media (max-width: 640px) {
+    .screen[data-screen-name="ml"] .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .summary-label {
     display: block;
     margin-bottom: 8px;
