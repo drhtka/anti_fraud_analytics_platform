@@ -61,7 +61,7 @@ function initDashboardEmbeds() {
         };
 
         if (iframeHasStartedLoading(iframe)) {
-            finishLoading();
+            softenLoading();
         }
 
         if (iframe.dataset.bound !== 'true') {
@@ -72,7 +72,6 @@ function initDashboardEmbeds() {
         if (frameCard.dataset.fallbackScheduled !== 'true') {
             frameCard.dataset.fallbackScheduled = 'true';
             window.setTimeout(softenLoading, 900);
-            window.setTimeout(finishLoading, 6000);
         }
     });
 }
