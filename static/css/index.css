@@ -211,6 +211,18 @@ button {
     text-decoration: none;
 }
 
+.json-action-link {
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+}
+
+.json-action-link:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
 .placeholder {
     margin-top: 20px;
     padding: 20px;
@@ -601,11 +613,6 @@ button {
     display: grid;
     gap: 20px;
     margin-top: 20px;
-}
-
-.result-actions {
-    display: flex;
-    justify-content: flex-end;
 }
 
 .result-card {

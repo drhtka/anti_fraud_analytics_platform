@@ -133,6 +133,11 @@
             <button type="button" class="secondary-button" id="clear-form">
                 Очистити
             </button>
+            {% if score_result and explain_result %}
+            <a href="#json" class="secondary-button action-link json-action-link">
+                Переглянути JSON
+            </a>
+            {% endif %}
         </div>
     </form>
 
@@ -159,9 +164,6 @@
 
     {% if score_result and explain_result %}
     <section class="results">
-        <div class="result-actions">
-            <a href="#json" class="secondary-button action-link">Переглянути JSON</a>
-        </div>
         <article class="result-card">
             <div class="result-header">
                 <h2>Результат скорингу</h2>
