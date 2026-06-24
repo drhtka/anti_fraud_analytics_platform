@@ -10,11 +10,16 @@ body {
 }
 
 main {
-    width: min(760px, calc(100vw - 40px));
+    width: calc(100% - 40px);
     max-width: 760px;
     margin: 0 auto;
     box-sizing: border-box;
-    padding: 32px 20px 48px;
+    padding: 32px 0 48px;
+}
+
+main > * {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -190,6 +195,11 @@ button {
     background: #ffffff;
     border: 1px solid #dbe3ee;
     border-radius: 12px;
+}
+
+.screen[data-screen-name="ml"] .content-card {
+    max-width: 720px;
+    margin: 0 auto;
 }
 
 .content-card h2,
