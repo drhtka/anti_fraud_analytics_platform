@@ -147,6 +147,18 @@ input {
     background: #fff;
 }
 
+input[readonly] {
+    color: #475569;
+    background: #f8fafc;
+    border-color: #dbe3ee;
+    cursor: default;
+}
+
+input[readonly]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 button {
     width: fit-content;
     padding: 10px 16px;
