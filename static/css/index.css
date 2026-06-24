@@ -266,8 +266,23 @@ button {
     align-items: stretch;
 }
 
+.screen[data-screen-name="ml"] .summary-block {
+    padding: 28px 24px;
+}
+
+.screen[data-screen-name="ml"] .summary-block-header {
+    margin-bottom: 24px;
+}
+
 .screen[data-screen-name="ml"] .summary-card {
+    min-width: 0;
+    box-sizing: border-box;
     height: 100%;
+}
+
+.screen[data-screen-name="ml"] .summary-value,
+.screen[data-screen-name="ml"] .summary-description {
+    overflow-wrap: anywhere;
 }
 
 @media (max-width: 640px) {
