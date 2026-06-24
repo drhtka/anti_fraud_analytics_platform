@@ -6,22 +6,26 @@
             демо-скорингом.
         </p>
 
-        <h3>Відповідь /score</h3>
-        {% if score_result_json %}
-        <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
-        {% else %}
-        <pre class="json-block"><code>{
+        <section class="json-section">
+            <h3>Відповідь /score</h3>
+            {% if score_result_json %}
+            <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
+            {% else %}
+            <pre class="json-block"><code>{
   "message": "Виконай скоринг, щоб побачити тут сирий вивід /score."
 }</code></pre>
-        {% endif %}
+            {% endif %}
+        </section>
 
-        <h3>Відповідь /explain</h3>
-        {% if explain_result_json %}
-        <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
-        {% else %}
-        <pre class="json-block"><code>{
+        <section class="json-section">
+            <h3>Відповідь /explain</h3>
+            {% if explain_result_json %}
+            <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
+            {% else %}
+            <pre class="json-block"><code>{
   "message": "Виконай скоринг, щоб побачити тут сирий вивід /explain."
 }</code></pre>
-        {% endif %}
+            {% endif %}
+        </section>
     </article>
 </section>
