@@ -53,7 +53,7 @@ def render_html_table(columns: list[str], rows: list[tuple], displayed_rows: int
     )
 
     if not body_rows:
-        body_html = f'<tr><td colspan="{len(columns)}">(0 rows)</td></tr>'
+        body_html = f'<tr><td colspan="{len(columns)}">(0 рядків)</td></tr>'
 
     return (
         '<div class="table-wrapper">'
@@ -61,7 +61,7 @@ def render_html_table(columns: list[str], rows: list[tuple], displayed_rows: int
         f"<thead><tr>{header_html}</tr></thead>"
         f"<tbody>{body_html}</tbody>"
         "</table>"
-        f'<p class="table-caption">Showing {min(len(rows), displayed_rows)} of {len(rows)} rows.</p>'
+        f'<p class="table-caption">Показано {min(len(rows), displayed_rows)} з {len(rows)} рядків.</p>'
         "</div>"
     )
 

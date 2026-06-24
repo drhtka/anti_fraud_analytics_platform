@@ -29,13 +29,13 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
         _, summary_rows = run_query(
             connection,
             """
-            SELECT COUNT(*) AS total_transactions,
+            SELECT COUNT(*) AS "Усього транзакцій",
               ROUND(
                 100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
                 4
-              ) AS fraud_rate_pct,
-              ROUND(AVG(TransactionAmt), 2) AS avg_transaction_amount,
-              COUNT(DISTINCT card1) AS customer_proxy_count
+              ) AS "Частка фроду, %",
+              ROUND(AVG(TransactionAmt), 2) AS "Середня сума транзакції",
+              COUNT(DISTINCT card1) AS "Проксі клієнтів"
             FROM train_transaction
             """,
         )
@@ -45,7 +45,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
             SELECT ROUND(
                 100.0 * COUNT(i.TransactionID) / COUNT(t.TransactionID),
                 2
-              ) AS identity_match_rate_pct
+              ) AS "Покриття identity, %"
             FROM train_transaction t
               LEFT JOIN train_identity i USING (TransactionID)
             """,
@@ -64,7 +64,7 @@ def load_eda_summary(data_dir: str) -> list[dict[str, str]]:
         {
             "label": "Доля фроду",
             "value": f"{summary_row[1]}%",
-            "description": "Дисбаланс target, який впливає на поріг рішення та обсяг ручної перевірки.",
+            "description": "Дисбаланс цільового класу, який впливає на поріг рішення та обсяг ручної перевірки.",
         },
         {
             "label": "Середня сума транзакції",
@@ -114,10 +114,10 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
         overview_columns, overview_rows = run_query(
             connection,
             """
-            SELECT COUNT(*) AS total_transactions,
-              COUNT(DISTINCT card1) AS customer_proxy_count,
-              ROUND(AVG(TransactionAmt), 2) AS avg_transaction_amount,
-              ROUND(MAX(TransactionAmt), 2) AS max_transaction_amount
+            SELECT COUNT(*) AS "Усього транзакцій",
+              COUNT(DISTINCT card1) AS "Проксі клієнтів",
+              ROUND(AVG(TransactionAmt), 2) AS "Середня сума транзакції",
+              ROUND(MAX(TransactionAmt), 2) AS "Максимальна сума транзакції"
             FROM train_transaction
             """,
         )
@@ -125,13 +125,13 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
         imbalance_columns, imbalance_rows = run_query(
             connection,
             """
-            SELECT COUNT(*) AS total_transactions,
-              SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS fraud_transactions,
-              SUM(CASE WHEN isFraud = 0 THEN 1 ELSE 0 END) AS non_fraud_transactions,
+            SELECT COUNT(*) AS "Усього транзакцій",
+              SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) AS "Фродові транзакції",
+              SUM(CASE WHEN isFraud = 0 THEN 1 ELSE 0 END) AS "Нефродові транзакції",
               ROUND(
                 100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
                 4
-              ) AS fraud_rate_pct
+              ) AS "Частка фроду, %"
             FROM train_transaction
             """,
         )
@@ -139,16 +139,16 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
         email_domain_columns, email_domain_rows = run_query(
             connection,
             """
-            SELECT COALESCE(R_emaildomain, 'missing') AS recipient_email_domain,
-              COUNT(*) AS tx_count,
+            SELECT COALESCE(R_emaildomain, 'відсутній') AS "Домен електронної пошти отримувача",
+              COUNT(*) AS "Кількість транзакцій",
               ROUND(
                 100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
                 2
-              ) AS fraud_rate_pct
+              ) AS "Частка фроду, %"
             FROM train_transaction
-            GROUP BY recipient_email_domain
+            GROUP BY COALESCE(R_emaildomain, 'відсутній')
             HAVING COUNT(*) >= 100
-            ORDER BY fraud_rate_pct DESC, tx_count DESC
+            ORDER BY "Частка фроду, %" DESC, "Кількість транзакцій" DESC
             LIMIT 12
             """,
         )
@@ -156,48 +156,48 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
         product_columns, product_rows = run_query(
             connection,
             """
-            SELECT ProductCD,
-              COUNT(*) AS tx_count,
+            SELECT ProductCD AS "Продуктовий сегмент",
+              COUNT(*) AS "Кількість транзакцій",
               ROUND(
                 100.0 * SUM(CASE WHEN isFraud = 1 THEN 1 ELSE 0 END) / COUNT(*),
                 2
-              ) AS fraud_rate_pct
+              ) AS "Частка фроду, %"
             FROM train_transaction
             GROUP BY ProductCD
-            ORDER BY fraud_rate_pct DESC, tx_count DESC
+            ORDER BY "Частка фроду, %" DESC, "Кількість транзакцій" DESC
             """,
         )
 
         payload = [
             {
                 "title": "1. Швидкий огляд даних",
-                "table_name": "eda_dataset_overview",
+                "table_name": "Огляд датасету",
                 "description": "Перший орієнтаційний блок із розміром датасету, масштабом сум і покриттям проксі клієнтів.",
                 "notes": build_notes(
                     "Починаємо з розміру таблиці, базових метрик по сумах і кількості проксі клієнтів.",
-                    f"У train_transaction {transaction_columns} колонок, а у train_identity {identity_columns} колонок.",
-                    "Це перший крок орієнтації перед fraud-специфічними зрізами.",
+                    f"У `train_transaction` {transaction_columns} колонок, а у `train_identity` {identity_columns} колонок.",
+                    "Це перший крок орієнтації перед фокусом на фрод-патернах.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(overview_columns, overview_rows, displayed_rows=10)},
                 ],
             },
             {
-                "title": "2. Target і дисбаланс класів",
-                "table_name": "eda_target_imbalance",
-                "description": "Компактний зріз рідкісності фроду, який пояснює, чому в anti-fraud не можна покладатися лише на accuracy.",
+                "title": "2. Цільовий клас і дисбаланс",
+                "table_name": "Дисбаланс цільового класу",
+                "description": "Компактний зріз рідкісності фроду, який пояснює, чому в антифроді не можна покладатися лише на точність.",
                 "notes": build_notes(
-                    "Для anti-fraud це обов'язкова рання перевірка, бо фрод зазвичай є рідкісним.",
-                    "Цей блок пояснює, чому далі в проєкті важливі tuning порога й review load.",
+                    "Для антифроду це обов'язкова рання перевірка, бо фрод зазвичай є рідкісним.",
+                    "Цей блок пояснює, чому далі в проєкті важливі налаштування порога й навантаження на ручну перевірку.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(imbalance_columns, imbalance_rows, displayed_rows=10)},
                     {
                         "kind": "image",
                         "content": render_chart(
-                            ["non_fraud", "fraud"],
+                            ["нефрод", "фрод"],
                             [float(imbalance_rows[0][2]), float(imbalance_rows[0][1])],
-                            "Дисбаланс класів у train_transaction",
+                            "Дисбаланс класів у `train_transaction`",
                             color="#dc2626",
                         ),
                     },
@@ -205,11 +205,11 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
             },
             {
                 "title": "3. Патерни продуктових сегментів",
-                "table_name": "eda_product_segment_risk",
-                "description": "Таблиця на рівні сегментів, яка показує, які групи ProductCD виглядають ризикованішими ще до навчання моделі.",
+                "table_name": "Ризик за продуктовими сегментами",
+                "description": "Таблиця на рівні сегментів, яка показує, які групи ознаки `ProductCD` виглядають ризикованішими ще до навчання моделі.",
                 "notes": build_notes(
                     "Цей блок показує, які продуктові сегменти виділяються ще до навчання моделі.",
-                    "ProductCD далі стає частиною і anti-fraud гіпотез, і MVP-ознак.",
+                    "Ознака `ProductCD` далі стає частиною і антифрод-гіпотез, і MVP-ознак.",
                 ),
                 "outputs": [
                     {"kind": "html", "content": render_html_table(product_columns, product_rows, displayed_rows=10)},
@@ -218,17 +218,17 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                         "content": render_chart(
                             [str(row[0]) for row in product_rows],
                             [float(row[2]) for row in product_rows],
-                            "Fraud rate за ProductCD",
+                            "Частка фроду за `ProductCD`",
                         ),
                     },
                 ],
             },
             {
-                "title": "4. Патерни доменів email отримувача",
-                "table_name": "eda_recipient_email_domain_risk",
+                "title": "4. Патерни доменів електронної пошти отримувача",
+                "table_name": "Ризик за доменами отримувача",
                 "description": "Зріз на рівні доменів, який допомагає пояснити, чому деякі домени отримувача стали сильними підозрілими сигналами.",
                 "notes": build_notes(
-                    "Аналіз email-доменів корисний, бо він зрозумілий і аналітикам, і бізнес-стейкхолдерам.",
+                    "Аналіз доменів електронної пошти корисний, бо він зрозумілий і аналітикам, і бізнес-стейкхолдерам.",
                     "Цей блок також напряму пов'язаний із подальшими ідеями правил та MVP-сигналами скорингу.",
                 ),
                 "outputs": [
@@ -238,7 +238,7 @@ def load_eda_sections(data_dir: str) -> list[dict[str, object]]:
                         "content": render_chart(
                             [str(row[0]) for row in email_domain_rows[:8]],
                             [float(row[2]) for row in email_domain_rows[:8]],
-                            "Fraud rate за доменом email отримувача",
+                            "Частка фроду за доменом електронної пошти отримувача",
                             color="#7c3aed",
                         ),
                     },
