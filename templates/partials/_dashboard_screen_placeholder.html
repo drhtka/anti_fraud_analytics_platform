@@ -1,0 +1,16 @@
+<section
+    class="screen"
+    data-screen-name="dashboard"
+    data-deferred-url="{{ request.url_for('dashboard_screen') }}"
+    data-loaded="false"
+    hidden
+>
+    <article class="content-card deferred-card">
+        <h2>Dashboard</h2>
+        <p>
+            This screen embeds the external Looker Studio BI dashboard only when
+            you open the tab.
+        </p>
+        <p class="deferred-hint">Open the tab to load the embedded dashboard.</p>
+    </article>
+</section>

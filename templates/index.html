@@ -49,6 +49,13 @@
                 <button
                     type="button"
                     class="screen-tab"
+                    data-screen-target="dashboard"
+                >
+                    Dashboard
+                </button>
+                <button
+                    type="button"
+                    class="screen-tab"
                     data-screen-target="json"
                 >
                     JSON
@@ -59,6 +66,7 @@
             "partials/_eda_screen_placeholder.html" %} {% include
             "partials/_sql_screen_placeholder.html" %} {% include
             "partials/_ml_screen_placeholder.html" %} {% include
+            "partials/_dashboard_screen_placeholder.html" %} {% include
             "partials/_json_screen.html" %}
         </main>
         <script id="demo-payloads-json" type="application/json">

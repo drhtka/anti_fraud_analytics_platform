@@ -633,3 +633,27 @@ button {
     border: 1px solid #fdba74;
     border-radius: 12px;
 }
+
+.dashboard-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.dashboard-frame-card {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+}
+
+.dashboard-iframe {
+    display: block;
+    width: 100%;
+    min-height: 900px;
+    border: 0;
+    border-radius: 8px;
+    background: #ffffff;
+}

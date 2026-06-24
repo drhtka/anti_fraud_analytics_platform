@@ -34,6 +34,10 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
 NOTEBOOKS_DIR = BASE_DIR / "notebooks"
+LOOKER_STUDIO_EMBED_URL = (
+    "https://datastudio.google.com/embed/reporting/"
+    "6304c4ce-f5cf-4a42-9fa9-7c5640f8c72a/page/iey1F"
+)
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
@@ -138,6 +142,7 @@ def index(request: Request) -> HTMLResponse:
             "explain_result_json": explain_result_json,
             "error_message": error_message,
             "demo_payloads": load_demo_payloads(),
+            "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },
     )
 
@@ -172,6 +177,17 @@ def ml_screen(request: Request) -> HTMLResponse:
         name="partials/_ml_screen.html",
         context={
             "ml_content": load_ml_content(str(NOTEBOOKS_DIR / "05_model_comparison.ipynb")),
+        },
+    )
+
+
+@app.get("/ui/dashboard", response_class=HTMLResponse, name="dashboard_screen")
+def dashboard_screen(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request=request,
+        name="partials/_dashboard_screen.html",
+        context={
+            "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },
     )
 
