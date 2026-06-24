@@ -144,12 +144,7 @@ demoButtons.forEach((button) => {
 
 if (clearFormButton && transactionForm) {
     clearFormButton.addEventListener('click', () => {
-        Array.from(transactionForm.elements).forEach((element) => {
-            if (!(element instanceof HTMLInputElement)) {
-                return;
-            }
-
-            element.value = '';
-        });
+        const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
+        window.location.assign(cleanUrl);
     });
 }
