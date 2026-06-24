@@ -26,9 +26,66 @@ h1 {
     margin-bottom: 8px;
 }
 
-.intro {
+.hero-panel {
     margin-bottom: 24px;
-    color: #4b5563;
+    padding: 24px;
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
+}
+
+.hero-kicker {
+    display: inline-block;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.hero-panel h1 {
+    margin-top: 0;
+}
+
+.intro {
+    margin-bottom: 20px;
+    color: #334155;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.hero-points {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.hero-point {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 14px;
+}
+
+.hero-point-label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.hero-point p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.55;
 }
 
 .screen-nav {
@@ -421,6 +478,14 @@ button {
 }
 
 @media (max-width: 640px) {
+    .hero-panel {
+        padding: 20px;
+    }
+
+    .hero-points {
+        grid-template-columns: 1fr;
+    }
+
     .screen[data-screen-name="eda"] .summary-grid {
         grid-template-columns: 1fr;
     }
