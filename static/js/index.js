@@ -3,12 +3,41 @@ const clearFormButton = document.getElementById('clear-form');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
 const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
+const scenarioModal = document.getElementById('scenario-modal');
+const closeScenarioModalButton = document.getElementById('close-scenario-modal');
 
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
     : [];
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
+let selectedDemoKey = '';
+
+function showScenarioModal() {
+    if (!(scenarioModal instanceof HTMLDivElement)) {
+        return;
+    }
+
+    scenarioModal.hidden = false;
+}
+
+function hideScenarioModal() {
+    if (!(scenarioModal instanceof HTMLDivElement)) {
+        return;
+    }
+
+    scenarioModal.hidden = true;
+}
+
+function updateSelectedDemoButton(nextDemoKey) {
+    selectedDemoKey = nextDemoKey;
+
+    demoButtons.forEach((button) => {
+        const isActive = button.dataset.demoKey === nextDemoKey;
+        button.classList.toggle('is-selected', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+    });
+}
 
 function hideDashboardLoading(frameCard) {
     if (!(frameCard instanceof HTMLElement) || frameCard.dataset.ready === 'true') {
@@ -194,6 +223,9 @@ demoButtons.forEach((button) => {
             return;
         }
 
+        hideScenarioModal();
+        updateSelectedDemoButton(payloadKey);
+
         Object.entries(payload).forEach(([fieldName, fieldValue]) => {
             const input = transactionForm.elements.namedItem(fieldName);
 
@@ -205,6 +237,31 @@ demoButtons.forEach((button) => {
         });
     });
 });
+
+if (closeScenarioModalButton) {
+    closeScenarioModalButton.addEventListener('click', () => {
+        hideScenarioModal();
+    });
+}
+
+if (scenarioModal instanceof HTMLDivElement) {
+    scenarioModal.addEventListener('click', (event) => {
+        if (event.target === scenarioModal) {
+            hideScenarioModal();
+        }
+    });
+}
+
+if (transactionForm) {
+    transactionForm.addEventListener('submit', (event) => {
+        if (selectedDemoKey) {
+            return;
+        }
+
+        event.preventDefault();
+        showScenarioModal();
+    });
+}
 
 if (clearFormButton && transactionForm) {
     clearFormButton.addEventListener('click', () => {

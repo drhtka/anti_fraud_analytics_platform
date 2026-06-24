@@ -22,6 +22,7 @@
                     placeholder="1000001"
                     value="{{ form_data.transaction_id if form_data else '' }}"
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -36,6 +37,7 @@
                     value="{{ form_data.transaction_amount if form_data else '' }}"
                     required
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -48,6 +50,7 @@
                     value="{{ form_data.product_cd if form_data else '' }}"
                     required
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -60,6 +63,7 @@
                     value="{{ form_data.card1 if form_data else '' }}"
                     required
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -71,6 +75,7 @@
                     placeholder="discover"
                     value="{{ form_data.card4 if form_data else '' }}"
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -82,6 +87,7 @@
                     placeholder="credit"
                     value="{{ form_data.card6 if form_data else '' }}"
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -93,6 +99,7 @@
                     placeholder="outlook.com"
                     value="{{ form_data.p_emaildomain if form_data else '' }}"
                     readonly
+                    tabindex="-1"
                 />
             </label>
 
@@ -104,6 +111,7 @@
                     placeholder="gmail.com"
                     value="{{ form_data.r_emaildomain if form_data else '' }}"
                     readonly
+                    tabindex="-1"
                 />
             </label>
         </div>
@@ -127,6 +135,23 @@
             </button>
         </div>
     </form>
+
+    <div class="modal-backdrop" id="scenario-modal" hidden>
+        <div
+            class="modal-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="scenario-modal-title"
+        >
+            <h3 id="scenario-modal-title">Підказка</h3>
+            <p>Оберіть один із трьох демо-сценаріїв.</p>
+            <div class="modal-actions">
+                <button type="button" class="submit-button" id="close-scenario-modal">
+                    Зрозуміло
+                </button>
+            </div>
+        </div>
+    </div>
 
     {% if error_message %}
     <section class="message error">{{ error_message }}</section>
