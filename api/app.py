@@ -63,6 +63,10 @@ LOOKER_STUDIO_EMBED_URL = (
 )
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+templates.env.policies["json.dumps_kwargs"] = {
+    **templates.env.policies.get("json.dumps_kwargs", {}),
+    "ensure_ascii": False,
+}
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
