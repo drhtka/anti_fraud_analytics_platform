@@ -164,6 +164,65 @@
 
     {% if score_result and explain_result %}
     <section class="results">
+        {% if score_result.operation_status %}
+        <article class="result-card score-op-card">
+            <div class="result-header">
+                <h2>Статус останнього скорингу</h2>
+                <span
+                    class="badge {% if score_result.operation_status.event_status == 'queued' %}badge-low{% elif score_result.operation_status.event_status == 'failed' %}badge-high{% else %}badge-medium{% endif %}"
+                >
+                    {% if score_result.operation_status.event_status == "queued" %}
+                    ЗБЕРЕЖЕНО В ФОН
+                    {% elif score_result.operation_status.event_status == "failed" %}
+                    ФОНОВА ВІДПРАВКА НЕ ВДАЛАСЬ
+                    {% else %} ФОНОВА ВІДПРАВКА ВИМКНЕНА {% endif %}
+                </span>
+            </div>
+            <p class="score-op-intro">
+                Тут видно, як саме був оброблений останній скоринг-запит після
+                натискання кнопки.
+            </p>
+            <div class="meta-grid score-op-grid">
+                <div class="metric">
+                    <span class="metric-label">Джерело відповіді</span>
+                    <span class="metric-value"
+                        >{{ score_result.operation_status.score_source }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Фонова подія</span>
+                    <span class="metric-value"
+                        >{{ score_result.operation_status.event_status }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Канал відправки</span>
+                    <span class="metric-value"
+                        >{{ score_result.operation_status.event_sink }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Режим runtime</span>
+                    <span class="metric-value"
+                        >{{ score_result.operation_status.runtime_mode }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">ID події</span>
+                    <span class="metric-value score-op-event-id"
+                        >{{ score_result.operation_status.event_id or 'n/a' }}</span
+                    >
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Час скорингу</span>
+                    <span class="metric-value score-op-timestamp"
+                        >{{ score_result.operation_status.scored_at }}</span
+                    >
+                </div>
+            </div>
+        </article>
+        {% endif %}
+
         <article class="result-card">
             <div class="result-header">
                 <h2>Результат скорингу</h2>

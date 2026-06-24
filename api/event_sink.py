@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -8,18 +9,27 @@ from api.schemas import ScoreRequest, ScoreResponse
 from api.settings import get_runtime_settings
 
 
-def enqueue_score_event(request: ScoreRequest, response: ScoreResponse) -> bool:
+@dataclass(frozen=True, slots=True)
+class ScoreEventDispatchResult:
+    status: str
+    sink: str
+    event_id: str | None = None
+
+
+def enqueue_score_event(request: ScoreRequest, response: ScoreResponse) -> ScoreEventDispatchResult:
     settings = get_runtime_settings()
     if not settings.celery_event_sink_enabled:
-        return False
+        return ScoreEventDispatchResult(status="disabled", sink="disabled")
 
     try:
         from api.tasks import persist_score_event
     except ImportError:
-        return False
+        return ScoreEventDispatchResult(status="failed", sink="celery_bigquery")
+
+    event_id = str(uuid4())
 
     event_payload = {
-        "event_id": str(uuid4()),
+        "event_id": event_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "transaction_id": request.transaction_id,
         "fraud_score": response.fraud_score,
@@ -36,6 +46,14 @@ def enqueue_score_event(request: ScoreRequest, response: ScoreResponse) -> bool:
     try:
         persist_score_event.delay(event_payload)
     except Exception:
-        return False
+        return ScoreEventDispatchResult(
+            status="failed",
+            sink="celery_bigquery",
+            event_id=event_id,
+        )
 
-    return True
+    return ScoreEventDispatchResult(
+        status="queued",
+        sink="celery_bigquery",
+        event_id=event_id,
+    )

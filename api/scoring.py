@@ -159,6 +159,7 @@ def explain_from_score_response(score_response: ScoreResponse) -> ExplainRespons
         explanation_text=build_explanation_text(score_response),
         explanation_points=build_explanation_points(score_response),
         feature_values=score_response.feature_values,
+        operation_status=score_response.operation_status,
     )
 
 

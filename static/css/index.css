@@ -791,27 +791,28 @@ button {
     line-height: 1.5;
 }
 
-.infra-status-card {
+.score-op-card {
     margin-top: 20px;
 }
 
-.infra-status-intro,
-.infra-status-note {
+.score-op-intro {
     color: #475569;
 }
 
-.infra-status-intro {
+.score-op-intro {
     margin-bottom: 16px;
 }
 
-.infra-status-note {
-    margin-top: 16px;
-    font-size: 13px;
-}
-
-.infra-status-grid .metric-value {
+.score-op-grid .metric-value {
     text-transform: uppercase;
     font-size: 16px;
+}
+
+.score-op-event-id,
+.score-op-timestamp {
+    font-size: 14px;
+    text-transform: none;
+    overflow-wrap: anywhere;
 }
 
 .evidence-intro {

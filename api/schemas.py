@@ -33,6 +33,15 @@ class RuntimeStatusResponse(BaseModel):
     last_checked_at: str
 
 
+class ScoreOperationStatus(BaseModel):
+    runtime_mode: Literal["local", "docker"]
+    score_source: Literal["model", "redis_cache"]
+    event_status: Literal["queued", "disabled", "failed"]
+    event_sink: Literal["celery_bigquery", "disabled"]
+    event_id: str | None = None
+    scored_at: str
+
+
 class ScoreRequest(BaseModel):
     transaction_id: int | None = Field(default=None, description="Optional transaction identifier.")
     transaction_amount: float = Field(..., ge=0, description="Transaction amount.")
@@ -60,6 +69,7 @@ class ScoreResponse(BaseModel):
     model_version: str
     active_signals: list[str]
     feature_values: dict[str, float]
+    operation_status: ScoreOperationStatus | None = None
 
 
 class ExplainResponse(BaseModel):
@@ -74,3 +84,4 @@ class ExplainResponse(BaseModel):
     explanation_text: str
     explanation_points: list[str]
     feature_values: dict[str, float]
+    operation_status: ScoreOperationStatus | None = None

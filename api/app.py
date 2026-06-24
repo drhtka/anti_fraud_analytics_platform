@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from api.schemas import (
     ExplainResponse,
     HealthResponse,
     RuntimeStatusResponse,
+    ScoreOperationStatus,
     ScoreRequest,
     ScoreResponse,
 )
@@ -71,15 +73,36 @@ def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
 
 
-def get_score_response(request: ScoreRequest) -> ScoreResponse:
+def get_score_response(request: ScoreRequest) -> tuple[ScoreResponse, str]:
     cached_response = load_cached_score_response(request)
     if cached_response is not None:
-        return cached_response
+        return cached_response, "redis_cache"
 
     bundle = get_model_bundle()
     score_response = score_transaction(request=request, bundle=bundle)
     store_cached_score_response(request, score_response)
-    return score_response
+    return score_response, "model"
+
+
+def attach_score_operation_status(
+    score_response: ScoreResponse,
+    score_source: str,
+    event_status: str,
+    event_sink: str,
+    event_id: str | None = None,
+) -> ScoreResponse:
+    return score_response.model_copy(
+        update={
+            "operation_status": ScoreOperationStatus(
+                runtime_mode=get_runtime_settings().runtime_mode,
+                score_source=score_source,
+                event_status=event_status,
+                event_sink=event_sink,
+                event_id=event_id,
+                scored_at=datetime.now(timezone.utc).isoformat(),
+            )
+        }
+    )
 
 
 def build_ui_form_data(request: Request) -> dict[str, str]:
@@ -139,7 +162,15 @@ def index(request: Request) -> HTMLResponse:
     if request.query_params:
         try:
             score_request = build_score_request(form_data)
-            score_result = get_score_response(score_request)
+            score_result, score_source = get_score_response(score_request)
+            dispatch_result = enqueue_score_event(score_request, score_result)
+            score_result = attach_score_operation_status(
+                score_result,
+                score_source=score_source,
+                event_status=dispatch_result.status,
+                event_sink=dispatch_result.sink,
+                event_id=dispatch_result.event_id,
+            )
             explain_result = explain_from_score_response(score_result)
             score_evidence_blocks = load_score_evidence(
                 str(DATA_DIR),
@@ -260,19 +291,33 @@ def ops_status() -> RuntimeStatusResponse:
 @app.post("/score", response_model=ScoreResponse)
 def score(request: ScoreRequest) -> ScoreResponse:
     try:
-        score_response = get_score_response(request)
+        score_response, score_source = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-    enqueue_score_event(request, score_response)
-    return score_response
+    dispatch_result = enqueue_score_event(request, score_response)
+    return attach_score_operation_status(
+        score_response,
+        score_source=score_source,
+        event_status=dispatch_result.status,
+        event_sink=dispatch_result.sink,
+        event_id=dispatch_result.event_id,
+    )
 
 
 @app.post("/explain", response_model=ExplainResponse)
 def explain(request: ScoreRequest) -> ExplainResponse:
     try:
-        score_response = get_score_response(request)
+        score_response, score_source = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
+    dispatch_result = enqueue_score_event(request, score_response)
+    score_response = attach_score_operation_status(
+        score_response,
+        score_source=score_source,
+        event_status=dispatch_result.status,
+        event_sink=dispatch_result.sink,
+        event_id=dispatch_result.event_id,
+    )
     return explain_from_score_response(score_response)
