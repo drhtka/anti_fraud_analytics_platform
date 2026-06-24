@@ -7,6 +7,8 @@ const demoPayloadsElement = document.getElementById('demo-payloads-json');
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
     : [];
+const DEFAULT_SCREEN = 'score';
+const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
 
 function getScreens() {
     return document.querySelectorAll('[data-screen-name]');
@@ -61,6 +63,11 @@ async function ensureScreenLoaded(screenName) {
 async function activateScreen(screenName) {
     await ensureScreenLoaded(screenName);
 
+    localStorage.setItem(ACTIVE_SCREEN_STORAGE_KEY, screenName);
+    if (window.location.hash !== `#${screenName}`) {
+        window.location.hash = screenName;
+    }
+
     screenTabs.forEach((tab) => {
         const isActive = tab.dataset.screenTarget === screenName;
         tab.classList.toggle('is-active', isActive);
@@ -72,13 +79,44 @@ async function activateScreen(screenName) {
     });
 }
 
+function getInitialScreenName() {
+    const hashScreen = window.location.hash.replace('#', '').trim();
+    const savedScreen = localStorage.getItem(ACTIVE_SCREEN_STORAGE_KEY) ?? '';
+    const availableScreens = new Set(
+        Array.from(screenTabs).map((tab) => tab.dataset.screenTarget),
+    );
+
+    if (hashScreen && availableScreens.has(hashScreen)) {
+        return hashScreen;
+    }
+
+    if (savedScreen && availableScreens.has(savedScreen)) {
+        return savedScreen;
+    }
+
+    return DEFAULT_SCREEN;
+}
+
 screenTabs.forEach((tab) => {
     tab.addEventListener('click', async () => {
         await activateScreen(tab.dataset.screenTarget);
     });
 });
 
-activateScreen('score');
+window.addEventListener('hashchange', async () => {
+    const hashScreen = window.location.hash.replace('#', '').trim();
+    const availableScreens = new Set(
+        Array.from(screenTabs).map((tab) => tab.dataset.screenTarget),
+    );
+
+    if (!hashScreen || !availableScreens.has(hashScreen)) {
+        return;
+    }
+
+    await activateScreen(hashScreen);
+});
+
+activateScreen(getInitialScreenName());
 
 demoButtons.forEach((button) => {
     button.addEventListener('click', () => {
