@@ -70,7 +70,7 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
             {
                 "label": "Референсна модель",
                 "value": "LogisticRegression",
-                "description": "Базова модель, яку збережено для чесного порівняння у Week 3.",
+                "description": "Базова модель, яку збережено для чесного порівняння.",
             },
             {
                 "label": "Поріг перевірки",

@@ -29,12 +29,19 @@ h1 {
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 20px;
+    justify-content: center;
 }
 
 .screen-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+    min-height: 44px;
     background: #ffffff;
     color: #334155;
     border: 1px solid #cbd5e1;
+    text-align: center;
 }
 
 .screen-tab.is-active {
@@ -332,6 +339,16 @@ button {
 
 .notebook-html-output {
     overflow-x: auto;
+}
+
+.screen[data-screen-name="ml"] .notebook-html-output {
+    display: flex;
+    justify-content: center;
+}
+
+.screen[data-screen-name="ml"] .notebook-html-output table {
+    width: auto;
+    max-width: 100%;
 }
 
 .notebook-html-output table,
