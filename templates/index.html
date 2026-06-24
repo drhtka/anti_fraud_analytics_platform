@@ -32,7 +32,15 @@
                     </article>
                     <article class="hero-point">
                         <span class="hero-point-label">API + UI</span>
-                        <p>Пояснюваний результат для демо, Swagger і перевірки інтеграції.</p>
+                        <p>
+                            Пояснюваний результат для демо,
+                            <a
+                                href="{{ request.url_for('swagger_ui_html') }}"
+                                class="hero-inline-link"
+                                >Swagger</a
+                            >
+                            і перевірки інтеграції.
+                        </p>
                     </article>
                 </div>
             </section>

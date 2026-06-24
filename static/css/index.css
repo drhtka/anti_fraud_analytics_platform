@@ -88,6 +88,24 @@ h1 {
     line-height: 1.55;
 }
 
+.hero-inline-link {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 0 2px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    vertical-align: baseline;
+}
+
+.hero-inline-link:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
 .screen-nav {
     display: flex;
     flex-wrap: wrap;
