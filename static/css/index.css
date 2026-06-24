@@ -767,7 +767,7 @@ button {
 .dashboard-iframe {
     display: block;
     width: 100%;
-    min-height: 900px;
+    height: clamp(940px, calc(72vh + 300px), 1060px);
     border: 0;
     border-radius: 8px;
     background: #ffffff;
