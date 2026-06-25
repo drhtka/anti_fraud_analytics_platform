@@ -11,10 +11,10 @@ A portfolio project focused on anti-fraud analytics, risk scoring, and decision-
 ## Quick Links
 
 - [Overview](#overview)
+- [Architecture](#architecture)
 - [Visual Snapshot](#visual-snapshot)
 - [UI Walkthrough](#ui-walkthrough)
 - [API Docs Preview](#api-docs-preview)
-- [Architecture](#architecture)
 - [Source Materials](#source-materials)
 - [API Scoring Snapshot](#api-scoring-snapshot)
 - [Runtime Modes](#runtime-modes)
@@ -29,6 +29,25 @@ This repository demonstrates an end-to-end anti-fraud workflow on top of the `IE
 - baseline `ML` scoring with business-facing review decisions;
 - `FastAPI` delivery with a UI, API endpoints, and optional Docker infrastructure;
 - Docker-only background export with `Redis`, `Celery`, and `BigQuery`.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[IEEE-CIS CSV files<br/>data/raw/] --> B[DuckDB exploration layer]
+    B --> C[EDA and SQL insights]
+    A --> D[Feature preparation and anti-fraud logic]
+    D --> E[Baseline ML model]
+    E --> F[FastAPI scoring service]
+    F --> G[Score UI and JSON output]
+    F --> H[Latest scoring operation status]
+    F --> I[POST /score and /explain]
+    F --> J{Runtime mode}
+    J -->|local| K[Synchronous scoring only]
+    J -->|docker| L[Redis cache]
+    J -->|docker| M[Celery worker]
+    M --> N[BigQuery scoring events]
+```
 
 ## Visual Snapshot
 
@@ -81,33 +100,14 @@ The repository also includes a browsable `FastAPI` documentation surface that ma
   <img src="docs/assets/readme/swagger-score-response.png" alt="Swagger POST score example with response body" width="82%" />
 </p>
 
-## Architecture
-
-```mermaid
-flowchart LR
-    A[IEEE-CIS CSV files<br/>data/raw/] --> B[DuckDB exploration layer]
-    B --> C[EDA and SQL insights]
-    A --> D[Feature preparation and anti-fraud logic]
-    D --> E[Baseline ML model]
-    E --> F[FastAPI scoring service]
-    F --> G[Score UI and JSON output]
-    F --> H[Latest scoring operation status]
-    F --> I[POST /score and /explain]
-    F --> J{Runtime mode}
-    J -->|local| K[Synchronous scoring only]
-    J -->|docker| L[Redis cache]
-    J -->|docker| M[Celery worker]
-    M --> N[BigQuery scoring events]
-```
-
 ## Source Materials
 
 This MVP is built on top of the public `IEEE-CIS Fraud Detection` dataset and the local raw CSV files derived from it.
 
 - Kaggle dataset source: [IEEE-CIS Fraud Detection](https://www.kaggle.com/datasets/lnasiri007/ieeecis-fraud-detection?resource=download&select=train_identity.csv)
 - Primary raw files used in the project:
-  - `data/raw/train_transaction.csv`
-  - `data/raw/train_identity.csv`
+    - `data/raw/train_transaction.csv`
+    - `data/raw/train_identity.csv`
 - These files power the local `DuckDB` exploration flow, the browser `EDA` views, and the anti-fraud scoring demo inputs.
 
 ## What This Project Shows
