@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     command: uvicorn api.app:app --host 0.0.0.0 --port 8000
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       SCORING_RUNTIME_MODE: docker
       ENABLE_REDIS_SCORE_CACHE: "true"
@@ -25,6 +25,9 @@ services:
     volumes:
       - ./data:/app/data
       - ./secrets:/run/secrets:ro
+    networks:
+      - default
+      - proxy_net
 
   worker:
     build:
@@ -50,8 +53,14 @@ services:
     volumes:
       - ./data:/app/data
       - ./secrets:/run/secrets:ro
+    networks:
+      - default
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+
+networks:
+  proxy_net:
+    external: true
