@@ -132,6 +132,7 @@ async function ensureScreenLoaded(screenName) {
             headers: {
                 'X-Requested-With': 'fetch',
             },
+            credentials: 'same-origin',
         });
 
         if (!response.ok) {
@@ -139,7 +140,17 @@ async function ensureScreenLoaded(screenName) {
         }
 
         const html = await response.text();
-        screen.outerHTML = html;
+        const nextScreen = document.createElement('template');
+        nextScreen.innerHTML = html.trim();
+        const renderedScreen = nextScreen.content.firstElementChild;
+
+        if (!(renderedScreen instanceof HTMLElement)) {
+            throw new Error('Deferred screen did not return a valid root element');
+        }
+
+        renderedScreen.hidden = false;
+        renderedScreen.dataset.loaded = 'true';
+        screen.replaceWith(renderedScreen);
         initDashboardEmbeds();
     } catch (error) {
         screen.dataset.loaded = 'error';

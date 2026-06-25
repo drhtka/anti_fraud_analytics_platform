@@ -14,6 +14,4 @@ data/raw/*
 *.duckdb
 __pycache__/
 .DS_Store
-deploy-scripts/
-deploy-scripts/*
-!deploy-scripts/README.md
+
