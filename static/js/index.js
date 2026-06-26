@@ -6,6 +6,40 @@ const demoPayloadsElement = document.getElementById('demo-payloads-json');
 const scenarioModal = document.getElementById('scenario-modal');
 const closeScenarioModalButton = document.getElementById('close-scenario-modal');
 
+//#region debug-point deferred-tabs-debug
+function reportDeferredDebug(event, payload = {}) {
+    try {
+        const body = JSON.stringify({
+            event,
+            payload,
+            href: window.location.href,
+            ua: window.navigator.userAgent,
+            at: new Date().toISOString(),
+        });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/debug/deferred-tabs', body);
+            return;
+        }
+        fetch('/api/debug/deferred-tabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            keepalive: true,
+            credentials: 'same-origin',
+        }).catch(() => {});
+    } catch (_) {
+        // no-op
+    }
+}
+
+function normalizeDeferredUrl(value) {
+    const url = new URL(value, window.location.origin);
+    url.protocol = window.location.protocol;
+    url.host = window.location.host;
+    return url.toString();
+}
+//#endregion debug-point deferred-tabs-debug
+
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
     : [];
@@ -108,14 +142,28 @@ function initDashboardEmbeds() {
 async function ensureScreenLoaded(screenName) {
     const screen = document.querySelector(`[data-screen-name="${screenName}"]`);
 
+    reportDeferredDebug('ensure_screen_loaded_start', {
+        screenName,
+        hasScreen: Boolean(screen),
+    });
+
     if (!screen) {
         return;
     }
 
     const deferredUrl = screen.dataset.deferredUrl;
+    const requestUrl = deferredUrl ? normalizeDeferredUrl(deferredUrl) : null;
     const alreadyLoaded = screen.dataset.loaded === 'true';
 
-    if (!deferredUrl || alreadyLoaded) {
+    reportDeferredDebug('ensure_screen_loaded_state', {
+        screenName,
+        deferredUrl,
+        requestUrl,
+        loaded: screen.dataset.loaded,
+        hidden: screen.hidden,
+    });
+
+    if (!requestUrl || alreadyLoaded) {
         return;
     }
 
@@ -128,11 +176,20 @@ async function ensureScreenLoaded(screenName) {
     `;
 
     try {
-        const response = await fetch(deferredUrl, {
+        const response = await fetch(requestUrl, {
             headers: {
                 'X-Requested-With': 'fetch',
             },
             credentials: 'same-origin',
+        });
+
+        reportDeferredDebug('ensure_screen_loaded_response', {
+            screenName,
+            status: response.status,
+            ok: response.ok,
+            redirected: response.redirected,
+            contentType: response.headers.get('content-type'),
+            finalUrl: response.url,
         });
 
         if (!response.ok) {
@@ -144,15 +201,33 @@ async function ensureScreenLoaded(screenName) {
         nextScreen.innerHTML = html.trim();
         const renderedScreen = nextScreen.content.firstElementChild;
 
+        reportDeferredDebug('ensure_screen_loaded_html', {
+            screenName,
+            htmlPreview: html.slice(0, 200),
+            hasRenderedScreen: renderedScreen instanceof HTMLElement,
+            renderedTag: renderedScreen?.tagName ?? null,
+            renderedName: renderedScreen?.dataset?.screenName ?? null,
+        });
+
         if (!(renderedScreen instanceof HTMLElement)) {
             throw new Error('Deferred screen did not return a valid root element');
         }
 
-        renderedScreen.hidden = false;
+        renderedScreen.hidden = screen.dataset.screenName !== screenName;
         renderedScreen.dataset.loaded = 'true';
         screen.replaceWith(renderedScreen);
         initDashboardEmbeds();
+
+        reportDeferredDebug('ensure_screen_loaded_success', {
+            screenName,
+            hidden: renderedScreen.hidden,
+            loaded: renderedScreen.dataset.loaded,
+        });
     } catch (error) {
+        reportDeferredDebug('ensure_screen_loaded_error', {
+            screenName,
+            message: error instanceof Error ? error.message : String(error),
+        });
         screen.dataset.loaded = 'error';
         screen.innerHTML = `
             <article class="content-card deferred-card">

@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
@@ -33,6 +33,7 @@ from api.ui_content import (
     load_score_evidence,
     load_sql_sections,
 )
+from api.ui_content.shared import get_ui_cache_dir
 
 
 @asynccontextmanager
@@ -70,6 +71,8 @@ templates.env.policies["json.dumps_kwargs"] = {
 PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+DEBUG_DEFERRED_TABS_LOG = BASE_DIR / "debug-domain-deferred-tabs.ndjson"
 
 
 @lru_cache(maxsize=1)
@@ -239,6 +242,15 @@ def index(request: Request) -> HTMLResponse:
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },
     )
+
+
+@app.post("/api/debug/deferred-tabs")
+async def debug_deferred_tabs(request: Request) -> JSONResponse:
+    payload = await request.json()
+    DEBUG_DEFERRED_TABS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with DEBUG_DEFERRED_TABS_LOG.open("a", encoding="utf-8") as log_file:
+        log_file.write(json.dumps(payload, ensure_ascii=False) + "\n")
+    return JSONResponse({"ok": True})
 
 
 @app.get("/ui/eda", response_class=HTMLResponse, name="eda_screen")
