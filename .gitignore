@@ -14,4 +14,8 @@ data/raw/*
 *.duckdb
 __pycache__/
 .DS_Store
-
+.env
+!secrets/
+secrets/*
+!secrets/*
+!secrets/README.md

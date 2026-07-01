@@ -50,7 +50,6 @@ class RuntimeSettings:
             self.runtime_mode == "docker"
             and self.enable_bigquery_event_sink
             and bool(self.celery_broker_url)
-            and self.bigquery_configured
         )
 
     @property

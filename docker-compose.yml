@@ -18,13 +18,14 @@ services:
       BIGQUERY_DATASET: ${BIGQUERY_DATASET:-anti_fraud_analytics}
       BIGQUERY_TABLE: ${BIGQUERY_TABLE:-scoring_events}
       BIGQUERY_AUTO_CREATE: ${BIGQUERY_AUTO_CREATE:-true}
-      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp-service-account.json
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
       MODEL_ARTIFACT_PATH: /app/api/artifacts/random_forest_mvp.joblib
     depends_on:
       - redis
     volumes:
       - ./data:/app/data
       - ./secrets:/run/secrets:ro
+      - ${GOOGLE_ADC_DIR:-./secrets/gcloud-adc}:/root/.config/gcloud:ro
     networks:
       - default
       - proxy_net
@@ -46,13 +47,14 @@ services:
       BIGQUERY_DATASET: ${BIGQUERY_DATASET:-anti_fraud_analytics}
       BIGQUERY_TABLE: ${BIGQUERY_TABLE:-scoring_events}
       BIGQUERY_AUTO_CREATE: ${BIGQUERY_AUTO_CREATE:-true}
-      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/gcp-service-account.json
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
       MODEL_ARTIFACT_PATH: /app/api/artifacts/random_forest_mvp.joblib
     depends_on:
       - redis
     volumes:
       - ./data:/app/data
       - ./secrets:/run/secrets:ro
+      - ${GOOGLE_ADC_DIR:-./secrets/gcloud-adc}:/root/.config/gcloud:ro
     networks:
       - default
 

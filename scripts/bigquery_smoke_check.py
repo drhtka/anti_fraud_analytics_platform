@@ -17,7 +17,7 @@ def main() -> int:
     project_id = require_env("BIGQUERY_PROJECT_ID")
     dataset = require_env("BIGQUERY_DATASET")
     table = require_env("BIGQUERY_TABLE")
-    credentials_path = require_env("GOOGLE_APPLICATION_CREDENTIALS")
+    credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
 
     client = bigquery.Client(project=project_id)
     query = """
