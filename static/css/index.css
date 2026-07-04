@@ -31,6 +31,7 @@ h1 {
 }
 
 .hero-panel {
+    position: relative;
     margin-bottom: 24px;
     padding: 24px;
     background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
@@ -40,10 +41,7 @@ h1 {
 }
 
 .hero-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    display: block;
     margin-bottom: 10px;
 }
 
@@ -60,6 +58,9 @@ h1 {
 }
 
 .language-switcher {
+    position: absolute;
+    top: 24px;
+    right: 24px;
     display: inline-flex;
     gap: 6px;
     padding: 4px;
@@ -701,12 +702,16 @@ button {
 
 @media (max-width: 640px) {
     .hero-topbar {
-        flex-direction: column;
-        align-items: flex-start;
+        margin-bottom: 12px;
     }
 
     .hero-panel {
         padding: 20px;
+    }
+
+    .language-switcher {
+        top: 20px;
+        right: 20px;
     }
 
     .hero-points {
