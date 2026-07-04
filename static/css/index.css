@@ -67,6 +67,7 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
+    margin-bottom: 14px;
 }
 
 .hero-point {
@@ -108,6 +109,61 @@ h1 {
 .hero-inline-link:hover {
     background: #dbeafe;
     border-color: #93c5fd;
+}
+
+.hero-data-sources {
+    display: grid;
+    gap: 12px;
+}
+
+.hero-data-source-card {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 14px;
+}
+
+.hero-data-source-card p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.55;
+}
+
+.hero-data-file-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hero-data-file-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.hero-data-file-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.hero-data-file-item p {
+    margin: 4px 0 8px;
+}
+
+.hero-data-file-item code {
+    display: inline-block;
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 12px;
+    word-break: break-all;
 }
 
 .screen-nav {
@@ -557,6 +613,10 @@ button {
 
     .hero-points {
         grid-template-columns: 1fr;
+    }
+
+    .hero-data-file-item {
+        flex-direction: column;
     }
 
     .screen[data-screen-name="eda"] .summary-grid {

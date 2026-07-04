@@ -43,6 +43,41 @@
                         </p>
                     </article>
                 </div>
+                <section class="hero-data-sources" aria-label="Джерела даних">
+                    <div class="hero-data-source-card">
+                        <span class="hero-point-label">Джерело даних</span>
+                        <p>
+                            Таблиці для MVP взяті з
+                            <a
+                                href="{{ dataset_source_url }}"
+                                class="hero-inline-link"
+                                target="_blank"
+                                rel="noreferrer"
+                                >Kaggle IEEE-CIS Fraud Detection</a
+                            >.
+                        </p>
+                    </div>
+                    <div class="hero-data-source-card">
+                        <span class="hero-point-label">Локальні CSV</span>
+                        <ul class="hero-data-file-list">
+                            {% for dataset_name, dataset in downloadable_datasets.items() %}
+                            <li class="hero-data-file-item">
+                                <div>
+                                    <strong>{{ dataset.label }}</strong>
+                                    <p>{{ dataset.description }}</p>
+                                    <code>{{ dataset.path }}</code>
+                                </div>
+                                <a
+                                    href="{{ request.url_for('download_dataset', dataset_name=dataset_name) }}"
+                                    class="hero-inline-link"
+                                    download="{{ dataset.label }}"
+                                    >Скачати CSV</a
+                                >
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
             </section>
             <nav class="screen-nav" aria-label="Основні розділи">
                 <button

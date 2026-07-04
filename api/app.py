@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
@@ -57,6 +57,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR = BASE_DIR / "data"
+RAW_DATA_DIR = DATA_DIR / "raw"
 NOTEBOOKS_DIR = BASE_DIR / "notebooks"
 LOOKER_STUDIO_EMBED_URL = (
     "https://datastudio.google.com/embed/reporting/"
@@ -73,6 +74,21 @@ PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 DEBUG_DEFERRED_TABS_LOG = BASE_DIR / "debug-domain-deferred-tabs.ndjson"
+DATASET_SOURCE_URL = (
+    "https://www.kaggle.com/datasets/lnasiri007/ieeecis-fraud-detection/data"
+)
+DOWNLOADABLE_DATASETS = {
+    "train_identity": {
+        "label": "train_identity.csv",
+        "path": RAW_DATA_DIR / "train_identity.csv",
+        "description": "Identity-таблиця з device/browser/user identity ознаками.",
+    },
+    "train_transaction": {
+        "label": "train_transaction.csv",
+        "path": RAW_DATA_DIR / "train_transaction.csv",
+        "description": "Transaction-таблиця з основними fraud-фічами та цільовою змінною.",
+    },
+}
 
 
 @lru_cache(maxsize=1)
@@ -240,6 +256,8 @@ def index(request: Request) -> HTMLResponse:
             "format_ui_datetime": format_ui_datetime,
             "demo_payloads": load_demo_payloads(),
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
+            "dataset_source_url": DATASET_SOURCE_URL,
+            "downloadable_datasets": DOWNLOADABLE_DATASETS,
         },
     )
 
@@ -295,6 +313,25 @@ def dashboard_screen(request: Request) -> HTMLResponse:
         context={
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },
+    )
+
+
+@app.get("/downloads/{dataset_name}", name="download_dataset")
+def download_dataset(dataset_name: str) -> FileResponse:
+    dataset = DOWNLOADABLE_DATASETS.get(dataset_name)
+
+    if dataset is None:
+        raise HTTPException(status_code=404, detail="Dataset not found.")
+
+    dataset_path = dataset["path"]
+
+    if not isinstance(dataset_path, Path) or not dataset_path.exists():
+        raise HTTPException(status_code=404, detail="Dataset file is missing.")
+
+    return FileResponse(
+        path=dataset_path,
+        filename=dataset["label"],
+        media_type="text/csv",
     )
 
 
