@@ -1,5 +1,11 @@
 # Secrets Directory
 
+# Google Cloud Service Account Key
+
+# https://console.cloud.google.com/auth/clients?project=anti-fraud-analytics
+
+https://console.cloud.google.com/auth/clients?project=anti-fraud-analytics
+
 Put Docker-only secrets here.
 
 Expected file:

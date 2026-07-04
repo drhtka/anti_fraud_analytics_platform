@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: uvicorn api.app:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
     expose:
       - "8000"
     environment:
@@ -35,6 +36,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: celery -A api.celery_app.celery_app worker --loglevel=info
+    restart: unless-stopped
     environment:
       SCORING_RUNTIME_MODE: docker
       ENABLE_REDIS_SCORE_CACHE: "true"
@@ -60,8 +62,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
 
 networks:
   proxy_net:
