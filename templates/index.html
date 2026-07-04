@@ -63,10 +63,10 @@
                             >.
                         </p>
                     </div>
-                    <ul class="hero-points hero-data-file-grid">
+                    <div class="hero-data-file-grid">
                         {% for dataset_name, dataset in
                         downloadable_datasets.items() %}
-                        <li class="hero-point hero-data-file-item">
+                        <article class="hero-point hero-data-file-item">
                             <div class="hero-data-file-content">
                                 <span class="hero-data-file-kicker"
                                     >{{ dataset.title }}</span
@@ -86,9 +86,9 @@
                                 download="{{ dataset.label }}"
                                 >Скачати CSV</a
                             >
-                        </li>
+                        </article>
                         {% endfor %}
-                    </ul>
+                    </div>
                 </section>
             </section>
             <nav class="screen-nav" aria-label="Основні розділи">
