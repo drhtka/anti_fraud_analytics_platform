@@ -45,6 +45,7 @@ const demoPayloads = demoPayloadsElement
     : [];
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
+const inFlightScreenLoads = new Map();
 let selectedDemoKey = '';
 
 function showScenarioModal() {
@@ -153,7 +154,8 @@ async function ensureScreenLoaded(screenName) {
 
     const deferredUrl = screen.dataset.deferredUrl;
     const requestUrl = deferredUrl ? normalizeDeferredUrl(deferredUrl) : null;
-    const alreadyLoaded = screen.dataset.loaded === 'true';
+    const currentLoadState = screen.dataset.loaded;
+    const alreadyLoaded = currentLoadState === 'true';
 
     reportDeferredDebug('ensure_screen_loaded_state', {
         screenName,
@@ -167,6 +169,10 @@ async function ensureScreenLoaded(screenName) {
         return;
     }
 
+    if (currentLoadState === 'loading') {
+        return inFlightScreenLoads.get(screenName);
+    }
+
     screen.dataset.loaded = 'loading';
     screen.innerHTML = `
         <article class="content-card deferred-card">
@@ -175,67 +181,74 @@ async function ensureScreenLoaded(screenName) {
         </article>
     `;
 
-    try {
-        const response = await fetch(requestUrl, {
-            headers: {
-                'X-Requested-With': 'fetch',
-            },
-            credentials: 'same-origin',
-        });
+    const loadPromise = (async () => {
+        try {
+            const response = await fetch(requestUrl, {
+                headers: {
+                    'X-Requested-With': 'fetch',
+                },
+                credentials: 'same-origin',
+            });
 
-        reportDeferredDebug('ensure_screen_loaded_response', {
-            screenName,
-            status: response.status,
-            ok: response.ok,
-            redirected: response.redirected,
-            contentType: response.headers.get('content-type'),
-            finalUrl: response.url,
-        });
+            reportDeferredDebug('ensure_screen_loaded_response', {
+                screenName,
+                status: response.status,
+                ok: response.ok,
+                redirected: response.redirected,
+                contentType: response.headers.get('content-type'),
+                finalUrl: response.url,
+            });
 
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const html = await response.text();
+            const nextScreen = document.createElement('template');
+            nextScreen.innerHTML = html.trim();
+            const renderedScreen = nextScreen.content.firstElementChild;
+
+            reportDeferredDebug('ensure_screen_loaded_html', {
+                screenName,
+                htmlPreview: html.slice(0, 200),
+                hasRenderedScreen: renderedScreen instanceof HTMLElement,
+                renderedTag: renderedScreen?.tagName ?? null,
+                renderedName: renderedScreen?.dataset?.screenName ?? null,
+            });
+
+            if (!(renderedScreen instanceof HTMLElement)) {
+                throw new Error('Deferred screen did not return a valid root element');
+            }
+
+            renderedScreen.hidden = screen.dataset.screenName !== screenName;
+            renderedScreen.dataset.loaded = 'true';
+            screen.replaceWith(renderedScreen);
+            initDashboardEmbeds();
+
+            reportDeferredDebug('ensure_screen_loaded_success', {
+                screenName,
+                hidden: renderedScreen.hidden,
+                loaded: renderedScreen.dataset.loaded,
+            });
+        } catch (error) {
+            reportDeferredDebug('ensure_screen_loaded_error', {
+                screenName,
+                message: error instanceof Error ? error.message : String(error),
+            });
+            screen.dataset.loaded = 'error';
+            screen.innerHTML = `
+                <article class="content-card deferred-card">
+                    <h2>Помилка завантаження</h2>
+                    <p class="deferred-hint">Не вдалося завантажити вміст розділу ${screenName.toUpperCase()}.</p>
+                </article>
+            `;
+        } finally {
+            inFlightScreenLoads.delete(screenName);
         }
+    })();
 
-        const html = await response.text();
-        const nextScreen = document.createElement('template');
-        nextScreen.innerHTML = html.trim();
-        const renderedScreen = nextScreen.content.firstElementChild;
-
-        reportDeferredDebug('ensure_screen_loaded_html', {
-            screenName,
-            htmlPreview: html.slice(0, 200),
-            hasRenderedScreen: renderedScreen instanceof HTMLElement,
-            renderedTag: renderedScreen?.tagName ?? null,
-            renderedName: renderedScreen?.dataset?.screenName ?? null,
-        });
-
-        if (!(renderedScreen instanceof HTMLElement)) {
-            throw new Error('Deferred screen did not return a valid root element');
-        }
-
-        renderedScreen.hidden = screen.dataset.screenName !== screenName;
-        renderedScreen.dataset.loaded = 'true';
-        screen.replaceWith(renderedScreen);
-        initDashboardEmbeds();
-
-        reportDeferredDebug('ensure_screen_loaded_success', {
-            screenName,
-            hidden: renderedScreen.hidden,
-            loaded: renderedScreen.dataset.loaded,
-        });
-    } catch (error) {
-        reportDeferredDebug('ensure_screen_loaded_error', {
-            screenName,
-            message: error instanceof Error ? error.message : String(error),
-        });
-        screen.dataset.loaded = 'error';
-        screen.innerHTML = `
-            <article class="content-card deferred-card">
-                <h2>Помилка завантаження</h2>
-                <p class="deferred-hint">Не вдалося завантажити вміст розділу ${screenName.toUpperCase()}.</p>
-            </article>
-        `;
-    }
+    inFlightScreenLoads.set(screenName, loadPromise);
+    return loadPromise;
 }
 
 async function activateScreen(screenName) {
