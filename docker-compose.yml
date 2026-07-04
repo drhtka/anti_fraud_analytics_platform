@@ -28,8 +28,10 @@ services:
       - ./secrets:/run/secrets:ro
       - ${GOOGLE_ADC_DIR:-./secrets/gcloud-adc}:/root/.config/gcloud:ro
     networks:
-      - default
-      - proxy_net
+      default:
+      proxy_net:
+        aliases:
+          - antifraud_app
 
   worker:
     build:
