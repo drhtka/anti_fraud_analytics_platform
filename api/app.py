@@ -185,6 +185,10 @@ def build_ui_form_data(request: Request) -> dict[str, str]:
     }
 
 
+def has_score_form_input(form_data: dict[str, str]) -> bool:
+    return any(value.strip() for value in form_data.values())
+
+
 def build_score_request(form_data: dict[str, str]) -> ScoreRequest:
     normalized_payload = {
         key: (value if value != "" else None)
@@ -342,7 +346,7 @@ def index(request: Request) -> HTMLResponse:
     explain_result_json: dict[str, object] | None = None
     error_message: str | None = None
 
-    if request.query_params:
+    if has_score_form_input(form_data):
         try:
             score_request = build_score_request(form_data)
             score_result, score_source = get_score_response(score_request)
