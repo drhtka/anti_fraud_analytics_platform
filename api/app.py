@@ -14,6 +14,7 @@ from pydantic import ValidationError
 
 from api.cache import load_cached_score_response, store_cached_score_response
 from api.event_sink import enqueue_score_event
+from api.i18n import DEFAULT_LANGUAGE, Language, detect_language, translate
 from api.model_bundle import ModelBundle, load_model_bundle
 from api.runtime_status import build_runtime_status
 from api.schemas import (
@@ -24,7 +25,7 @@ from api.schemas import (
     ScoreRequest,
     ScoreResponse,
 )
-from api.scoring import explain_from_score_response, score_transaction
+from api.scoring import explain_from_score_response, localize_score_response, score_transaction
 from api.settings import DEFAULT_MODEL_ARTIFACT_PATH, get_runtime_settings
 from api.ui_content import (
     load_eda_sections,
@@ -78,16 +79,12 @@ DATASET_SOURCE_URL = (
 )
 DOWNLOADABLE_DATASETS = {
     "train_identity": {
-        "title": "Identity-ознаки",
         "label": "train_identity.csv",
         "path": RAW_DATA_DIR / "train_identity.csv",
-        "description": "Identity-таблиця з device/browser/user identity ознаками.",
     },
     "train_transaction": {
-        "title": "Транзакції та fraud-мітка",
         "label": "train_transaction.csv",
         "path": RAW_DATA_DIR / "train_transaction.csv",
-        "description": "Transaction-таблиця з основними fraud-фічами та цільовою змінною.",
     },
 }
 
@@ -97,7 +94,7 @@ def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
 
 
-def format_ui_datetime(value: str | None) -> str:
+def format_ui_datetime(value: str | None, lang: Language) -> str:
     if not value:
         return "n/a"
 
@@ -106,21 +103,40 @@ def format_ui_datetime(value: str | None) -> str:
     except ValueError:
         return value
 
-    month_names = {
-        1: "січня",
-        2: "лютого",
-        3: "березня",
-        4: "квітня",
-        5: "травня",
-        6: "червня",
-        7: "липня",
-        8: "серпня",
-        9: "вересня",
-        10: "жовтня",
-        11: "листопада",
-        12: "грудня",
-    }
+    month_names = (
+        {
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December",
+        }
+        if lang == "en"
+        else {
+            1: "січня",
+            2: "лютого",
+            3: "березня",
+            4: "квітня",
+            5: "травня",
+            6: "червня",
+            7: "липня",
+            8: "серпня",
+            9: "вересня",
+            10: "жовтня",
+            11: "листопада",
+            12: "грудня",
+        }
+    )
     month_label = month_names.get(parsed_value.month, f"{parsed_value.month:02d}")
+    if lang == "en":
+        return f"{month_label} {parsed_value.day}, {parsed_value.year}, {parsed_value:%H:%M}"
     return f"{parsed_value.day} {month_label} {parsed_value.year}, {parsed_value:%H:%M}"
 
 
@@ -177,11 +193,64 @@ def build_score_request(form_data: dict[str, str]) -> ScoreRequest:
     return ScoreRequest(**normalized_payload)
 
 
-def load_demo_payloads() -> list[dict[str, object]]:
+def build_frontend_i18n(lang: Language) -> dict[str, object]:
+    return {
+        "scorePlaceholderTitle": translate(
+            lang,
+            "Готово до демонстрації скорингу",
+            "Ready for the scoring demo",
+        ),
+        "scorePlaceholderIntro": translate(
+            lang,
+            'Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".',
+            'Choose one of the three demo scenarios and click "Run scoring".',
+        ),
+        "scorePlaceholderAfter": translate(
+            lang,
+            "Після запуску на цій сторінці з'являться:",
+            "After running, this page will show:",
+        ),
+        "scorePlaceholderBullets": [
+            translate(lang, "підсумковий fraud score і рівень ризику;", "the final fraud score and risk level;"),
+            translate(lang, "рішення щодо ручної перевірки;", "the manual review decision;"),
+            translate(lang, "активні ризик-сигнали для транзакції;", "active risk signals for the transaction;"),
+            translate(lang, "коротке пояснення результату;", "a short explanation of the result;"),
+            translate(
+                lang,
+                "підтвердження з сирих таблиць для ключових сигналів.",
+                "evidence from the raw tables for key signals.",
+            ),
+        ],
+        "loadingTitle": translate(lang, "Завантаження", "Loading"),
+        "loadingHintPrefix": translate(
+            lang,
+            "Рендеримо вміст розділу",
+            "Rendering content for",
+        ),
+        "loadingErrorTitle": translate(lang, "Помилка завантаження", "Loading error"),
+        "loadingErrorPrefix": translate(
+            lang,
+            "Не вдалося завантажити вміст розділу",
+            "Failed to load content for",
+        ),
+        "submitRunning": translate(lang, "Виконуємо скоринг...", "Running scoring..."),
+        "submitDefault": translate(lang, "Виконати скоринг", "Run scoring"),
+        "screenLabels": {
+            "score": translate(lang, "Скоринг", "Scoring"),
+            "eda": "EDA",
+            "sql": "SQL",
+            "ml": "ML",
+            "dashboard": translate(lang, "Дашборд", "Dashboard"),
+            "json": "JSON",
+        },
+    }
+
+
+def load_demo_payloads(lang: Language) -> list[dict[str, object]]:
     payload_specs = [
-        ("Високий ризик", "high_risk.json"),
-        ("Середній ризик", "medium_ish.json"),
-        ("Низький ризик", "low_risk.json"),
+        (translate(lang, "Високий ризик", "High risk"), "high_risk.json"),
+        (translate(lang, "Середній ризик", "Medium risk"), "medium_ish.json"),
+        (translate(lang, "Низький ризик", "Low risk"), "low_risk.json"),
     ]
     demo_payloads: list[dict[str, object]] = []
 
@@ -209,8 +278,8 @@ def format_file_size(num_bytes: int) -> str:
     return "n/a"
 
 
-@lru_cache(maxsize=1)
-def get_downloadable_datasets() -> dict[str, dict[str, object]]:
+@lru_cache(maxsize=2)
+def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
     datasets: dict[str, dict[str, object]] = {}
 
     for dataset_name, dataset in DOWNLOADABLE_DATASETS.items():
@@ -224,6 +293,24 @@ def get_downloadable_datasets() -> dict[str, dict[str, object]]:
 
         datasets[dataset_name] = {
             **dataset,
+            "title": (
+                translate(lang, "Identity-ознаки", "Identity features")
+                if dataset_name == "train_identity"
+                else translate(lang, "Транзакції та fraud-мітка", "Transactions and fraud label")
+            ),
+            "description": (
+                translate(
+                    lang,
+                    "Identity-таблиця з device/browser/user identity ознаками.",
+                    "Identity table with device, browser, and user identity features.",
+                )
+                if dataset_name == "train_identity"
+                else translate(
+                    lang,
+                    "Transaction-таблиця з основними fraud-фічами та цільовою змінною.",
+                    "Transaction table with the main fraud features and the target label.",
+                )
+            ),
             "path_text": str(dataset_path),
             "file_size": format_file_size(file_size_bytes),
             "row_count": row_count,
@@ -234,6 +321,8 @@ def get_downloadable_datasets() -> dict[str, dict[str, object]]:
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
+    lang = detect_language(request)
+    tr = lambda uk, en: translate(lang, uk, en)
     form_data = build_ui_form_data(request)
     score_result: ScoreResponse | None = None
     explain_result: ExplainResponse | None = None
@@ -247,6 +336,7 @@ def index(request: Request) -> HTMLResponse:
         try:
             score_request = build_score_request(form_data)
             score_result, score_source = get_score_response(score_request)
+            score_result = localize_score_response(score_result, lang)
             dispatch_result = enqueue_score_event(score_request, score_result)
             score_result = attach_score_operation_status(
                 score_result,
@@ -255,17 +345,21 @@ def index(request: Request) -> HTMLResponse:
                 event_sink=dispatch_result.sink,
                 event_id=dispatch_result.event_id,
             )
-            explain_result = explain_from_score_response(score_result)
+            explain_result = explain_from_score_response(score_result, lang=lang)
             score_evidence_blocks = load_score_evidence(
                 str(DATA_DIR),
                 score_request=score_request,
                 feature_values=score_result.feature_values,
+                lang=lang,
             )
             if not score_evidence_blocks:
-                score_evidence_note = (
+                score_evidence_note = tr(
                     "Поточні MVP-блоки підтвердження покривають ProductCD, "
                     "email-домени та аномалії суми. Цей запит не активував "
-                    "один із підтриманих сигналів із табличним підтвердженням."
+                    "один із підтриманих сигналів із табличним підтвердженням.",
+                    "The current MVP evidence blocks cover ProductCD, email domains, "
+                    "and amount anomalies. This request did not trigger one of the "
+                    "supported signals with tabular evidence.",
                 )
             score_result_json = score_result.model_dump(mode="json")
             explain_result_json = explain_result.model_dump(mode="json")
@@ -274,11 +368,13 @@ def index(request: Request) -> HTMLResponse:
         except ValidationError as exc:
             error_message = exc.errors()[0]["msg"]
 
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
-            "page_title": "Антифрод аналітика та скоринг",
+            "lang": lang,
+            "page_title": tr("Антифрод аналітика та скоринг", "Anti-fraud analytics and scoring"),
+            "tr": tr,
             "form_data": form_data,
             "score_result": score_result,
             "explain_result": explain_result,
@@ -287,13 +383,16 @@ def index(request: Request) -> HTMLResponse:
             "score_result_json": score_result_json,
             "explain_result_json": explain_result_json,
             "error_message": error_message,
-            "format_ui_datetime": format_ui_datetime,
-            "demo_payloads": load_demo_payloads(),
+            "format_ui_datetime": lambda value: format_ui_datetime(value, lang),
+            "demo_payloads": load_demo_payloads(lang),
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
             "dataset_source_url": DATASET_SOURCE_URL,
-            "downloadable_datasets": get_downloadable_datasets(),
+            "downloadable_datasets": get_downloadable_datasets(lang),
+            "frontend_i18n": build_frontend_i18n(lang),
         },
     )
+    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return response
 
 
 @app.post("/api/debug/deferred-tabs")
@@ -307,47 +406,67 @@ async def debug_deferred_tabs(request: Request) -> JSONResponse:
 
 @app.get("/ui/eda", response_class=HTMLResponse, name="eda_screen")
 def eda_screen(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
+    lang = detect_language(request)
+    response = templates.TemplateResponse(
         request=request,
         name="partials/_eda_screen.html",
         context={
-            "eda_summary": load_eda_summary(str(DATA_DIR)),
-            "eda_sections": load_eda_sections(str(DATA_DIR)),
+            "lang": lang,
+            "tr": lambda uk, en: translate(lang, uk, en),
+            "eda_summary": load_eda_summary(str(DATA_DIR), lang=lang),
+            "eda_sections": load_eda_sections(str(DATA_DIR), lang=lang),
         },
     )
+    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return response
 
 
 @app.get("/ui/sql", response_class=HTMLResponse, name="sql_screen")
 def sql_screen(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
+    lang = detect_language(request)
+    response = templates.TemplateResponse(
         request=request,
         name="partials/_sql_screen.html",
         context={
-            "sql_sections": load_sql_sections(str(DATA_DIR)),
+            "lang": lang,
+            "tr": lambda uk, en: translate(lang, uk, en),
+            "sql_sections": load_sql_sections(str(DATA_DIR), lang=lang),
         },
     )
+    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return response
 
 
 @app.get("/ui/ml", response_class=HTMLResponse, name="ml_screen")
 def ml_screen(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
+    lang = detect_language(request)
+    response = templates.TemplateResponse(
         request=request,
         name="partials/_ml_screen.html",
         context={
-            "ml_content": load_ml_content(str(NOTEBOOKS_DIR / "05_model_comparison.ipynb")),
+            "lang": lang,
+            "tr": lambda uk, en: translate(lang, uk, en),
+            "ml_content": load_ml_content(str(NOTEBOOKS_DIR / "05_model_comparison.ipynb"), lang=lang),
         },
     )
+    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return response
 
 
 @app.get("/ui/dashboard", response_class=HTMLResponse, name="dashboard_screen")
 def dashboard_screen(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(
+    lang = detect_language(request)
+    response = templates.TemplateResponse(
         request=request,
         name="partials/_dashboard_screen.html",
         context={
+            "lang": lang,
+            "tr": lambda uk, en: translate(lang, uk, en),
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
         },
     )
+    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return response
 
 
 @app.get("/downloads/{dataset_name}", name="download_dataset")
@@ -404,12 +523,13 @@ def ops_status() -> RuntimeStatusResponse:
 
 
 @app.post("/score", response_model=ScoreResponse)
-def score(request: ScoreRequest) -> ScoreResponse:
+def score(request: ScoreRequest, lang: Language = DEFAULT_LANGUAGE) -> ScoreResponse:
     try:
         score_response, score_source = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
+    score_response = localize_score_response(score_response, lang)
     dispatch_result = enqueue_score_event(request, score_response)
     return attach_score_operation_status(
         score_response,
@@ -421,12 +541,13 @@ def score(request: ScoreRequest) -> ScoreResponse:
 
 
 @app.post("/explain", response_model=ExplainResponse)
-def explain(request: ScoreRequest) -> ExplainResponse:
+def explain(request: ScoreRequest, lang: Language = DEFAULT_LANGUAGE) -> ExplainResponse:
     try:
         score_response, score_source = get_score_response(request)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
+    score_response = localize_score_response(score_response, lang)
     dispatch_result = enqueue_score_event(request, score_response)
     score_response = attach_score_operation_status(
         score_response,
@@ -435,4 +556,4 @@ def explain(request: ScoreRequest) -> ExplainResponse:
         event_sink=dispatch_result.sink,
         event_id=dispatch_result.event_id,
     )
-    return explain_from_score_response(score_response)
+    return explain_from_score_response(score_response, lang=lang)

@@ -1,18 +1,23 @@
 <section class="screen" data-screen-name="eda" hidden>
     <article class="content-card">
-        <h2>EDA-інсайти</h2>
+        <h2>{{ tr('EDA-інсайти', 'EDA insights') }}</h2>
         <p>
-            Цей екран показує живі зведені таблиці та графіки з локальних
-            IEEE-CIS CSV-файлів у <code>data/raw/</code> і залишає тільки
-            найсильніші демо-блоки.
+            {{ tr(
+                'Цей екран показує живі зведені таблиці та графіки з локальних IEEE-CIS CSV-файлів у',
+                'This screen shows live summary tables and charts from local IEEE-CIS CSV files in'
+            ) }}
+            <code>data/raw/</code>
+            {{ tr('і залишає тільки найсильніші демо-блоки.', 'and keeps only the strongest demo blocks.') }}
         </p>
         {% if eda_summary %}
         <section class="summary-block">
             <div class="summary-block-header">
-                <h3>Швидкий знімок датасету</h3>
+                <h3>{{ tr('Швидкий знімок датасету', 'Quick dataset snapshot') }}</h3>
                 <p>
-                    Короткий верхньорівневий огляд перед детальнішими EDA-зрізами
-                    та fraud-патернами.
+                    {{ tr(
+                        'Короткий верхньорівневий огляд перед детальнішими EDA-зрізами та fraud-патернами.',
+                        'A short top-level overview before the more detailed EDA slices and fraud patterns.'
+                    ) }}
                 </p>
             </div>
             <div class="summary-grid">
@@ -28,7 +33,7 @@
         {% endif %} {% for section in eda_sections %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">EDA-крок {{ loop.index }}</p>
+                <p class="learning-step">{{ tr('EDA-крок', 'EDA step') }} {{ loop.index }}</p>
                 <h3>{{ section.title }}</h3>
             </div>
 
@@ -36,12 +41,12 @@
             <div class="sql-meta">
                 {% if section.table_name %}
                 <div class="metric">
-                    <span class="metric-label">Таблиця результату</span>
+                    <span class="metric-label">{{ tr('Таблиця результату', 'Result table') }}</span>
                     <span class="metric-value">{{ section.table_name }}</span>
                 </div>
                 {% endif %} {% if section.description %}
                 <div class="metric">
-                    <span class="metric-label">Що ми бачимо</span>
+                    <span class="metric-label">{{ tr('Що ми бачимо', 'What we see') }}</span>
                     <span class="metric-value">{{ section.description }}</span>
                 </div>
                 {% endif %}

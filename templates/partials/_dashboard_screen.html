@@ -1,38 +1,41 @@
 <section class="screen" data-screen-name="dashboard" hidden>
     <article class="content-card">
-        <h2>Дашборд</h2>
+        <h2>{{ tr('Дашборд', 'Dashboard') }}</h2>
         <p>
-            Цей екран вбудовує поточний employer-facing BI-дашборд з Looker
-            Studio прямо в застосунок, щоб демо скорингу та BI-історія були в
-            одному місці.
+            {{ tr(
+                'Цей екран вбудовує поточний employer-facing BI-дашборд з Looker Studio прямо в застосунок, щоб демо скорингу та BI-історія були в одному місці.',
+                'This screen embeds the current employer-facing BI dashboard from Looker Studio directly into the app so the scoring demo and BI story stay in one place.'
+            ) }}
         </p>
 
         <div class="dashboard-meta">
             <div class="metric">
-                <span class="metric-label">Джерело</span>
+                <span class="metric-label">{{ tr('Джерело', 'Source') }}</span>
                 <span class="metric-value">Looker Studio</span>
             </div>
             <div class="metric">
-                <span class="metric-label">Режим</span>
-                <span class="metric-value">Вбудований iframe</span>
+                <span class="metric-label">{{ tr('Режим', 'Mode') }}</span>
+                <span class="metric-value">{{ tr('Вбудований iframe', 'Embedded iframe') }}</span>
             </div>
         </div>
 
         <div class="insight-grid">
             <section class="insight-card">
-                <h3>Що тут показано</h3>
+                <h3>{{ tr('Що тут показано', 'What is shown here') }}</h3>
                 <p>
-                    Дашборд зводить в одному місці ключові anti-fraud сигнали,
-                    сегменти ризику та вплив вибраного ML-порога на ручну
-                    перевірку.
+                    {{ tr(
+                        'Дашборд зводить в одному місці ключові anti-fraud сигнали, сегменти ризику та вплив вибраного ML-порога на ручну перевірку.',
+                        'The dashboard brings together the key anti-fraud signals, risk segments, and the impact of the selected ML threshold on manual review.'
+                    ) }}
                 </p>
             </section>
             <section class="insight-card">
-                <h3>Як читати демо</h3>
+                <h3>{{ tr('Як читати демо', 'How to read the demo') }}</h3>
                 <p>
-                    Спочатку звертай увагу на підозрілі патерни, а потім на блок
-                    з ML threshold impact, щоб швидко пояснити компроміс між
-                    fraud capture і review load.
+                    {{ tr(
+                        'Спочатку звертай увагу на підозрілі патерни, а потім на блок з ML threshold impact, щоб швидко пояснити компроміс між fraud capture і review load.',
+                        'Start with suspicious patterns, then move to the ML threshold impact block to quickly explain the trade-off between fraud capture and review load.'
+                    ) }}
                 </p>
             </section>
         </div>
@@ -57,13 +60,13 @@
                     </div>
                 </div>
                 <p class="dashboard-loading-text">
-                    Очікуйте: графіки дашборда вже промальовуються.
+                    {{ tr('Очікуйте: графіки дашборда вже промальовуються.', 'Please wait: the dashboard charts are already rendering.') }}
                 </p>
             </div>
             <iframe
                 class="dashboard-iframe"
                 src="{{ dashboard_embed_url }}"
-                title="Антифрод BI-дашборд"
+                title="{{ tr('Антифрод BI-дашборд', 'Anti-fraud BI dashboard') }}"
                 loading="lazy"
                 allowfullscreen
                 sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"

@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from api.i18n import Language, translate
+
 
 def _join_notebook_value(value: object) -> str:
     if isinstance(value, list):
@@ -51,69 +53,98 @@ def _extract_named_table_outputs(cells: list[dict[str, object]]) -> dict[str, st
     return named_tables
 
 
-def _build_ml_content(notebook_path: str, named_tables: dict[str, str], warning: str | None = None) -> dict[str, object]:
+def _build_ml_content(
+    notebook_path: str,
+    named_tables: dict[str, str],
+    lang: Language,
+    warning: str | None = None,
+) -> dict[str, object]:
+    tr = lambda uk, en: translate(lang, uk, en)
     content: dict[str, object] = {
         "source_notebook": Path(notebook_path).name,
         "overview_cards": [
             {
-                "label": "Обрана MVP-модель",
+                "label": tr("Обрана MVP-модель", "Selected MVP model"),
                 "value": "RandomForestClassifier",
-                "description": "Поточний найбільш придатний кандидат для демонстраційного скорингу.",
+                "description": tr(
+                    "Поточний найбільш придатний кандидат для демонстраційного скорингу.",
+                    "The current best-fit candidate for demo scoring.",
+                ),
             },
             {
-                "label": "Референсна модель",
+                "label": tr("Референсна модель", "Reference model"),
                 "value": "LogisticRegression",
-                "description": "Базова модель, яку збережено для чесного порівняння.",
+                "description": tr(
+                    "Базова модель, яку збережено для чесного порівняння.",
+                    "The baseline model kept for a fair comparison.",
+                ),
             },
             {
-                "label": "Поріг перевірки",
+                "label": tr("Поріг перевірки", "Review threshold"),
                 "value": "0.7",
-                "description": "Найреалістичніший поточний кандидат для сценарію ручної перевірки.",
+                "description": tr(
+                    "Найреалістичніший поточний кандидат для сценарію ручної перевірки.",
+                    "The most realistic current candidate for the manual review scenario.",
+                ),
             },
             {
-                "label": "Робочий артефакт",
-                "value": "Лише RandomForest",
-                "description": "Поточний артефакт API-скорингу - це MVP-набір на RandomForest.",
+                "label": tr("Робочий артефакт", "Serving artifact"),
+                "value": tr("Лише RandomForest", "RandomForest only"),
+                "description": tr(
+                    "Поточний артефакт API-скорингу - це MVP-набір на RandomForest.",
+                    "The current API scoring artifact is an MVP bundle built on RandomForest.",
+                ),
             },
         ],
-        "winner_note": (
+        "winner_note": tr(
             "Проєкт залишає RandomForestClassifier як поточну MVP-модель, "
             "тому що вона покращила precision, recall, f1 і roc_auc та водночас "
-            "забезпечила нижче навантаження на ручну перевірку на тих самих порогах."
+            "забезпечила нижче навантаження на ручну перевірку на тих самих порогах.",
+            "The project keeps RandomForestClassifier as the current MVP model "
+            "because it improved precision, recall, f1, and roc_auc while also "
+            "delivering lower manual review load at the same thresholds.",
         ),
         "tables": [
             {
-                "title": "Метрики моделей",
-                "description": (
+                "title": tr("Метрики моделей", "Model metrics"),
+                "description": tr(
                     "Ключові валідаційні метрики для двох навчених моделей на "
-                    "одному й тому самому feature set та одному validation split."
+                    "одному й тому самому feature set та одному validation split.",
+                    "Key validation metrics for two trained models on the same "
+                    "feature set and the same validation split.",
                 ),
                 "table_name": "model_metrics_df",
                 "html": named_tables.get("model_metrics_df"),
             },
             {
-                "title": "Дельта метрик",
-                "description": (
+                "title": tr("Дельта метрик", "Metric delta"),
+                "description": tr(
                     "Прямий зріз дельти, який робить uplift RandomForest над "
-                    "LogisticRegression простим для пояснення."
+                    "LogisticRegression простим для пояснення.",
+                    "A direct delta view that makes the RandomForest uplift over "
+                    "LogisticRegression easy to explain.",
                 ),
                 "table_name": "model_metrics_comparison_df",
                 "html": named_tables.get("model_metrics_comparison_df"),
             },
             {
-                "title": "Порівняння порогів",
-                "description": (
+                "title": tr("Порівняння порогів", "Threshold comparison"),
+                "description": tr(
                     "Поведінка обох моделей на різних порогах, включно з "
-                    "precision, recall, f1, fraud count і manual review rate."
+                    "precision, recall, f1, fraud count і manual review rate.",
+                    "Behavior of both models at different thresholds, including "
+                    "precision, recall, f1, fraud count, and manual review rate.",
                 ),
                 "table_name": "threshold_df_by_model",
                 "html": named_tables.get("threshold_df_by_model"),
             },
             {
-                "title": "Навантаження ручної перевірки",
-                "description": (
+                "title": tr("Навантаження ручної перевірки", "Manual review load"),
+                "description": tr(
                     "Фокусне порівняння manual review rate за порогами для "
-                    "кожної моделі та дельти між ними."
+                    "кожної моделі та дельти між ними.",
+                    "A focused comparison of manual review rate by threshold for "
+                    "each model and the delta between them.",
                 ),
                 "table_name": "manual_review_comparison_df",
                 "html": named_tables.get("manual_review_comparison_df"),
@@ -125,7 +156,7 @@ def _build_ml_content(notebook_path: str, named_tables: dict[str, str], warning:
     return content
 
 
-def load_ml_content(notebook_path: str) -> dict[str, object]:
+def load_ml_content(notebook_path: str, lang: Language) -> dict[str, object]:
     notebook_file = Path(notebook_path)
     try:
         notebook = json.loads(notebook_file.read_text(encoding="utf-8"))
@@ -133,9 +164,15 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
         return _build_ml_content(
             notebook_path,
             {},
+            lang=lang,
             warning=(
-                "Ноутбук із результатами ML недоступний у поточному середовищі. "
-                "Перезберіть контейнер, щоб додати файл 05_model_comparison.ipynb."
+                translate(
+                    lang,
+                    "Ноутбук із результатами ML недоступний у поточному середовищі. "
+                    "Перезберіть контейнер, щоб додати файл 05_model_comparison.ipynb.",
+                    "The notebook with ML results is unavailable in the current environment. "
+                    "Rebuild the container to add 05_model_comparison.ipynb.",
+                )
             ),
         )
 
@@ -144,4 +181,4 @@ def load_ml_content(notebook_path: str) -> dict[str, object]:
         cells = []
 
     named_tables = _extract_named_table_outputs(cells)
-    return _build_ml_content(notebook_path, named_tables)
+    return _build_ml_content(notebook_path, named_tables, lang=lang)

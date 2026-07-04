@@ -6,11 +6,13 @@
     hidden
 >
     <article class="content-card deferred-card">
-        <h2>SQL-знахідки</h2>
+        <h2>{{ tr('SQL-знахідки', 'SQL findings') }}</h2>
         <p>
-            Цей екран запускає важчі SQL-блоки дослідження лише тоді, коли ти
-            відкриваєш вкладку SQL.
+            {{ tr(
+                'Цей екран запускає важчі SQL-блоки дослідження лише тоді, коли ти відкриваєш вкладку SQL.',
+                'This screen runs the heavier SQL exploration blocks only when you open the SQL tab.'
+            ) }}
         </p>
-        <p class="deferred-hint">Відкрий вкладку, щоб завантажити таблиці результатів.</p>
+        <p class="deferred-hint">{{ tr('Відкрий вкладку, щоб завантажити таблиці результатів.', 'Open the tab to load the result tables.') }}</p>
     </article>
 </section>

@@ -9,6 +9,8 @@ from pathlib import Path
 import duckdb
 import matplotlib
 
+from api.i18n import Language, translate
+
 # FastAPI renders charts on the server, so a non-interactive backend is required.
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -25,6 +27,7 @@ def render_chart(
     x_values: list[str],
     y_values: list[float],
     title: str,
+    lang: Language,
     color: str = "#2563eb",
 ) -> str:
     figure, axis = plt.subplots(figsize=(8, 4.5))
@@ -42,7 +45,12 @@ def render_chart(
     return f"data:image/png;base64,{encoded}"
 
 
-def render_html_table(columns: list[str], rows: list[tuple], displayed_rows: int) -> str:
+def render_html_table(
+    columns: list[str],
+    rows: list[tuple],
+    displayed_rows: int,
+    lang: Language,
+) -> str:
     header_html = "".join(f"<th>{escape(column)}</th>" for column in columns)
     body_rows = rows[:displayed_rows]
     body_html = "".join(
@@ -53,7 +61,11 @@ def render_html_table(columns: list[str], rows: list[tuple], displayed_rows: int
     )
 
     if not body_rows:
-        body_html = f'<tr><td colspan="{len(columns)}">(0 рядків)</td></tr>'
+        body_html = (
+            f'<tr><td colspan="{len(columns)}">'
+            f"{escape(translate(lang, '(0 рядків)', '(0 rows)'))}"
+            "</td></tr>"
+        )
 
     return (
         '<div class="table-wrapper">'
@@ -61,7 +73,12 @@ def render_html_table(columns: list[str], rows: list[tuple], displayed_rows: int
         f"<thead><tr>{header_html}</tr></thead>"
         f"<tbody>{body_html}</tbody>"
         "</table>"
-        f'<p class="table-caption">Показано {min(len(rows), displayed_rows)} з {len(rows)} рядків.</p>'
+        f'<p class="table-caption">'
+        f"{escape(translate(lang, 'Показано', 'Showing'))} "
+        f"{min(len(rows), displayed_rows)} "
+        f"{escape(translate(lang, 'з', 'of'))} {len(rows)} "
+        f"{escape(translate(lang, 'рядків.', 'rows.'))}"
+        "</p>"
         "</div>"
     )
 

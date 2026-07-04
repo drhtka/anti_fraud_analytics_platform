@@ -6,11 +6,13 @@
     hidden
 >
     <article class="content-card deferred-card">
-        <h2>Дашборд</h2>
+        <h2>{{ tr('Дашборд', 'Dashboard') }}</h2>
         <p>
-            Цей екран вбудовує зовнішній BI-дашборд з Looker Studio лише тоді,
-            коли ти відкриваєш вкладку.
+            {{ tr(
+                'Цей екран вбудовує зовнішній BI-дашборд з Looker Studio лише тоді, коли ти відкриваєш вкладку.',
+                'This screen embeds the external BI dashboard from Looker Studio only when you open the tab.'
+            ) }}
         </p>
-        <p class="deferred-hint">Відкрий вкладку, щоб завантажити вбудований дашборд.</p>
+        <p class="deferred-hint">{{ tr('Відкрий вкладку, щоб завантажити вбудований дашборд.', 'Open the tab to load the embedded dashboard.') }}</p>
     </article>
 </section>

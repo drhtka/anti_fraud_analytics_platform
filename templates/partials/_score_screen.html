@@ -1,19 +1,25 @@
 <section class="screen" data-screen-name="score">
     <section class="demo-actions">
-        <h2>Демо-сценарії</h2>
+        <h2>{{ tr('Демо-сценарії', 'Demo scenarios') }}</h2>
         <p>
-            Використай один із підготовлених payload-файлів з
-            <code>api/payloads</code>, щоб заповнити форму в один клік, а потім
-            запустити той самий сценарій скорингу на цій сторінці. Ручне
-            редагування полів вимкнено.
+            {{ tr(
+                'Використай один із підготовлених payload-файлів з',
+                'Use one of the prepared payload files from'
+            ) }}
+            <code>api/payloads</code>,
+            {{ tr(
+                'щоб заповнити форму в один клік, а потім запустити той самий сценарій скорингу на цій сторінці. Ручне редагування полів вимкнено.',
+                'to fill the form in one click and then run the same scoring scenario on this page. Manual field editing is disabled.'
+            ) }}
         </p>
     </section>
 
     <form method="get" action="/" id="transaction-form">
-        <p>Поля нижче заповнюються лише через кнопки демо-сценаріїв.</p>
+        <input type="hidden" name="lang" value="{{ lang }}" />
+        <p>{{ tr('Поля нижче заповнюються лише через кнопки демо-сценаріїв.', 'The fields below are populated only through the demo-scenario buttons.') }}</p>
         <div class="grid">
             <label>
-                ID транзакції
+                {{ tr('ID транзакції', 'Transaction ID') }}
                 <input
                     type="number"
                     name="transaction_id"
@@ -25,7 +31,7 @@
             </label>
 
             <label>
-                Сума транзакції
+                {{ tr('Сума транзакції', 'Transaction amount') }}
                 <input
                     type="number"
                     step="0.01"
@@ -90,7 +96,7 @@
             </label>
 
             <label>
-                Домен email покупця
+                {{ tr('Домен email покупця', 'Purchaser email domain') }}
                 <input
                     type="text"
                     name="p_emaildomain"
@@ -102,7 +108,7 @@
             </label>
 
             <label>
-                Домен email отримувача
+                {{ tr('Домен email отримувача', 'Recipient email domain') }}
                 <input
                     type="text"
                     name="r_emaildomain"
@@ -128,17 +134,17 @@
 
         <div class="form-actions">
             <button type="submit" class="submit-button">
-                Виконати скоринг
+                {{ tr('Виконати скоринг', 'Run scoring') }}
             </button>
             <button type="button" class="secondary-button" id="clear-form">
-                Очистити
+                {{ tr('Очистити', 'Clear') }}
             </button>
             {% if score_result and explain_result %}
             <a
                 href="#json"
                 class="secondary-button action-link json-action-link"
             >
-                Вивід у JSON
+                {{ tr('Вивід у JSON', 'JSON output') }}
             </a>
             {% endif %}
         </div>
@@ -149,13 +155,15 @@
             class="loading-dialog"
             role="status"
             aria-live="polite"
-            aria-label="Виконується скоринг"
+            aria-label="{{ tr('Виконується скоринг', 'Scoring in progress') }}"
         >
             <span class="loading-spinner" aria-hidden="true"></span>
-            <h3>Виконуємо скоринг</h3>
+            <h3>{{ tr('Виконуємо скоринг', 'Running scoring') }}</h3>
             <p>
-                Рахуємо fraud score, збираємо сигнали ризику та готуємо
-                результат.
+                {{ tr(
+                    'Рахуємо fraud score, збираємо сигнали ризику та готуємо результат.',
+                    'Calculating the fraud score, collecting risk signals, and preparing the result.'
+                ) }}
             </p>
         </div>
     </div>
@@ -167,15 +175,15 @@
             aria-modal="true"
             aria-labelledby="scenario-modal-title"
         >
-            <h3 id="scenario-modal-title">Підказка</h3>
-            <p>Оберіть один із трьох демо-сценаріїв.</p>
+            <h3 id="scenario-modal-title">{{ tr('Підказка', 'Hint') }}</h3>
+            <p>{{ tr('Оберіть один із трьох демо-сценаріїв.', 'Choose one of the three demo scenarios.') }}</p>
             <div class="modal-actions">
                 <button
                     type="button"
                     class="submit-button"
                     id="close-scenario-modal"
                 >
-                    Зрозуміло
+                    {{ tr('Зрозуміло', 'Got it') }}
                 </button>
             </div>
         </div>
@@ -193,55 +201,56 @@
             tabindex="-1"
         >
             <div class="result-header">
-                <h2>Статус останнього скорингу</h2>
+                <h2>{{ tr('Статус останнього скорингу', 'Latest scoring status') }}</h2>
                 <span
                     class="badge {% if score_result.operation_status.event_status == 'queued' %}badge-low{% elif score_result.operation_status.event_status == 'failed' %}badge-high{% else %}badge-medium{% endif %}"
                 >
                     {% if score_result.operation_status.event_status == "queued"
-                    %} ЗБЕРЕЖЕНО В ФОН {% elif
+                    %} {{ tr('ЗБЕРЕЖЕНО В ФОН', 'QUEUED IN BACKGROUND') }} {% elif
                     score_result.operation_status.event_status == "failed" %}
-                    ФОНОВА ВІДПРАВКА НЕ ВДАЛАСЬ {% else %} ФОНОВА ВІДПРАВКА
-                    ВИМКНЕНА {% endif %}
+                    {{ tr('ФОНОВА ВІДПРАВКА НЕ ВДАЛАСЬ', 'BACKGROUND DISPATCH FAILED') }} {% else %} {{ tr('ФОНОВА ВІДПРАВКА ВИМКНЕНА', 'BACKGROUND DISPATCH DISABLED') }} {% endif %}
                 </span>
             </div>
             <p class="score-op-intro">
-                Тут видно, як саме був оброблений останній скоринг-запит після
-                натискання кнопки.
+                {{ tr(
+                    'Тут видно, як саме був оброблений останній скоринг-запит після натискання кнопки.',
+                    'This shows exactly how the latest scoring request was processed after the button click.'
+                ) }}
             </p>
             <div class="meta-grid score-op-grid">
                 <div class="metric">
-                    <span class="metric-label">Джерело відповіді</span>
+                    <span class="metric-label">{{ tr('Джерело відповіді', 'Response source') }}</span>
                     <span class="metric-value"
                         >{{ score_result.operation_status.score_source }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Фонова подія</span>
+                    <span class="metric-label">{{ tr('Фонова подія', 'Background event') }}</span>
                     <span class="metric-value"
                         >{{ score_result.operation_status.event_status }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Канал відправки</span>
+                    <span class="metric-label">{{ tr('Канал відправки', 'Dispatch channel') }}</span>
                     <span class="metric-value"
                         >{{ score_result.operation_status.event_sink }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Режим runtime</span>
+                    <span class="metric-label">{{ tr('Режим runtime', 'Runtime mode') }}</span>
                     <span class="metric-value"
                         >{{ score_result.operation_status.runtime_mode }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">ID події</span>
+                    <span class="metric-label">{{ tr('ID події', 'Event ID') }}</span>
                     <span class="metric-value score-op-event-id"
                         >{{ score_result.operation_status.event_id or 'n/a'
                         }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Час скорингу</span>
+                    <span class="metric-label">{{ tr('Час скорингу', 'Scoring time') }}</span>
                     <span
                         class="metric-value score-op-timestamp"
                         title="{{ score_result.operation_status.scored_at }}"
@@ -256,12 +265,12 @@
 
         <article class="result-card">
             <div class="result-header">
-                <h2>Результат скорингу</h2>
+                <h2>{{ tr('Результат скорингу', 'Scoring result') }}</h2>
                 <div class="result-badges">
                     <span class="badge badge-{{ score_result.risk_label }}">
-                        {% if score_result.risk_label == "high" %}ВИСОКИЙ{% elif
-                        score_result.risk_label == "medium" %}СЕРЕДНІЙ{% else
-                        %}НИЗЬКИЙ{% endif %} РИЗИК
+                        {% if score_result.risk_label == "high" %}{{ tr('ВИСОКИЙ', 'HIGH') }}{% elif
+                        score_result.risk_label == "medium" %}{{ tr('СЕРЕДНІЙ', 'MEDIUM') }}{% else
+                        %}{{ tr('НИЗЬКИЙ', 'LOW') }}{% endif %} {{ tr('РИЗИК', 'RISK') }}
                     </span>
                 </div>
             </div>
@@ -269,9 +278,7 @@
             <div
                 class="review-banner {% if score_result.needs_manual_review %}review-yes{% else %}review-no{% endif %}"
             >
-                {% if score_result.needs_manual_review %} Для цієї транзакції
-                потрібна ручна перевірка. {% else %} Для цієї транзакції ручна
-                перевірка не потрібна. {% endif %}
+                {% if score_result.needs_manual_review %} {{ tr('Для цієї транзакції потрібна ручна перевірка.', 'This transaction requires manual review.') }} {% else %} {{ tr('Для цієї транзакції ручна перевірка не потрібна.', 'This transaction does not require manual review.') }} {% endif %}
             </div>
 
             <div class="result-grid">
@@ -282,22 +289,22 @@
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Рівень ризику</span>
+                    <span class="metric-label">{{ tr('Рівень ризику', 'Risk level') }}</span>
                     <span class="metric-value"
-                        >{% if score_result.risk_label == "high" %}високий{%
-                        elif score_result.risk_label == "medium" %}середній{%
-                        else %}низький{% endif %}</span
+                        >{% if score_result.risk_label == "high" %}{{ tr('високий', 'high') }}{%
+                        elif score_result.risk_label == "medium" %}{{ tr('середній', 'medium') }}{%
+                        else %}{{ tr('низький', 'low') }}{% endif %}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Ручна перевірка</span>
+                    <span class="metric-label">{{ tr('Ручна перевірка', 'Manual review') }}</span>
                     <span class="metric-value"
-                        >{% if score_result.needs_manual_review %}так{% else
-                        %}ні{% endif %}</span
+                        >{% if score_result.needs_manual_review %}{{ tr('так', 'yes') }}{% else
+                        %}{{ tr('ні', 'no') }}{% endif %}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Поріг рішення</span>
+                    <span class="metric-label">{{ tr('Поріг рішення', 'Decision threshold') }}</span>
                     <span class="metric-value"
                         >{{ score_result.threshold_used }}</span
                     >
@@ -306,20 +313,20 @@
 
             <div class="meta-grid">
                 <div class="metric">
-                    <span class="metric-label">Модель</span>
+                    <span class="metric-label">{{ tr('Модель', 'Model') }}</span>
                     <span class="metric-value"
                         >{{ score_result.model_name }}</span
                     >
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Версія</span>
+                    <span class="metric-label">{{ tr('Версія', 'Version') }}</span>
                     <span class="metric-value"
                         >{{ score_result.model_version }}</span
                     >
                 </div>
             </div>
 
-            <h3>Активні сигнали</h3>
+            <h3>{{ tr('Активні сигнали', 'Active signals') }}</h3>
             <ul class="signals-list">
                 {% for signal in score_result.active_signals %}
                 <li class="signal-pill">{{ signal }}</li>
@@ -328,12 +335,12 @@
         </article>
 
         <article class="result-card">
-            <h2>Пояснення ризику</h2>
+            <h2>{{ tr('Пояснення ризику', 'Risk explanation') }}</h2>
             <div class="explanation-callout">
                 <p>{{ explain_result.explanation_text }}</p>
             </div>
 
-            <h3>Ключові пояснення</h3>
+            <h3>{{ tr('Ключові пояснення', 'Key explanations') }}</h3>
             <ol>
                 {% for point in explain_result.explanation_points %}
                 <li>{{ point }}</li>
@@ -342,10 +349,13 @@
         </article>
 
         <article class="result-card">
-            <h2>Підтвердження з сирих таблиць</h2>
+            <h2>{{ tr('Підтвердження з сирих таблиць', 'Evidence from raw tables') }}</h2>
             <p class="evidence-intro">
-                Ці блоки пов'язують поточний результат скорингу з живими
-                підтвердженнями з <code>data/raw/train_transaction.csv</code>.
+                {{ tr(
+                    "Ці блоки пов'язують поточний результат скорингу з живими підтвердженнями з",
+                    'These blocks connect the current scoring result with live evidence from'
+                ) }}
+                <code>data/raw/train_transaction.csv</code>.
             </p>
 
             {% if score_evidence_blocks %}
@@ -372,7 +382,7 @@
                     </div>
                     {% endif %} {% if block.business_note %}
                     <div class="takeaway-card">
-                        <span class="takeaway-label">Чому це важливо</span>
+                        <span class="takeaway-label">{{ tr('Чому це важливо', 'Why this matters') }}</span>
                         <p>{{ block.business_note }}</p>
                     </div>
                     {% endif %}
@@ -388,18 +398,20 @@
     </section>
     {% else %}
     <section class="placeholder">
-        <h2>Готово до демонстрації скорингу</h2>
+        <h2>{{ tr('Готово до демонстрації скорингу', 'Ready for the scoring demo') }}</h2>
         <p>
-            Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати
-            скоринг".
+            {{ tr(
+                'Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".',
+                'Choose one of the three demo scenarios and click "Run scoring".'
+            ) }}
         </p>
-        <p>Після запуску на цій сторінці з'являться:</p>
+        <p>{{ tr("Після запуску на цій сторінці з'являться:", 'After running, this page will show:') }}</p>
         <ul>
-            <li>підсумковий fraud score і рівень ризику;</li>
-            <li>рішення щодо ручної перевірки;</li>
-            <li>активні ризик-сигнали для транзакції;</li>
-            <li>коротке пояснення результату;</li>
-            <li>підтвердження з сирих таблиць для ключових сигналів.</li>
+            <li>{{ tr('підсумковий fraud score і рівень ризику;', 'the final fraud score and risk level;') }}</li>
+            <li>{{ tr('рішення щодо ручної перевірки;', 'the manual review decision;') }}</li>
+            <li>{{ tr('активні ризик-сигнали для транзакції;', 'active risk signals for the transaction;') }}</li>
+            <li>{{ tr('коротке пояснення результату;', 'a short explanation of the result;') }}</li>
+            <li>{{ tr('підтвердження з сирих таблиць для ключових сигналів.', 'evidence from the raw tables for key signals.') }}</li>
         </ul>
     </section>
     {% endif %}

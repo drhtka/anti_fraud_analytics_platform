@@ -1,25 +1,31 @@
 <section class="screen" data-screen-name="sql" hidden>
     <article class="content-card">
-        <h2>SQL-знахідки</h2>
+        <h2>{{ tr('SQL-знахідки', 'SQL findings') }}</h2>
         <p>
-            Цей екран запускає найсильніші SQL-блоки дослідження з
-            <code>sql/</code> на локальних IEEE-CIS CSV-файлах і залишає лише
-            найкращі демо-таблиці.
+            {{ tr(
+                'Цей екран запускає найсильніші SQL-блоки дослідження з',
+                'This screen runs the strongest SQL exploration blocks from'
+            ) }}
+            <code>sql/</code>
+            {{ tr(
+                'на локальних IEEE-CIS CSV-файлах і залишає лише найкращі демо-таблиці.',
+                'on local IEEE-CIS CSV files and keeps only the best demo tables.'
+            ) }}
         </p>
         {% for section in sql_sections %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">SQL-крок {{ loop.index }}</p>
+                <p class="learning-step">{{ tr('SQL-крок', 'SQL step') }} {{ loop.index }}</p>
                 <h3>{{ section.title }}</h3>
             </div>
 
             <div class="sql-meta">
                 <div class="metric">
-                    <span class="metric-label">Файл-джерело</span>
+                    <span class="metric-label">{{ tr('Файл-джерело', 'Source file') }}</span>
                     <span class="metric-value">{{ section.source_file }}</span>
                 </div>
                 <div class="metric">
-                    <span class="metric-label">Таблиця результату</span>
+                    <span class="metric-label">{{ tr('Таблиця результату', 'Result table') }}</span>
                     <span class="metric-value">{{ section.table_name }}</span>
                 </div>
             </div>
@@ -42,7 +48,7 @@
             </div>
             {% endif %} {% if section.business_takeaway %}
             <div class="takeaway-card">
-                <span class="takeaway-label">Бізнес-висновок</span>
+                <span class="takeaway-label">{{ tr('Бізнес-висновок', 'Business takeaway') }}</span>
                 <p>{{ section.business_takeaway }}</p>
             </div>
             {% endif %}

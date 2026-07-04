@@ -39,9 +39,16 @@ h1 {
     box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
 }
 
+.hero-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
 .hero-kicker {
     display: inline-block;
-    margin-bottom: 10px;
     padding: 6px 10px;
     background: #dbeafe;
     color: #1d4ed8;
@@ -50,6 +57,29 @@ h1 {
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+}
+
+.language-switcher {
+    display: inline-flex;
+    gap: 6px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #c7d7fe;
+    border-radius: 999px;
+}
+
+.language-button {
+    min-width: 52px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #1d4ed8;
+}
+
+.language-button.is-active {
+    background: #2563eb;
+    color: #ffffff;
 }
 
 .hero-panel h1 {
@@ -670,6 +700,11 @@ button {
 }
 
 @media (max-width: 640px) {
+    .hero-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .hero-panel {
         padding: 20px;
     }

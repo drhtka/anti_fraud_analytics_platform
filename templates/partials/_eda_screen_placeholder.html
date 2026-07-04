@@ -6,11 +6,15 @@
     hidden
 >
     <article class="content-card deferred-card">
-        <h2>EDA-інсайти</h2>
+        <h2>{{ tr('EDA-інсайти', 'EDA insights') }}</h2>
         <p>
-            Цей екран завантажує живі зведені таблиці та графіки з
-            <code>data/raw/</code> лише тоді, коли ти відкриваєш вкладку EDA.
+            {{ tr(
+                'Цей екран завантажує живі зведені таблиці та графіки з',
+                'This screen loads live summary tables and charts from'
+            ) }}
+            <code>data/raw/</code>
+            {{ tr('лише тоді, коли ти відкриваєш вкладку EDA.', 'only when you open the EDA tab.') }}
         </p>
-        <p class="deferred-hint">Відкрий вкладку, щоб завантажити аналіз.</p>
+        <p class="deferred-hint">{{ tr('Відкрий вкладку, щоб завантажити аналіз.', 'Open the tab to load the analysis.') }}</p>
     </article>
 </section>

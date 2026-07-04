@@ -1,17 +1,21 @@
 <section class="screen" data-screen-name="ml" hidden>
     <article class="content-card">
-        <h2>Порівняння ML-моделей</h2>
+        <h2>{{ tr('Порівняння ML-моделей', 'ML model comparison') }}</h2>
         <p>
-            Цей екран перетворює результати навчання на зручне демо-
-            порівняння між <code>LogisticRegression</code> та
+            {{ tr(
+                'Цей екран перетворює результати навчання на зручне демо-порівняння між',
+                'This screen turns the training results into a clear demo comparison between'
+            ) }}
+            <code>LogisticRegression</code>
+            {{ tr('та', 'and') }}
             <code>RandomForestClassifier</code>.
         </p>
 
         <section class="summary-block">
             <div class="summary-block-header">
-                <h3>Короткий знімок вибору моделі</h3>
+                <h3>{{ tr('Короткий знімок вибору моделі', 'Quick model-selection snapshot') }}</h3>
                 <p>
-                    Джерело:
+                    {{ tr('Джерело:', 'Source:') }}
                     <code>{{ ml_content.source_notebook }}</code>
                 </p>
             </div>
@@ -27,7 +31,7 @@
         </section>
 
         <div class="takeaway-card">
-            <span class="takeaway-label">Чому переміг RandomForest</span>
+            <span class="takeaway-label">{{ tr('Чому переміг RandomForest', 'Why RandomForest won') }}</span>
             <p>{{ ml_content.winner_note }}</p>
         </div>
 
@@ -38,13 +42,13 @@
         {% for table in ml_content.tables %}
         <section class="learning-block">
             <div class="learning-block-header">
-                <p class="learning-step">ML-крок {{ loop.index }}</p>
+                <p class="learning-step">{{ tr('ML-крок', 'ML step') }} {{ loop.index }}</p>
                 <h3>{{ table.title }}</h3>
             </div>
 
             <div class="sql-meta">
                 <div class="metric">
-                    <span class="metric-label">Таблиця з ноутбука</span>
+                    <span class="metric-label">{{ tr('Таблиця з ноутбука', 'Notebook table') }}</span>
                     <span class="metric-value">{{ table.table_name }}</span>
                 </div>
             </div>
@@ -56,7 +60,7 @@
                 {{ table.html | safe }}
             </div>
             {% else %}
-            <p class="deferred-hint">Вивід ноутбука недоступний для цього блоку.</p>
+            <p class="deferred-hint">{{ tr('Вивід ноутбука недоступний для цього блоку.', 'Notebook output is unavailable for this block.') }}</p>
             {% endif %}
         </section>
         {% endfor %}

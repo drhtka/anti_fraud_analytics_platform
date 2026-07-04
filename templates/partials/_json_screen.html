@@ -1,29 +1,31 @@
 <section class="screen" data-screen-name="json" hidden>
     <article class="content-card">
-        <h2>Сирий вивід API</h2>
+        <h2>{{ tr('Сирий вивід API', 'Raw API output') }}</h2>
         <p>
-            Цей екран показує технічну відповідь сервісу. Він допомагає швидко
-            перевірити результат скорингу та пояснення без зайвих деталей.
+            {{ tr(
+                'Цей екран показує технічну відповідь сервісу. Він допомагає швидко перевірити результат скорингу та пояснення без зайвих деталей.',
+                'This screen shows the technical service response. It helps quickly verify the scoring result and explanation without extra detail.'
+            ) }}
         </p>
 
         <section class="json-section">
-            <h3>Відповідь /score</h3>
+            <h3>{{ tr('Відповідь /score', 'Response /score') }}</h3>
             {% if score_result_json %}
             <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
             <pre class="json-block"><code>{
-  "message": "Виконай скоринг, щоб побачити тут сирий вивід /score."
+  "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /score.', 'Run scoring to see the raw /score output here.') }}"
 }</code></pre>
             {% endif %}
         </section>
 
         <section class="json-section">
-            <h3>Відповідь /explain</h3>
+            <h3>{{ tr('Відповідь /explain', 'Response /explain') }}</h3>
             {% if explain_result_json %}
             <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
             <pre class="json-block"><code>{
-  "message": "Виконай скоринг, щоб побачити тут сирий вивід /explain."
+  "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /explain.', 'Run scoring to see the raw /explain output here.') }}"
 }</code></pre>
             {% endif %}
         </section>

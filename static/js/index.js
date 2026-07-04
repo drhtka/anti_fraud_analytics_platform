@@ -5,8 +5,10 @@ const submitButton = transactionForm?.querySelector('.submit-button');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
 const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
+const frontendI18nElement = document.getElementById('frontend-i18n-json');
 const scenarioModal = document.getElementById('scenario-modal');
 const closeScenarioModalButton = document.getElementById('close-scenario-modal');
+const languageSwitchButtons = document.querySelectorAll('[data-lang-switch]');
 
 //#region debug-point deferred-tabs-debug
 function reportDeferredDebug(event, payload = {}) {
@@ -38,6 +40,7 @@ function normalizeDeferredUrl(value) {
     const url = new URL(value, window.location.origin);
     url.protocol = window.location.protocol;
     url.host = window.location.host;
+    url.searchParams.set('lang', getCurrentLanguage());
     return url.toString();
 }
 //#endregion debug-point deferred-tabs-debug
@@ -45,25 +48,47 @@ function normalizeDeferredUrl(value) {
 const demoPayloads = demoPayloadsElement
     ? JSON.parse(demoPayloadsElement.textContent)
     : [];
+const uiTexts = frontendI18nElement
+    ? JSON.parse(frontendI18nElement.textContent)
+    : {};
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
 const SCORE_RESULT_SCROLL_STORAGE_KEY = 'anti-fraud-scroll-to-score-results';
+const LANGUAGE_STORAGE_KEY = 'anti-fraud-language';
 const inFlightScreenLoads = new Map();
 let selectedDemoKey = '';
 const SCORE_PLACEHOLDER_HTML = `
     <section class="placeholder">
-        <h2>Готово до демонстрації скорингу</h2>
-        <p>Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".</p>
-        <p>Після запуску на цій сторінці з'являться:</p>
+        <h2>${uiTexts.scorePlaceholderTitle ?? 'Готово до демонстрації скорингу'}</h2>
+        <p>${uiTexts.scorePlaceholderIntro ?? 'Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".'}</p>
+        <p>${uiTexts.scorePlaceholderAfter ?? "Після запуску на цій сторінці з'являться:"}</p>
         <ul>
-            <li>підсумковий fraud score і рівень ризику;</li>
-            <li>рішення щодо ручної перевірки;</li>
-            <li>активні ризик-сигнали для транзакції;</li>
-            <li>коротке пояснення результату;</li>
-            <li>підтвердження з сирих таблиць для ключових сигналів.</li>
+            ${(uiTexts.scorePlaceholderBullets ?? []).map((item) => `<li>${item}</li>`).join('')}
         </ul>
     </section>
 `;
+
+function getCurrentLanguage() {
+    return document.documentElement.lang === 'en' ? 'en' : 'uk';
+}
+
+function buildUrlWithLanguage(targetLanguage, baseUrl = window.location.href) {
+    const nextUrl = new URL(baseUrl, window.location.origin);
+    nextUrl.searchParams.set('lang', targetLanguage);
+    return nextUrl;
+}
+
+function applySavedLanguagePreference() {
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    const currentUrl = new URL(window.location.href);
+    const urlLanguage = currentUrl.searchParams.get('lang');
+
+    if (!savedLanguage || savedLanguage === getCurrentLanguage() || urlLanguage) {
+        return;
+    }
+
+    window.location.replace(buildUrlWithLanguage(savedLanguage).toString());
+}
 
 function showScoreLoadingOverlay() {
     if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
@@ -166,6 +191,10 @@ function getScreens() {
     return document.querySelectorAll('[data-screen-name]');
 }
 
+function getScreenLabel(screenName) {
+    return uiTexts.screenLabels?.[screenName] ?? screenName.toUpperCase();
+}
+
 function initDashboardEmbeds() {
     const dashboardIframes = document.querySelectorAll('.dashboard-iframe');
 
@@ -244,8 +273,8 @@ async function ensureScreenLoaded(screenName) {
     screen.dataset.loaded = 'loading';
     screen.innerHTML = `
         <article class="content-card deferred-card">
-            <h2>Завантаження</h2>
-            <p class="deferred-hint">Рендеримо вміст розділу ${screenName.toUpperCase()}...</p>
+            <h2>${uiTexts.loadingTitle ?? 'Завантаження'}</h2>
+            <p class="deferred-hint">${uiTexts.loadingHintPrefix ?? 'Рендеримо вміст розділу'} ${getScreenLabel(screenName)}...</p>
         </article>
     `;
 
@@ -306,8 +335,8 @@ async function ensureScreenLoaded(screenName) {
             screen.dataset.loaded = 'error';
             screen.innerHTML = `
                 <article class="content-card deferred-card">
-                    <h2>Помилка завантаження</h2>
-                    <p class="deferred-hint">Не вдалося завантажити вміст розділу ${screenName.toUpperCase()}.</p>
+                    <h2>${uiTexts.loadingErrorTitle ?? 'Помилка завантаження'}</h2>
+                    <p class="deferred-hint">${uiTexts.loadingErrorPrefix ?? 'Не вдалося завантажити вміст розділу'} ${getScreenLabel(screenName)}.</p>
                 </article>
             `;
         } finally {
@@ -375,6 +404,7 @@ window.addEventListener('hashchange', async () => {
     await activateScreen(hashScreen);
 });
 
+applySavedLanguagePreference();
 activateScreen(getInitialScreenName());
 initDashboardEmbeds();
 
@@ -434,7 +464,8 @@ if (transactionForm) {
             showScoreLoadingOverlay();
             if (submitButton instanceof HTMLButtonElement) {
                 submitButton.disabled = true;
-                submitButton.textContent = 'Виконуємо скоринг...';
+                submitButton.textContent =
+                    uiTexts.submitRunning ?? 'Виконуємо скоринг...';
             }
             return;
         }
@@ -461,10 +492,28 @@ if (clearFormButton && transactionForm) {
 
         if (submitButton instanceof HTMLButtonElement) {
             submitButton.disabled = false;
-            submitButton.textContent = 'Виконати скоринг';
+            submitButton.textContent =
+                uiTexts.submitDefault ?? 'Виконати скоринг';
         }
 
         resetScoreScreenView();
-        window.history.replaceState({}, document.title, cleanUrl);
+        const cleanStateUrl = buildUrlWithLanguage(
+            getCurrentLanguage(),
+            `${window.location.origin}${cleanUrl}`,
+        );
+        window.history.replaceState({}, document.title, cleanStateUrl);
     });
 }
+
+languageSwitchButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const targetLanguage = button.dataset.langSwitch;
+
+        if (!targetLanguage || targetLanguage === getCurrentLanguage()) {
+            return;
+        }
+
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, targetLanguage);
+        window.location.assign(buildUrlWithLanguage(targetLanguage).toString());
+    });
+});
