@@ -278,6 +278,16 @@ def format_file_size(num_bytes: int) -> str:
     return "n/a"
 
 
+def get_asset_version() -> str:
+    asset_paths = [
+        STATIC_DIR / "css" / "index.css",
+        STATIC_DIR / "js" / "index.js",
+        TEMPLATES_DIR / "index.html",
+    ]
+    latest_mtime_ns = max(path.stat().st_mtime_ns for path in asset_paths if path.exists())
+    return str(latest_mtime_ns)
+
+
 @lru_cache(maxsize=2)
 def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
     datasets: dict[str, dict[str, object]] = {}
@@ -373,6 +383,7 @@ def index(request: Request) -> HTMLResponse:
         name="index.html",
         context={
             "lang": lang,
+            "asset_version": get_asset_version(),
             "page_title": tr("Антифрод аналітика та скоринг", "Anti-fraud analytics and scoring"),
             "tr": tr,
             "form_data": form_data,
