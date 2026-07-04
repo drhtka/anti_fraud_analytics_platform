@@ -2,7 +2,6 @@ const transactionForm = document.getElementById('transaction-form');
 const clearFormButton = document.getElementById('clear-form');
 const scoreLoadingOverlay = document.getElementById('score-loading-overlay');
 const submitButton = transactionForm?.querySelector('.submit-button');
-const scoreFormHint = transactionForm?.querySelector('p');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
 const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
@@ -115,18 +114,6 @@ function resetScoreScreenView() {
     if (!scoreScreen.querySelector('.placeholder')) {
         scoreScreen.insertAdjacentHTML('beforeend', SCORE_PLACEHOLDER_HTML);
     }
-}
-
-function revealScoreFormHint() {
-    const target = scoreFormHint instanceof HTMLElement ? scoreFormHint : transactionForm;
-
-    if (!(target instanceof HTMLElement)) {
-        return;
-    }
-
-    window.requestAnimationFrame(() => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
 }
 
 function showScenarioModal() {
@@ -479,6 +466,5 @@ if (clearFormButton && transactionForm) {
 
         resetScoreScreenView();
         window.history.replaceState({}, document.title, cleanUrl);
-        revealScoreFormHint();
     });
 }
