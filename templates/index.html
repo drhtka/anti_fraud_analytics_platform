@@ -50,7 +50,7 @@
                     </article>
                 </div>
                 <section class="hero-data-sources" aria-label="Джерела даних">
-                    <div class="hero-data-source-card">
+                    <div class="hero-point hero-data-source-card">
                         <span class="hero-point-label">Джерело даних</span>
                         <p class="hero-data-source-text">
                             Таблиці для MVP взяті з
@@ -63,37 +63,32 @@
                             >.
                         </p>
                     </div>
-                    <div class="hero-data-source-card">
-                        <span class="hero-point-label">Локальні CSV</span>
-                        <ul class="hero-data-file-list">
-                            {% for dataset_name, dataset in
-                            downloadable_datasets.items() %}
-                            <li class="hero-data-file-item">
-                                <div class="hero-data-file-content">
-                                    <span class="hero-data-file-kicker"
-                                        >{{ dataset.title }}</span
-                                    >
-                                    <strong class="hero-data-file-title"
-                                        >{{ dataset.label }}</strong
-                                    >
-                                    <div class="hero-data-file-meta">
-                                        <span
-                                            >{{ dataset.row_count }} rows</span
-                                        >
-                                        <span>{{ dataset.file_size }}</span>
-                                    </div>
-                                    <p>{{ dataset.description }}</p>
-                                </div>
-                                <a
-                                    href="{{ request.url_for('download_dataset', dataset_name=dataset_name) }}"
-                                    class="hero-inline-link hero-download-link"
-                                    download="{{ dataset.label }}"
-                                    >Скачати CSV</a
+                    <ul class="hero-points hero-data-file-grid">
+                        {% for dataset_name, dataset in
+                        downloadable_datasets.items() %}
+                        <li class="hero-point hero-data-file-item">
+                            <div class="hero-data-file-content">
+                                <span class="hero-data-file-kicker"
+                                    >{{ dataset.title }}</span
                                 >
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                                <strong class="hero-data-file-title"
+                                    >{{ dataset.label }}</strong
+                                >
+                                <div class="hero-data-file-meta">
+                                    <span>{{ dataset.row_count }} rows</span>
+                                    <span>{{ dataset.file_size }}</span>
+                                </div>
+                                <p>{{ dataset.description }}</p>
+                            </div>
+                            <a
+                                href="{{ request.url_for('download_dataset', dataset_name=dataset_name) }}"
+                                class="hero-inline-link hero-download-link"
+                                download="{{ dataset.label }}"
+                                >Скачати CSV</a
+                            >
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </section>
             </section>
             <nav class="screen-nav" aria-label="Основні розділи">
