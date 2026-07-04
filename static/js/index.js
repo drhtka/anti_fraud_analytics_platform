@@ -2,6 +2,7 @@ const transactionForm = document.getElementById('transaction-form');
 const clearFormButton = document.getElementById('clear-form');
 const scoreLoadingOverlay = document.getElementById('score-loading-overlay');
 const submitButton = transactionForm?.querySelector('.submit-button');
+const scoreFormHint = transactionForm?.querySelector('p');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
 const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
@@ -50,6 +51,20 @@ const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
 const SCORE_RESULT_SCROLL_STORAGE_KEY = 'anti-fraud-scroll-to-score-results';
 const inFlightScreenLoads = new Map();
 let selectedDemoKey = '';
+const SCORE_PLACEHOLDER_HTML = `
+    <section class="placeholder">
+        <h2>Готово до демонстрації скорингу</h2>
+        <p>Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".</p>
+        <p>Після запуску на цій сторінці з'являться:</p>
+        <ul>
+            <li>підсумковий fraud score і рівень ризику;</li>
+            <li>рішення щодо ручної перевірки;</li>
+            <li>активні ризик-сигнали для транзакції;</li>
+            <li>коротке пояснення результату;</li>
+            <li>підтвердження з сирих таблиць для ключових сигналів.</li>
+        </ul>
+    </section>
+`;
 
 function showScoreLoadingOverlay() {
     if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
@@ -83,6 +98,34 @@ function scrollToLatestScoreResult() {
         if (scoreStatusCard instanceof HTMLElement) {
             scoreStatusCard.focus({ preventScroll: true });
         }
+    });
+}
+
+function resetScoreScreenView() {
+    const scoreScreen = document.querySelector('[data-screen-name="score"]');
+
+    if (!(scoreScreen instanceof HTMLElement)) {
+        return;
+    }
+
+    scoreScreen.querySelector('.message.error')?.remove();
+    scoreScreen.querySelector('.results')?.remove();
+    scoreScreen.querySelector('.json-action-link')?.remove();
+
+    if (!scoreScreen.querySelector('.placeholder')) {
+        scoreScreen.insertAdjacentHTML('beforeend', SCORE_PLACEHOLDER_HTML);
+    }
+}
+
+function revealScoreFormHint() {
+    const target = scoreFormHint instanceof HTMLElement ? scoreFormHint : transactionForm;
+
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    window.requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 }
 
@@ -417,6 +460,25 @@ if (transactionForm) {
 if (clearFormButton && transactionForm) {
     clearFormButton.addEventListener('click', () => {
         const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
-        window.location.assign(cleanUrl);
+
+        sessionStorage.removeItem(SCORE_RESULT_SCROLL_STORAGE_KEY);
+        hideScoreLoadingOverlay();
+        hideScenarioModal();
+        updateSelectedDemoButton('');
+
+        Array.from(transactionForm.elements).forEach((element) => {
+            if (element instanceof HTMLInputElement) {
+                element.value = '';
+            }
+        });
+
+        if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Виконати скоринг';
+        }
+
+        resetScoreScreenView();
+        window.history.replaceState({}, document.title, cleanUrl);
+        revealScoreFormHint();
     });
 }
