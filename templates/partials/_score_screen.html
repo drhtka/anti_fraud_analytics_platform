@@ -10,9 +10,7 @@
     </section>
 
     <form method="get" action="/" id="transaction-form">
-        <p>
-            Поля нижче заповнюються лише через кнопки демо-сценаріїв.
-        </p>
+        <p>Поля нижче заповнюються лише через кнопки демо-сценаріїв.</p>
         <div class="grid">
             <label>
                 ID транзакції
@@ -129,17 +127,38 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="submit-button">Виконати скоринг</button>
+            <button type="submit" class="submit-button">
+                Виконати скоринг
+            </button>
             <button type="button" class="secondary-button" id="clear-form">
                 Очистити
             </button>
             {% if score_result and explain_result %}
-            <a href="#json" class="secondary-button action-link json-action-link">
+            <a
+                href="#json"
+                class="secondary-button action-link json-action-link"
+            >
                 Вивід у JSON
             </a>
             {% endif %}
         </div>
     </form>
+
+    <div class="loading-overlay" id="score-loading-overlay" hidden>
+        <div
+            class="loading-dialog"
+            role="status"
+            aria-live="polite"
+            aria-label="Виконується скоринг"
+        >
+            <span class="loading-spinner" aria-hidden="true"></span>
+            <h3>Виконуємо скоринг</h3>
+            <p>
+                Рахуємо fraud score, збираємо сигнали ризику та готуємо
+                результат.
+            </p>
+        </div>
+    </div>
 
     <div class="modal-backdrop" id="scenario-modal" hidden>
         <div
@@ -151,7 +170,11 @@
             <h3 id="scenario-modal-title">Підказка</h3>
             <p>Оберіть один із трьох демо-сценаріїв.</p>
             <div class="modal-actions">
-                <button type="button" class="submit-button" id="close-scenario-modal">
+                <button
+                    type="button"
+                    class="submit-button"
+                    id="close-scenario-modal"
+                >
                     Зрозуміло
                 </button>
             </div>
@@ -160,22 +183,25 @@
 
     {% if error_message %}
     <section class="message error">{{ error_message }}</section>
-    {% endif %}
-
-    {% if score_result and explain_result %}
-    <section class="results">
+    {% endif %} {% if score_result and explain_result %}
+    <section class="results" id="score-results" data-score-results>
         {% if score_result.operation_status %}
-        <article class="result-card score-op-card">
+        <article
+            class="result-card score-op-card"
+            id="score-status-card"
+            data-score-status-card
+            tabindex="-1"
+        >
             <div class="result-header">
                 <h2>Статус останнього скорингу</h2>
                 <span
                     class="badge {% if score_result.operation_status.event_status == 'queued' %}badge-low{% elif score_result.operation_status.event_status == 'failed' %}badge-high{% else %}badge-medium{% endif %}"
                 >
-                    {% if score_result.operation_status.event_status == "queued" %}
-                    ЗБЕРЕЖЕНО В ФОН
-                    {% elif score_result.operation_status.event_status == "failed" %}
-                    ФОНОВА ВІДПРАВКА НЕ ВДАЛАСЬ
-                    {% else %} ФОНОВА ВІДПРАВКА ВИМКНЕНА {% endif %}
+                    {% if score_result.operation_status.event_status == "queued"
+                    %} ЗБЕРЕЖЕНО В ФОН {% elif
+                    score_result.operation_status.event_status == "failed" %}
+                    ФОНОВА ВІДПРАВКА НЕ ВДАЛАСЬ {% else %} ФОНОВА ВІДПРАВКА
+                    ВИМКНЕНА {% endif %}
                 </span>
             </div>
             <p class="score-op-intro">
@@ -210,7 +236,8 @@
                 <div class="metric">
                     <span class="metric-label">ID події</span>
                     <span class="metric-value score-op-event-id"
-                        >{{ score_result.operation_status.event_id or 'n/a' }}</span
+                        >{{ score_result.operation_status.event_id or 'n/a'
+                        }}</span
                     >
                 </div>
                 <div class="metric">
@@ -218,7 +245,9 @@
                     <span
                         class="metric-value score-op-timestamp"
                         title="{{ score_result.operation_status.scored_at }}"
-                        >{{ format_ui_datetime(score_result.operation_status.scored_at) }}</span
+                        >{{
+                        format_ui_datetime(score_result.operation_status.scored_at)
+                        }}</span
                     >
                 </div>
             </div>
@@ -247,15 +276,17 @@
 
             <div class="result-grid">
                 <div class="metric">
-                <span class="metric-label">Fraud score</span>
-                    <span class="metric-value">{{ score_result.fraud_score }}</span>
+                    <span class="metric-label">Fraud score</span>
+                    <span class="metric-value"
+                        >{{ score_result.fraud_score }}</span
+                    >
                 </div>
                 <div class="metric">
                     <span class="metric-label">Рівень ризику</span>
                     <span class="metric-value"
-                        >{% if score_result.risk_label == "high" %}високий{% elif
-                        score_result.risk_label == "medium" %}середній{% else
-                        %}низький{% endif %}</span
+                        >{% if score_result.risk_label == "high" %}високий{%
+                        elif score_result.risk_label == "medium" %}середній{%
+                        else %}низький{% endif %}</span
                     >
                 </div>
                 <div class="metric">
@@ -276,7 +307,9 @@
             <div class="meta-grid">
                 <div class="metric">
                     <span class="metric-label">Модель</span>
-                    <span class="metric-value">{{ score_result.model_name }}</span>
+                    <span class="metric-value"
+                        >{{ score_result.model_name }}</span
+                    >
                 </div>
                 <div class="metric">
                     <span class="metric-label">Версія</span>
@@ -357,7 +390,8 @@
     <section class="placeholder">
         <h2>Готово до демонстрації скорингу</h2>
         <p>
-            Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".
+            Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати
+            скоринг".
         </p>
         <p>Після запуску на цій сторінці з'являться:</p>
         <ul>

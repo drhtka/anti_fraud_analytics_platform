@@ -1,5 +1,7 @@
 const transactionForm = document.getElementById('transaction-form');
 const clearFormButton = document.getElementById('clear-form');
+const scoreLoadingOverlay = document.getElementById('score-loading-overlay');
+const submitButton = transactionForm?.querySelector('.submit-button');
 const demoButtons = document.querySelectorAll('[data-demo-key]');
 const screenTabs = document.querySelectorAll('[data-screen-target]');
 const demoPayloadsElement = document.getElementById('demo-payloads-json');
@@ -45,8 +47,44 @@ const demoPayloads = demoPayloadsElement
     : [];
 const DEFAULT_SCREEN = 'score';
 const ACTIVE_SCREEN_STORAGE_KEY = 'anti-fraud-active-screen';
+const SCORE_RESULT_SCROLL_STORAGE_KEY = 'anti-fraud-scroll-to-score-results';
 const inFlightScreenLoads = new Map();
 let selectedDemoKey = '';
+
+function showScoreLoadingOverlay() {
+    if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
+        return;
+    }
+
+    scoreLoadingOverlay.hidden = false;
+    document.body.classList.add('is-loading-score');
+}
+
+function hideScoreLoadingOverlay() {
+    if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
+        return;
+    }
+
+    scoreLoadingOverlay.hidden = true;
+    document.body.classList.remove('is-loading-score');
+}
+
+function scrollToLatestScoreResult() {
+    const scoreStatusCard = document.querySelector('[data-score-status-card]');
+    const scoreResults = document.querySelector('[data-score-results]');
+    const target = scoreStatusCard ?? scoreResults;
+
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    window.requestAnimationFrame(() => {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (scoreStatusCard instanceof HTMLElement) {
+            scoreStatusCard.focus({ preventScroll: true });
+        }
+    });
+}
 
 function showScenarioModal() {
     if (!(scenarioModal instanceof HTMLDivElement)) {
@@ -310,6 +348,14 @@ window.addEventListener('hashchange', async () => {
 activateScreen(getInitialScreenName());
 initDashboardEmbeds();
 
+if (sessionStorage.getItem(SCORE_RESULT_SCROLL_STORAGE_KEY) === 'true') {
+    sessionStorage.removeItem(SCORE_RESULT_SCROLL_STORAGE_KEY);
+    hideScoreLoadingOverlay();
+    activateScreen('score').then(() => {
+        scrollToLatestScoreResult();
+    });
+}
+
 demoButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const payloadKey = button.dataset.demoKey;
@@ -354,6 +400,12 @@ if (scenarioModal instanceof HTMLDivElement) {
 if (transactionForm) {
     transactionForm.addEventListener('submit', (event) => {
         if (selectedDemoKey) {
+            sessionStorage.setItem(SCORE_RESULT_SCROLL_STORAGE_KEY, 'true');
+            showScoreLoadingOverlay();
+            if (submitButton instanceof HTMLButtonElement) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Виконуємо скоринг...';
+            }
             return;
         }
 
