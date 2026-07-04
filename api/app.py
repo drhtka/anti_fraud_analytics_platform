@@ -78,11 +78,13 @@ DATASET_SOURCE_URL = (
 )
 DOWNLOADABLE_DATASETS = {
     "train_identity": {
+        "title": "Identity-ознаки",
         "label": "train_identity.csv",
         "path": RAW_DATA_DIR / "train_identity.csv",
         "description": "Identity-таблиця з device/browser/user identity ознаками.",
     },
     "train_transaction": {
+        "title": "Транзакції та fraud-мітка",
         "label": "train_transaction.csv",
         "path": RAW_DATA_DIR / "train_transaction.csv",
         "description": "Transaction-таблиця з основними fraud-фічами та цільовою змінною.",

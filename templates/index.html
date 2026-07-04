@@ -70,6 +70,9 @@
                             downloadable_datasets.items() %}
                             <li class="hero-data-file-item">
                                 <div class="hero-data-file-content">
+                                    <span class="hero-data-file-kicker"
+                                        >{{ dataset.title }}</span
+                                    >
                                     <strong class="hero-data-file-title"
                                         >{{ dataset.label }}</strong
                                     >
@@ -80,7 +83,6 @@
                                         <span>{{ dataset.file_size }}</span>
                                     </div>
                                     <p>{{ dataset.description }}</p>
-                                    <code>{{ dataset.path_text }}</code>
                                 </div>
                                 <a
                                     href="{{ request.url_for('download_dataset', dataset_name=dataset_name) }}"

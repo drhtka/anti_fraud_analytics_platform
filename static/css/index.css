@@ -135,6 +135,7 @@ h1 {
 
 .hero-data-file-list {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     margin: 0;
     padding: 0;
@@ -143,16 +144,13 @@ h1 {
 
 .hero-data-file-item {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 18px;
-    padding-top: 14px;
-    border-top: 1px solid #e2e8f0;
-}
-
-.hero-data-file-item:first-child {
-    padding-top: 0;
-    border-top: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
 }
 
 .hero-data-file-item p {
@@ -161,6 +159,16 @@ h1 {
 
 .hero-data-file-content {
     min-width: 0;
+}
+
+.hero-data-file-kicker {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .hero-data-file-title {
@@ -201,7 +209,7 @@ h1 {
 
 .hero-download-link {
     margin: 0;
-    align-self: center;
+    align-self: flex-start;
     white-space: nowrap;
 }
 
@@ -655,7 +663,11 @@ button {
     }
 
     .hero-data-file-item {
-        flex-direction: column;
+        padding: 14px;
+    }
+
+    .hero-data-file-list {
+        grid-template-columns: 1fr;
     }
 
     .screen[data-screen-name="eda"] .summary-grid {
