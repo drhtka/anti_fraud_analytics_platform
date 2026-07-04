@@ -17,18 +17,24 @@
                 <p class="intro">
                     Цей MVP показує повний anti-fraud workflow: від EDA та
                     SQL-інсайтів до ML-скорингу й пояснюваного рішення для
-                    конкретної транзакції. На одному екрані зібрані fraud
-                    score, активні сигнали ризику, рішення щодо manual review
-                    та технічний API-вивід для перевірки інтеграції.
+                    конкретної транзакції. На одному екрані зібрані fraud score,
+                    активні сигнали ризику, рішення щодо manual review та
+                    технічний API-вивід для перевірки інтеграції.
                 </p>
                 <div class="hero-points" aria-label="Ключові можливості">
                     <article class="hero-point">
                         <span class="hero-point-label">EDA та SQL</span>
-                        <p>Пошук fraud-патернів у транзакціях і живі зрізи з локальних даних.</p>
+                        <p>
+                            Пошук fraud-патернів у транзакціях і живі зрізи з
+                            локальних даних.
+                        </p>
                     </article>
                     <article class="hero-point">
                         <span class="hero-point-label">ML scoring</span>
-                        <p>Оцінка ризику, активні сигнали та рішення щодо manual review.</p>
+                        <p>
+                            Оцінка ризику, активні сигнали та рішення щодо
+                            manual review.
+                        </p>
                     </article>
                     <article class="hero-point">
                         <span class="hero-point-label">API + UI</span>
@@ -46,7 +52,7 @@
                 <section class="hero-data-sources" aria-label="Джерела даних">
                     <div class="hero-data-source-card">
                         <span class="hero-point-label">Джерело даних</span>
-                        <p>
+                        <p class="hero-data-source-text">
                             Таблиці для MVP взяті з
                             <a
                                 href="{{ dataset_source_url }}"
@@ -60,16 +66,25 @@
                     <div class="hero-data-source-card">
                         <span class="hero-point-label">Локальні CSV</span>
                         <ul class="hero-data-file-list">
-                            {% for dataset_name, dataset in downloadable_datasets.items() %}
+                            {% for dataset_name, dataset in
+                            downloadable_datasets.items() %}
                             <li class="hero-data-file-item">
-                                <div>
-                                    <strong>{{ dataset.label }}</strong>
+                                <div class="hero-data-file-content">
+                                    <strong class="hero-data-file-title"
+                                        >{{ dataset.label }}</strong
+                                    >
+                                    <div class="hero-data-file-meta">
+                                        <span
+                                            >{{ dataset.row_count }} rows</span
+                                        >
+                                        <span>{{ dataset.file_size }}</span>
+                                    </div>
                                     <p>{{ dataset.description }}</p>
-                                    <code>{{ dataset.path }}</code>
+                                    <code>{{ dataset.path_text }}</code>
                                 </div>
                                 <a
                                     href="{{ request.url_for('download_dataset', dataset_name=dataset_name) }}"
-                                    class="hero-inline-link"
+                                    class="hero-inline-link hero-download-link"
                                     download="{{ dataset.label }}"
                                     >Скачати CSV</a
                                 >

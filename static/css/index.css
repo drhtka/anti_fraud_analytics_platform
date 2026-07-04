@@ -129,6 +129,10 @@ h1 {
     line-height: 1.55;
 }
 
+.hero-data-source-text {
+    margin-top: 6px;
+}
+
 .hero-data-file-list {
     display: grid;
     gap: 12px;
@@ -141,8 +145,8 @@ h1 {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
-    padding-top: 12px;
+    gap: 18px;
+    padding-top: 14px;
     border-top: 1px solid #e2e8f0;
 }
 
@@ -152,7 +156,36 @@ h1 {
 }
 
 .hero-data-file-item p {
-    margin: 4px 0 8px;
+    margin: 6px 0 10px;
+}
+
+.hero-data-file-content {
+    min-width: 0;
+}
+
+.hero-data-file-title {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.hero-data-file-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.hero-data-file-meta span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    background: #f8fafc;
+    border: 1px solid #dbe3ee;
+    border-radius: 999px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .hero-data-file-item code {
@@ -164,6 +197,12 @@ h1 {
     padding: 6px 8px;
     font-size: 12px;
     word-break: break-all;
+}
+
+.hero-download-link {
+    margin: 0;
+    align-self: center;
+    white-space: nowrap;
 }
 
 .screen-nav {

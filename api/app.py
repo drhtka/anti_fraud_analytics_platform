@@ -33,7 +33,6 @@ from api.ui_content import (
     load_score_evidence,
     load_sql_sections,
 )
-from api.ui_content.shared import get_ui_cache_dir
 
 
 @asynccontextmanager
@@ -198,6 +197,39 @@ def load_demo_payloads() -> list[dict[str, object]]:
     return demo_payloads
 
 
+def format_file_size(num_bytes: int) -> str:
+    for unit in ("B", "KB", "MB", "GB"):
+        if num_bytes < 1024 or unit == "GB":
+            if unit == "B":
+                return f"{num_bytes} {unit}"
+            return f"{num_bytes:.1f} {unit}"
+        num_bytes /= 1024
+    return "n/a"
+
+
+@lru_cache(maxsize=1)
+def get_downloadable_datasets() -> dict[str, dict[str, object]]:
+    datasets: dict[str, dict[str, object]] = {}
+
+    for dataset_name, dataset in DOWNLOADABLE_DATASETS.items():
+        dataset_path = dataset["path"]
+        file_size_bytes = dataset_path.stat().st_size if dataset_path.exists() else 0
+        row_count = 0
+
+        if dataset_path.exists():
+            with dataset_path.open("r", encoding="utf-8", newline="") as dataset_file:
+                row_count = max(sum(1 for _ in dataset_file) - 1, 0)
+
+        datasets[dataset_name] = {
+            **dataset,
+            "path_text": str(dataset_path),
+            "file_size": format_file_size(file_size_bytes),
+            "row_count": row_count,
+        }
+
+    return datasets
+
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
     form_data = build_ui_form_data(request)
@@ -257,7 +289,7 @@ def index(request: Request) -> HTMLResponse:
             "demo_payloads": load_demo_payloads(),
             "dashboard_embed_url": LOOKER_STUDIO_EMBED_URL,
             "dataset_source_url": DATASET_SOURCE_URL,
-            "downloadable_datasets": DOWNLOADABLE_DATASETS,
+            "downloadable_datasets": get_downloadable_datasets(),
         },
     )
 
