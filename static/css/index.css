@@ -1901,6 +1901,24 @@ form,
     margin-bottom: 12px;
 }
 
+.placeholder ul,
+.placeholder ol,
+.placeholder li,
+.result-card ul,
+.result-card ol,
+.decision-explanation-points ol,
+.decision-explanation-points li,
+.decision-placeholder ul,
+.decision-placeholder ol,
+.decision-placeholder li {
+    color: var(--text-secondary);
+}
+
+.decision-explanation-points ol,
+.decision-placeholder ul {
+    line-height: 1.6;
+}
+
 .ml-console {
     background:
         linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
