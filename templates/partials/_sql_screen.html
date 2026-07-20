@@ -1,58 +1,91 @@
 <section class="screen" data-screen-name="sql" hidden>
-    <article class="content-card">
-        <h2>{{ tr('SQL-знахідки', 'SQL findings') }}</h2>
-        <p>
-            {{ tr(
-                'Цей екран запускає найсильніші SQL-блоки дослідження з',
-                'This screen runs the strongest SQL exploration blocks from'
-            ) }}
-            <code>sql/</code>
-            {{ tr(
-                'на локальних IEEE-CIS CSV-файлах і залишає лише найкращі демо-таблиці.',
-                'on local IEEE-CIS CSV files and keeps only the best demo tables.'
-            ) }}
-        </p>
-        {% for section in sql_sections %}
-        <section class="learning-block">
-            <div class="learning-block-header">
-                <p class="learning-step">{{ tr('SQL-крок', 'SQL step') }} {{ loop.index }}</p>
-                <h3>{{ section.title }}</h3>
+    <article class="content-card sql-console">
+        <div class="sql-console-header">
+            <div>
+                <span class="hero-point-label">{{ tr('Fraud Investigation', 'Fraud Investigation') }}</span>
+                <h2>{{ tr('SQL-дослідження suspicious patterns', 'SQL investigation of suspicious patterns') }}</h2>
+                <p>
+                    {{ tr(
+                        'Цей екран подає SQL як інструмент розслідування: базова картина фроду, сегменти ризику, watchlist-кандидати та аномалії, які можна перетворити на evidence для ручної перевірки.',
+                        'This screen presents SQL as an investigation tool: baseline fraud picture, risk segments, watchlist candidates, and anomalies that can become evidence for manual review.'
+                    ) }}
+                </p>
             </div>
-
-            <div class="sql-meta">
-                <div class="metric">
-                    <span class="metric-label">{{ tr('Файл-джерело', 'Source file') }}</span>
-                    <span class="metric-value">{{ section.source_file }}</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">{{ tr('Таблиця результату', 'Result table') }}</span>
-                    <span class="metric-value">{{ section.table_name }}</span>
-                </div>
+            <div class="sql-console-source">
+                <span class="sql-console-source-label">{{ tr('Query sources', 'Query sources') }}</span>
+                <code>sql/</code>
+                <code>DuckDB</code>
             </div>
+        </div>
 
-            <p>{{ section.description }}</p>
-
-            <pre
-                class="sql-query"
-            ><code>{{ section.query.strip() }}</code></pre>
-
-            {% if section.result_html %}
-            <div class="sql-result-block">{{ section.result_html | safe }}</div>
-            {% endif %} {% if section.reading_notes %}
-            <div class="learning-notes">
-                <ul>
-                    {% for note in section.reading_notes %}
-                    <li>{{ note }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %} {% if section.business_takeaway %}
-            <div class="takeaway-card">
-                <span class="takeaway-label">{{ tr('Бізнес-висновок', 'Business takeaway') }}</span>
-                <p>{{ section.business_takeaway }}</p>
-            </div>
-            {% endif %}
+        <section class="sql-playbook">
+            <article class="sql-playbook-card sql-playbook-card-primary">
+                <span class="sql-playbook-label">{{ tr('Outcome', 'Outcome') }}</span>
+                <strong class="sql-playbook-value">{{ tr('Evidence-backed slices', 'Evidence-backed slices') }}</strong>
+                <p>{{ tr('Кожен блок дає конкретний зріз і приклад evidence, який можна додати в anti-fraud workflow.', 'Each block produces a concrete slice and evidence that can be plugged into an anti-fraud workflow.') }}</p>
+            </article>
+            <article class="sql-playbook-card">
+                <span class="sql-playbook-label">{{ tr('Focus', 'Focus') }}</span>
+                <strong class="sql-playbook-value">{{ tr('Cohorts + anomalies', 'Cohorts + anomalies') }}</strong>
+                <p>{{ tr('Сегменти (ProductCD, email domains) показують, де концентрується ризик. Аномалії показують, що саме підозріло.', 'Segments (ProductCD, email domains) show where risk concentrates. Anomalies show what is suspicious.') }}</p>
+            </article>
+            <article class="sql-playbook-card">
+                <span class="sql-playbook-label">{{ tr('Next step', 'Next step') }}</span>
+                <strong class="sql-playbook-value">{{ tr('Signals + monitoring', 'Signals + monitoring') }}</strong>
+                <p>{{ tr('Після підтвердження патернів їх можна перетворити на легкі сигнали, watchlist або моніторинг у BI.', 'After confirming patterns, they can become lightweight signals, watchlists, or BI monitoring.') }}</p>
+            </article>
         </section>
-        {% endfor %}
+
+        <section class="sql-case-stack">
+            {% for section in sql_sections %}
+            <section class="learning-block sql-case">
+                <div class="learning-block-header sql-case-header">
+                    <div>
+                        <p class="learning-step">{{ tr('Case', 'Case') }} {{ loop.index }}</p>
+                        <h3>{{ section.title }}</h3>
+                    </div>
+                    <div class="sql-case-meta">
+                        <span class="sql-case-meta-chip">{{ section.table_name }}</span>
+                        <span class="sql-case-meta-chip">{{ section.source_file }}</span>
+                    </div>
+                </div>
+
+                <div class="sql-case-body">
+                    <div class="sql-case-left">
+                        <div class="metric sql-case-metric">
+                            <span class="metric-label">{{ tr('Investigation question', 'Investigation question') }}</span>
+                            <span class="metric-value">{{ section.description }}</span>
+                        </div>
+                        {% if section.business_takeaway %}
+                        <div class="takeaway-card sql-business-takeaway">
+                            <span class="takeaway-label">{{ tr('Бізнес-висновок', 'Business takeaway') }}</span>
+                            <p>{{ section.business_takeaway }}</p>
+                        </div>
+                        {% endif %}
+                        {% if section.reading_notes %}
+                        <div class="learning-notes sql-reading-notes">
+                            <ul>
+                                {% for note in section.reading_notes %}
+                                <li>{{ note }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="sql-case-right">
+                        <details class="sql-evidence" open>
+                            <summary>{{ tr('Query evidence', 'Query evidence') }}</summary>
+                            <pre class="sql-query"><code>{{ section.query.strip() }}</code></pre>
+                        </details>
+
+                        {% if section.result_html %}
+                        <div class="sql-result-block sql-result-card">{{ section.result_html | safe }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+        </section>
     </article>
 </section>
