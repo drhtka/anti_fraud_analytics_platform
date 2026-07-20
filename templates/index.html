@@ -21,19 +21,19 @@
                     >
                         <button
                             type="button"
-                            class="language-button {% if lang == 'uk' %}is-active{% endif %}"
-                            data-lang-switch="uk"
-                            aria-pressed="{{ 'true' if lang == 'uk' else 'false' }}"
-                        >
-                            UA
-                        </button>
-                        <button
-                            type="button"
                             class="language-button {% if lang == 'en' %}is-active{% endif %}"
                             data-lang-switch="en"
                             aria-pressed="{{ 'true' if lang == 'en' else 'false' }}"
                         >
                             EN
+                        </button>
+                        <button
+                            type="button"
+                            class="language-button {% if lang == 'uk' %}is-active{% endif %}"
+                            data-lang-switch="uk"
+                            aria-pressed="{{ 'true' if lang == 'uk' else 'false' }}"
+                        >
+                            UA
                         </button>
                     </div>
                 </div>

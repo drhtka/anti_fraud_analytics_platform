@@ -6,7 +6,7 @@ from fastapi import Request
 
 Language = Literal["uk", "en"]
 
-DEFAULT_LANGUAGE: Language = "uk"
+DEFAULT_LANGUAGE: Language = "en"
 SUPPORTED_LANGUAGES: set[str] = {"uk", "en"}
 
 
