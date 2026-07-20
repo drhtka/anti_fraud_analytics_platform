@@ -2199,9 +2199,155 @@ form,
     background: rgba(11, 16, 32, 0.5);
 }
 
+.eda-console {
+    background:
+        linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
+}
+
+.eda-console-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.eda-console-header h2 {
+    margin: 0 0 10px;
+}
+
+.eda-console-header p {
+    margin: 0;
+}
+
+.eda-console-source {
+    min-width: 220px;
+    padding: 16px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.eda-console-source-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.eda-summary-block {
+    margin-bottom: 18px;
+}
+
+.eda-playbook {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.eda-playbook-card {
+    padding: 18px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.eda-playbook-card-primary {
+    background: rgba(103, 183, 255, 0.1);
+    border-color: rgba(103, 183, 255, 0.24);
+}
+
+.eda-playbook-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.eda-playbook-value {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.eda-playbook-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.eda-case-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.eda-case {
+    background: rgba(11, 16, 32, 0.44);
+}
+
+.eda-case-header {
+    align-items: center;
+}
+
+.eda-case-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.eda-case-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.eda-case-question {
+    margin-top: 14px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.eda-reading-notes {
+    margin-top: 12px;
+}
+
+.eda-reading-notes p,
+.eda-reading-notes ul {
+    color: var(--text-secondary);
+}
+
+.eda-output-stack {
+    margin-top: 16px;
+}
+
+.eda-output-card {
+    background: rgba(11, 16, 32, 0.5);
+    border: 1px solid rgba(129, 153, 196, 0.18);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
 @media (max-width: 1100px) {
     .sql-playbook,
-    .sql-case-body {
+    .sql-case-body,
+    .eda-playbook {
         grid-template-columns: 1fr;
     }
 }

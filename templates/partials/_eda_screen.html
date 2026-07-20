@@ -1,28 +1,37 @@
 <section class="screen" data-screen-name="eda" hidden>
-    <article class="content-card">
-        <h2>{{ tr('EDA-інсайти', 'EDA insights') }}</h2>
-        <p>
-            {{ tr(
-                'Цей екран показує живі зведені таблиці та графіки з локальних IEEE-CIS CSV-файлів у',
-                'This screen shows live summary tables and charts from local IEEE-CIS CSV files in'
-            ) }}
-            <code>data/raw/</code>
-            {{ tr('і залишає тільки найсильніші демо-блоки.', 'and keeps only the strongest demo blocks.') }}
-        </p>
-        {% if eda_summary %}
-        <section class="summary-block">
-            <div class="summary-block-header">
-                <h3>{{ tr('Швидкий знімок датасету', 'Quick dataset snapshot') }}</h3>
+    <article class="content-card eda-console">
+        <div class="eda-console-header">
+            <div>
+                <span class="hero-point-label">{{ tr('Data Investigation', 'Data Investigation') }}</span>
+                <h2>{{ tr('EDA для fraud patterns і cohort slices', 'EDA for fraud patterns and cohort slices') }}</h2>
                 <p>
                     {{ tr(
-                        'Короткий верхньорівневий огляд перед детальнішими EDA-зрізами та fraud-патернами.',
-                        'A short top-level overview before the more detailed EDA slices and fraud patterns.'
+                        'Цей екран показує не просто EDA-ноутбук, а робочий investigation layer: розмір датасету, дисбаланс класів, сегменти ризику та домени, які можна перетворити на anti-fraud сигнали.',
+                        'This screen is not just notebook-style EDA but a working investigation layer: dataset size, class imbalance, risk segments, and domains that can be turned into anti-fraud signals.'
                     ) }}
                 </p>
             </div>
-            <div class="summary-grid">
+            <div class="eda-console-source">
+                <span class="eda-console-source-label">{{ tr('Source', 'Source') }}</span>
+                <code>data/raw/</code>
+                <code>DuckDB</code>
+            </div>
+        </div>
+
+        {% if eda_summary %}
+        <section class="summary-block eda-summary-block">
+            <div class="summary-block-header">
+                <h3>{{ tr('Dataset snapshot', 'Dataset snapshot') }}</h3>
+                <p>
+                    {{ tr(
+                        'Базовий контекст перед детальнішими розслідуваннями: обсяг таблиць, fraud share, amount scale та identity coverage.',
+                        'Baseline context before deeper investigations: table scale, fraud share, amount scale, and identity coverage.'
+                    ) }}
+                </p>
+            </div>
+            <div class="summary-grid eda-summary-grid">
                 {% for item in eda_summary %}
-                <article class="summary-card">
+                <article class="summary-card eda-summary-card">
                     <span class="summary-label">{{ item.label }}</span>
                     <strong class="summary-value">{{ item.value }}</strong>
                     <p class="summary-description">{{ item.description }}</p>
@@ -30,59 +39,81 @@
                 {% endfor %}
             </div>
         </section>
-        {% endif %} {% for section in eda_sections %}
-        <section class="learning-block">
-            <div class="learning-block-header">
-                <p class="learning-step">{{ tr('EDA-крок', 'EDA step') }} {{ loop.index }}</p>
-                <h3>{{ section.title }}</h3>
-            </div>
+        {% endif %}
 
-            {% if section.table_name or section.description %}
-            <div class="sql-meta">
-                {% if section.table_name %}
-                <div class="metric">
-                    <span class="metric-label">{{ tr('Таблиця результату', 'Result table') }}</span>
-                    <span class="metric-value">{{ section.table_name }}</span>
+        <section class="eda-playbook">
+            <article class="eda-playbook-card eda-playbook-card-primary">
+                <span class="eda-playbook-label">{{ tr('Investigation focus', 'Investigation focus') }}</span>
+                <strong class="eda-playbook-value">{{ tr('Fraud rarity + risky cohorts', 'Fraud rarity + risky cohorts') }}</strong>
+                <p>{{ tr('Сначала показываем дисбаланс классов, затем поднимаемся на уровень cohort slices и сегментов, где риск концентрируется.', 'First we show class imbalance, then move to cohort slices and segments where risk concentrates.') }}</p>
+            </article>
+            <article class="eda-playbook-card">
+                <span class="eda-playbook-label">{{ tr('Evidence type', 'Evidence type') }}</span>
+                <strong class="eda-playbook-value">{{ tr('Tables + charts', 'Tables + charts') }}</strong>
+                <p>{{ tr('Каждый блок сочетает числовую таблицу и визуальный паттерн, чтобы вывод был читаем и для аналитика, и для hiring manager.', 'Each block combines a numeric table and a visual pattern so the conclusion reads clearly for both an analyst and a hiring manager.') }}</p>
+            </article>
+            <article class="eda-playbook-card">
+                <span class="eda-playbook-label">{{ tr('Product use', 'Product use') }}</span>
+                <strong class="eda-playbook-value">{{ tr('Signals for scoring', 'Signals for scoring') }}</strong>
+                <p>{{ tr('Эти срезы уже напрямую кормят scoring logic, manual review heuristics и будущий monitoring narrative.', 'These slices already feed the scoring logic, manual review heuristics, and the future monitoring narrative.') }}</p>
+            </article>
+        </section>
+
+        <section class="eda-case-stack">
+            {% for section in eda_sections %}
+            <section class="learning-block eda-case">
+                <div class="learning-block-header eda-case-header">
+                    <div>
+                        <p class="learning-step">{{ tr('EDA case', 'EDA case') }} {{ loop.index }}</p>
+                        <h3>{{ section.title }}</h3>
+                    </div>
+                    {% if section.table_name %}
+                    <div class="eda-case-meta">
+                        <span class="eda-case-meta-chip">{{ section.table_name }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %} {% if section.description %}
-                <div class="metric">
-                    <span class="metric-label">{{ tr('Що ми бачимо', 'What we see') }}</span>
+
+                {% if section.description %}
+                <div class="metric eda-case-question">
+                    <span class="metric-label">{{ tr('Investigation question', 'Investigation question') }}</span>
                     <span class="metric-value">{{ section.description }}</span>
                 </div>
                 {% endif %}
-            </div>
-            {% endif %} {% if section.notes %}
-            <div class="learning-notes">
-                {% for note in section.notes %} {% if note.kind == "paragraph"
-                %}
-                <p>{{ note.text }}</p>
-                {% else %}
-                <ul>
-                    <li>{{ note.text }}</li>
-                </ul>
-                {% endif %} {% endfor %}
-            </div>
-            {% endif %} {% if section.outputs %}
-            <div class="notebook-output-stack">
-                {% for output in section.outputs %} {% if output.kind == "html"
-                %}
-                <div class="notebook-html-output">
-                    {{ output.content | safe }}
+
+                {% if section.notes %}
+                <div class="learning-notes eda-reading-notes">
+                    {% for note in section.notes %} {% if note.kind == "paragraph" %}
+                    <p>{{ note.text }}</p>
+                    {% else %}
+                    <ul>
+                        <li>{{ note.text }}</li>
+                    </ul>
+                    {% endif %} {% endfor %}
                 </div>
-                {% elif output.kind == "image" %}
-                <figure class="chart-card">
-                    <img
-                        src="{{ output.content }}"
-                        alt="{{ section.title }} chart"
-                        class="eda-chart"
-                    />
-                </figure>
-                {% elif output.kind == "text" %}
-                <pre class="text-output"><code>{{ output.content }}</code></pre>
-                {% endif %} {% endfor %}
-            </div>
-            {% endif %}
+                {% endif %}
+
+                {% if section.outputs %}
+                <div class="notebook-output-stack eda-output-stack">
+                    {% for output in section.outputs %} {% if output.kind == "html" %}
+                    <div class="notebook-html-output eda-output-card">
+                        {{ output.content | safe }}
+                    </div>
+                    {% elif output.kind == "image" %}
+                    <figure class="chart-card eda-output-card">
+                        <img
+                            src="{{ output.content }}"
+                            alt="{{ section.title }} chart"
+                            class="eda-chart"
+                        />
+                    </figure>
+                    {% elif output.kind == "text" %}
+                    <pre class="text-output"><code>{{ output.content }}</code></pre>
+                    {% endif %} {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+            {% endfor %}
         </section>
-        {% endfor %}
     </article>
 </section>
