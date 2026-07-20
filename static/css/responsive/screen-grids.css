@@ -1,0 +1,8 @@
+@media (max-width: 1100px) {
+    .sql-playbook,
+    .sql-case-body,
+    .eda-playbook,
+    .json-console-grid {
+        grid-template-columns: 1fr;
+    }
+}

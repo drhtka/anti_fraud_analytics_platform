@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -282,14 +283,31 @@ def format_file_size(num_bytes: int) -> str:
     return "n/a"
 
 
+def iter_static_asset_paths() -> list[Path]:
+    asset_paths: list[Path] = []
+
+    for asset_dir in (STATIC_DIR / "css", STATIC_DIR / "js"):
+        if not asset_dir.exists():
+            continue
+
+        asset_paths.extend(
+            sorted(path for path in asset_dir.rglob("*") if path.is_file())
+        )
+
+    return asset_paths
+
+
 def get_asset_version() -> str:
-    asset_paths = [
-        STATIC_DIR / "css" / "index.css",
-        STATIC_DIR / "js" / "index.js",
-        TEMPLATES_DIR / "index.html",
-    ]
-    latest_mtime_ns = max(path.stat().st_mtime_ns for path in asset_paths if path.exists())
-    return str(latest_mtime_ns)
+    version_fingerprint = hashlib.sha256()
+
+    for path in iter_static_asset_paths():
+        stat = path.stat()
+        relative_path = path.relative_to(BASE_DIR).as_posix()
+        version_fingerprint.update(
+            f"{relative_path}:{stat.st_mtime_ns}:{stat.st_size}\n".encode("utf-8")
+        )
+
+    return version_fingerprint.hexdigest()[:16]
 
 
 @lru_cache(maxsize=2)

@@ -1,0 +1,104 @@
+.dashboard-console,
+.json-console {
+    background:
+        linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
+}
+
+.dashboard-console-header,
+.json-console-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.dashboard-console-header h2,
+.json-console-header h2 {
+    margin: 0 0 10px;
+}
+
+.dashboard-console-header p,
+.json-console-header p {
+    margin: 0;
+}
+
+.dashboard-console-source,
+.json-console-source {
+    min-width: 220px;
+    padding: 16px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.dashboard-console-source-label,
+.json-console-source-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.dashboard-console-meta {
+    margin-bottom: 18px;
+}
+
+.dashboard-insight-grid {
+    margin-bottom: 18px;
+}
+
+.dashboard-frame-shell {
+    background: rgba(11, 16, 32, 0.44);
+}
+
+.json-console-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.json-section-card {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.json-console-grid .json-section + .json-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.json-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.json-section-header h3 {
+    margin: 0;
+}
+
+.json-section-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    background: rgba(103, 183, 255, 0.12);
+    border: 1px solid rgba(103, 183, 255, 0.22);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}

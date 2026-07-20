@@ -1,0 +1,120 @@
+.ml-console {
+    background:
+        linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
+}
+
+.ml-console-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.ml-console-header h2 {
+    margin: 0 0 10px;
+}
+
+.ml-console-header p {
+    margin: 0;
+}
+
+.ml-console-source {
+    min-width: 220px;
+    padding: 16px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.ml-console-source-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ml-evaluation-summary {
+    margin-bottom: 18px;
+}
+
+.ml-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ml-summary-card {
+    min-width: 0;
+}
+
+.ml-decision-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.ml-decision-card {
+    padding: 18px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.ml-decision-card-primary {
+    background: rgba(103, 183, 255, 0.1);
+    border-color: rgba(103, 183, 255, 0.24);
+}
+
+.ml-decision-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ml-decision-value {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.ml-decision-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.ml-table-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.ml-table-block {
+    background: rgba(11, 16, 32, 0.44);
+}
+
+.ml-table-header-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 1200px) {
+    .screen[data-screen-name="ml"] .content-card {
+        max-width: none;
+        margin: 0;
+    }
+
+    .ml-console {
+        width: 100%;
+    }
+}

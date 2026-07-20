@@ -1,0 +1,210 @@
+form,
+.content-card,
+.result-card,
+.summary-block,
+.learning-block {
+    padding: 22px;
+    min-width: 0;
+}
+
+label {
+    color: var(--text-primary);
+}
+
+input {
+    border-color: var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-primary);
+}
+
+input::placeholder {
+    color: var(--text-muted);
+}
+
+input[readonly] {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+button,
+.action-link {
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(103, 183, 255, 0.24) 0%, rgba(103, 183, 255, 0.16) 100%);
+    border: 1px solid rgba(103, 183, 255, 0.24);
+    color: var(--text-primary);
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+button:hover,
+.action-link:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(180deg, rgba(103, 183, 255, 0.28) 0%, rgba(103, 183, 255, 0.2) 100%);
+    border-color: rgba(103, 183, 255, 0.38);
+}
+
+.demo-button,
+.secondary-button {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.demo-button {
+    background: linear-gradient(180deg, rgba(103, 183, 255, 0.16) 0%, rgba(103, 183, 255, 0.08) 100%);
+    border-color: rgba(103, 183, 255, 0.34);
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 20px rgba(4, 10, 24, 0.2);
+}
+
+.demo-button:hover {
+    background: linear-gradient(180deg, rgba(103, 183, 255, 0.24) 0%, rgba(103, 183, 255, 0.14) 100%);
+    border-color: rgba(103, 183, 255, 0.46);
+    color: #f5f9ff;
+}
+
+.demo-button.is-selected {
+    background: linear-gradient(180deg, rgba(103, 183, 255, 0.34) 0%, rgba(103, 183, 255, 0.18) 100%);
+    border-color: rgba(125, 211, 252, 0.58);
+    color: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.2), 0 12px 28px rgba(7, 20, 43, 0.3);
+}
+
+.json-action-link {
+    background: rgba(103, 183, 255, 0.12);
+    color: var(--accent);
+    border-color: rgba(103, 183, 255, 0.24);
+    box-shadow: none;
+}
+
+.notebook-html-output table,
+.data-table,
+.dashboard-iframe {
+    background: rgba(11, 16, 32, 0.72);
+}
+
+.sql-meta,
+.result-grid,
+.meta-grid,
+.summary-grid,
+.insight-grid,
+.evidence-stack,
+.evidence-summary-grid,
+.dashboard-meta,
+.table-wrapper,
+.sql-result-block {
+    min-width: 0;
+}
+
+.notebook-html-output th,
+.notebook-html-output td,
+.data-table th,
+.data-table td {
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.notebook-html-output th,
+.data-table th {
+    background: rgba(103, 183, 255, 0.08);
+}
+
+.text-output,
+.sql-query,
+.json-block {
+    max-width: 100%;
+    box-sizing: border-box;
+    background: rgba(5, 9, 20, 0.96);
+    border: 1px solid rgba(129, 153, 196, 0.16);
+    color: #d8e2f3;
+}
+
+.metric-value,
+.summary-value {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.review-yes {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #fecaca;
+}
+
+.review-no,
+.takeaway-card {
+    background: rgba(52, 211, 153, 0.1);
+    border-color: rgba(52, 211, 153, 0.28);
+    color: #d1fae5;
+}
+
+.badge-low {
+    background: rgba(52, 211, 153, 0.14);
+    color: #bbf7d0;
+}
+
+.badge-medium {
+    background: rgba(251, 191, 36, 0.14);
+    color: #fde68a;
+}
+
+.badge-high {
+    background: rgba(248, 113, 113, 0.16);
+    color: #fecaca;
+}
+
+.explanation-callout {
+    background: rgba(255, 255, 255, 0.03);
+    border-left-color: var(--accent);
+}
+
+.evidence-note {
+    background: rgba(251, 191, 36, 0.08);
+    border-color: rgba(251, 191, 36, 0.24);
+    color: #fde68a;
+}
+
+.message.error {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #fecaca;
+}
+
+.modal-backdrop,
+.loading-overlay {
+    background: rgba(2, 6, 18, 0.72);
+}
+
+.loading-dialog,
+.modal-dialog {
+    background: rgba(16, 23, 39, 0.96);
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+.loading-spinner {
+    border-color: rgba(103, 183, 255, 0.12);
+    border-top-color: var(--accent);
+}
+
+.dashboard-loading-note,
+.dashboard-loading-preview {
+    background: rgba(12, 18, 34, 0.82);
+    border-color: var(--border);
+}
+
+.dashboard-loading-chip,
+.dashboard-loading-kpis span,
+.dashboard-loading-chart span {
+    background: linear-gradient(
+        90deg,
+        rgba(129, 153, 196, 0.22) 25%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(129, 153, 196, 0.22) 75%
+    );
+}
+

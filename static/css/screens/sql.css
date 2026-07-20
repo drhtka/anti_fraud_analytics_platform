@@ -1,0 +1,205 @@
+.sql-console {
+    background:
+        linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
+}
+
+.sql-console-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.sql-console-header h2 {
+    margin: 0 0 10px;
+}
+
+.sql-console-header p {
+    margin: 0;
+}
+
+.sql-console-source {
+    min-width: 220px;
+    padding: 16px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.sql-console-source-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sql-playbook {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.sql-playbook-card {
+    padding: 18px;
+    background: rgba(11, 16, 32, 0.44);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.sql-playbook-card-primary {
+    background: rgba(103, 183, 255, 0.1);
+    border-color: rgba(103, 183, 255, 0.24);
+}
+
+.sql-playbook-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sql-playbook-value {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.sql-playbook-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.sql-case-stack {
+    display: grid;
+    gap: 16px;
+}
+
+.sql-case {
+    background: rgba(11, 16, 32, 0.44);
+}
+
+.sql-case-header {
+    align-items: center;
+}
+
+.sql-case-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.sql-case-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sql-case-body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.sql-case-left,
+.sql-case-right {
+    min-width: 0;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+}
+
+.sql-case-metric {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sql-business-takeaway {
+    margin-top: 0;
+}
+
+.sql-reading-notes ul {
+    margin: 0;
+}
+
+.sql-reading-notes {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.sql-reading-notes ul {
+    padding-left: 18px;
+    color: rgba(231, 237, 249, 0.86);
+}
+
+.sql-reading-notes li {
+    color: rgba(231, 237, 249, 0.86);
+}
+
+.sql-evidence {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: rgba(5, 9, 20, 0.86);
+    overflow: hidden;
+}
+
+.sql-evidence summary {
+    cursor: pointer;
+    padding: 12px 14px;
+    color: var(--text-primary);
+    font-weight: 700;
+    background: rgba(103, 183, 255, 0.08);
+    border-bottom: 1px solid rgba(129, 153, 196, 0.18);
+}
+
+.sql-evidence[open] summary {
+    border-bottom-color: rgba(129, 153, 196, 0.24);
+}
+
+.sql-evidence .sql-query {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+@media (min-width: 1200px) {
+    .sql-case-body {
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    }
+
+    .sql-evidence .sql-query,
+    .sql-evidence .sql-query code {
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+}
+
+.sql-result-card {
+    padding: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(129, 153, 196, 0.18);
+    background: rgba(11, 16, 32, 0.5);
+}
