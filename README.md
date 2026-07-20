@@ -2,6 +2,8 @@
 
 A portfolio project focused on anti-fraud analytics, risk scoring, and decision-ready backend delivery.
 
+- Live Demo: [https://antifraud.pp.ua/](https://antifraud.pp.ua/)
+
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
 ![DuckDB](https://img.shields.io/badge/DuckDB-Analytics-FFF000?logo=duckdb&logoColor=black)
@@ -10,6 +12,7 @@ A portfolio project focused on anti-fraud analytics, risk scoring, and decision-
 
 ## Quick Links
 
+- [Live Demo](https://antifraud.pp.ua/)
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Visual Snapshot](#visual-snapshot)
