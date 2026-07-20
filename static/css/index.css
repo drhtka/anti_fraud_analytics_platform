@@ -1689,6 +1689,40 @@ form,
         linear-gradient(180deg, rgba(20, 28, 49, 0.92) 0%, rgba(13, 19, 34, 0.94) 100%);
 }
 
+.decision-form {
+    position: relative;
+    border: 1px solid rgba(103, 183, 255, 0.26);
+    box-shadow: 0 22px 54px rgba(3, 8, 20, 0.38);
+    overflow: hidden;
+}
+
+.decision-form::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        rgba(103, 183, 255, 0.86) 0%,
+        rgba(103, 183, 255, 0.18) 55%,
+        rgba(52, 211, 153, 0.14) 100%
+    );
+}
+
+.decision-form::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at top left, rgba(103, 183, 255, 0.12), transparent 45%);
+    opacity: 0.9;
+}
+
+.decision-form > * {
+    position: relative;
+    z-index: 1;
+}
+
 .decision-console-header,
 .decision-form-header,
 .decision-block-header,
@@ -1800,6 +1834,7 @@ form,
     margin-bottom: 0;
     background: rgba(11, 16, 32, 0.44);
     border-style: solid;
+    border-color: rgba(103, 183, 255, 0.16);
 }
 
 .decision-actions {
