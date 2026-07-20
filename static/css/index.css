@@ -2415,6 +2415,12 @@ form,
     border-top: 0;
 }
 
+.json-console-grid .json-section + .json-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
 .json-section-header {
     display: flex;
     flex-wrap: wrap;
