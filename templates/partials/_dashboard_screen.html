@@ -1,14 +1,24 @@
 <section class="screen" data-screen-name="dashboard" hidden>
-    <article class="content-card">
-        <h2>{{ tr('Дашборд', 'Dashboard') }}</h2>
-        <p>
-            {{ tr(
-                'Цей екран вбудовує поточний employer-facing BI-дашборд з Looker Studio прямо в застосунок, щоб демо скорингу та BI-історія були в одному місці.',
-                'This screen embeds the current employer-facing BI dashboard from Looker Studio directly into the app so the scoring demo and BI story stay in one place.'
-            ) }}
-        </p>
+    <article class="content-card dashboard-console">
+        <div class="dashboard-console-header">
+            <div>
+                <span class="hero-point-label">{{ tr('Monitoring Surface', 'Monitoring Surface') }}</span>
+                <h2>{{ tr('BI-моніторинг для anti-fraud narrative', 'BI monitoring for the anti-fraud narrative') }}</h2>
+                <p>
+                    {{ tr(
+                        'Цей екран вбудовує BI-дашборд як monitoring layer: suspicious patterns, cohort slices і threshold impact зібрані в одному продуктному контексті.',
+                        'This screen embeds the BI dashboard as a monitoring layer: suspicious patterns, cohort slices, and threshold impact are gathered into one product context.'
+                    ) }}
+                </p>
+            </div>
+            <div class="dashboard-console-source">
+                <span class="dashboard-console-source-label">{{ tr('Embed source', 'Embed source') }}</span>
+                <code>Looker Studio</code>
+                <code>iframe</code>
+            </div>
+        </div>
 
-        <div class="dashboard-meta">
+        <div class="dashboard-meta dashboard-console-meta">
             <div class="metric">
                 <span class="metric-label">{{ tr('Джерело', 'Source') }}</span>
                 <span class="metric-value">Looker Studio</span>
@@ -17,9 +27,13 @@
                 <span class="metric-label">{{ tr('Режим', 'Mode') }}</span>
                 <span class="metric-value">{{ tr('Вбудований iframe', 'Embedded iframe') }}</span>
             </div>
+            <div class="metric">
+                <span class="metric-label">{{ tr('Reading mode', 'Reading mode') }}</span>
+                <span class="metric-value">{{ tr('Suspicious patterns first', 'Suspicious patterns first') }}</span>
+            </div>
         </div>
 
-        <div class="insight-grid">
+        <div class="insight-grid dashboard-insight-grid">
             <section class="insight-card">
                 <h3>{{ tr('Що тут показано', 'What is shown here') }}</h3>
                 <p>
@@ -33,14 +47,23 @@
                 <h3>{{ tr('Як читати демо', 'How to read the demo') }}</h3>
                 <p>
                     {{ tr(
-                        'Спочатку звертай увагу на підозрілі патерни, а потім на блок з ML threshold impact, щоб швидко пояснити компроміс між fraud capture і review load.',
+                        'Спочатку звертай увагу на suspicious patterns, а потім на блок з ML threshold impact, щоб швидко пояснити компроміс між fraud capture і review load.',
                         'Start with suspicious patterns, then move to the ML threshold impact block to quickly explain the trade-off between fraud capture and review load.'
+                    ) }}
+                </p>
+            </section>
+            <section class="insight-card">
+                <h3>{{ tr('Навіщо це в консолі', 'Why this belongs in the console') }}</h3>
+                <p>
+                    {{ tr(
+                        'Цей екран завершує narrative: від transaction decision і SQL/EDA evidence до макрорівня моніторингу та BI-історії.',
+                        'This screen completes the narrative: from transaction decision and SQL/EDA evidence to macro-level monitoring and BI storytelling.'
                     ) }}
                 </p>
             </section>
         </div>
 
-        <div class="dashboard-frame-card is-loading">
+        <div class="dashboard-frame-card dashboard-frame-shell is-loading">
             <div class="dashboard-loading-note" aria-hidden="true">
                 <div class="dashboard-loading-preview">
                     <div class="dashboard-loading-header">

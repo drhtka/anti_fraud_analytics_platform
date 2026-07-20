@@ -1,15 +1,29 @@
 <section class="screen" data-screen-name="json" hidden>
-    <article class="content-card">
-        <h2>{{ tr('Сирий вивід API', 'Raw API output') }}</h2>
-        <p>
-            {{ tr(
-                'Цей екран показує технічну відповідь сервісу. Він допомагає швидко перевірити результат скорингу та пояснення без зайвих деталей.',
-                'This screen shows the technical service response. It helps quickly verify the scoring result and explanation without extra detail.'
-            ) }}
-        </p>
+    <article class="content-card json-console">
+        <div class="json-console-header">
+            <div>
+                <span class="hero-point-label">{{ tr('API Inspection', 'API Inspection') }}</span>
+                <h2>{{ tr('Технічний вихід scoring pipeline', 'Technical output of the scoring pipeline') }}</h2>
+                <p>
+                    {{ tr(
+                        'Цей екран показує raw API payloads як інженерний inspection layer: тут можна швидко звірити score, explanation і структуру відповіді без спрощення для UI.',
+                        'This screen shows raw API payloads as an engineering inspection layer: here you can quickly verify the score, explanation, and response structure without UI simplification.'
+                    ) }}
+                </p>
+            </div>
+            <div class="json-console-source">
+                <span class="json-console-source-label">{{ tr('Payloads', 'Payloads') }}</span>
+                <code>/score</code>
+                <code>/explain</code>
+            </div>
+        </div>
 
-        <section class="json-section">
-            <h3>{{ tr('Відповідь /score', 'Response /score') }}</h3>
+        <div class="json-console-grid">
+            <section class="json-section json-section-card">
+                <div class="json-section-header">
+                    <h3>{{ tr('Відповідь /score', 'Response /score') }}</h3>
+                    <span class="json-section-chip">score</span>
+                </div>
             {% if score_result_json %}
             <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
@@ -17,10 +31,13 @@
   "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /score.', 'Run scoring to see the raw /score output here.') }}"
 }</code></pre>
             {% endif %}
-        </section>
+            </section>
 
-        <section class="json-section">
-            <h3>{{ tr('Відповідь /explain', 'Response /explain') }}</h3>
+            <section class="json-section json-section-card">
+                <div class="json-section-header">
+                    <h3>{{ tr('Відповідь /explain', 'Response /explain') }}</h3>
+                    <span class="json-section-chip">explain</span>
+                </div>
             {% if explain_result_json %}
             <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
@@ -28,6 +45,7 @@
   "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /explain.', 'Run scoring to see the raw /explain output here.') }}"
 }</code></pre>
             {% endif %}
-        </section>
+            </section>
+        </div>
     </article>
 </section>
