@@ -283,6 +283,42 @@ def format_file_size(num_bytes: int) -> str:
     return "n/a"
 
 
+def is_ui_translate_request(request: Request) -> bool:
+    return request.query_params.get("ui_translate") == "1"
+
+
+def build_ui_translate_operation_status(
+    request: Request,
+    score_source: str,
+) -> ScoreOperationStatus:
+    request_score_source = request.query_params.get("ui_score_source")
+    request_event_status = request.query_params.get("ui_event_status")
+    request_event_sink = request.query_params.get("ui_event_sink")
+    request_event_id = request.query_params.get("ui_event_id")
+    request_scored_at = request.query_params.get("ui_scored_at")
+
+    return ScoreOperationStatus(
+        runtime_mode=get_runtime_settings().runtime_mode,
+        score_source=(
+            request_score_source
+            if request_score_source in {"model", "redis_cache"}
+            else score_source
+        ),
+        event_status=(
+            request_event_status
+            if request_event_status in {"queued", "disabled", "failed"}
+            else "disabled"
+        ),
+        event_sink=(
+            request_event_sink
+            if request_event_sink in {"celery_bigquery", "disabled"}
+            else "disabled"
+        ),
+        event_id=request_event_id or None,
+        scored_at=request_scored_at or datetime.now(timezone.utc).isoformat(),
+    )
+
+
 def iter_static_asset_paths() -> list[Path]:
     asset_paths: list[Path] = []
 
@@ -354,6 +390,7 @@ def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
     lang = detect_language(request)
+    translate_only = is_ui_translate_request(request)
     tr = lambda uk, en: translate(lang, uk, en)
     form_data = build_ui_form_data(request)
     score_result: ScoreResponse | None = None
@@ -369,14 +406,26 @@ def index(request: Request) -> HTMLResponse:
             score_request = build_score_request(form_data)
             score_result, score_source = get_score_response(score_request)
             score_result = localize_score_response(score_result, lang)
-            dispatch_result = enqueue_score_event(score_request, score_result)
-            score_result = attach_score_operation_status(
-                score_result,
-                score_source=score_source,
-                event_status=dispatch_result.status,
-                event_sink=dispatch_result.sink,
-                event_id=dispatch_result.event_id,
-            )
+
+            if translate_only:
+                score_result = score_result.model_copy(
+                    update={
+                        "operation_status": build_ui_translate_operation_status(
+                            request,
+                            score_source=score_source,
+                        )
+                    }
+                )
+            else:
+                dispatch_result = enqueue_score_event(score_request, score_result)
+                score_result = attach_score_operation_status(
+                    score_result,
+                    score_source=score_source,
+                    event_status=dispatch_result.status,
+                    event_sink=dispatch_result.sink,
+                    event_id=dispatch_result.event_id,
+                )
+
             explain_result = explain_from_score_response(score_result, lang=lang)
             score_evidence_blocks = load_score_evidence(
                 str(DATA_DIR),

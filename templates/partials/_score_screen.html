@@ -363,6 +363,11 @@
             class="result-card score-op-card"
             id="score-status-card"
             data-score-status-card
+            data-score-source="{{ score_result.operation_status.score_source }}"
+            data-event-status="{{ score_result.operation_status.event_status }}"
+            data-event-sink="{{ score_result.operation_status.event_sink }}"
+            data-event-id="{{ score_result.operation_status.event_id or '' }}"
+            data-scored-at="{{ score_result.operation_status.scored_at }}"
             tabindex="-1"
         >
             <div class="decision-block-header">
