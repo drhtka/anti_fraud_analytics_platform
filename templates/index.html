@@ -38,6 +38,60 @@
                     </div>
                 </div>
 
+                <nav
+                    class="screen-nav screen-nav--mobile"
+                    aria-label="{{ tr('Основні розділи', 'Main sections') }}"
+                >
+                    <button
+                        type="button"
+                        class="screen-tab is-active"
+                        data-screen-target="score"
+                    >
+                        <span class="screen-tab-label">{{ tr('Рішення', 'Decision') }}</span>
+                        <span class="screen-tab-subtitle">{{ tr('Scoring workflow', 'Scoring workflow') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="eda"
+                    >
+                        <span class="screen-tab-label">EDA</span>
+                        <span class="screen-tab-subtitle">{{ tr('Local data slices', 'Local data slices') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="sql"
+                    >
+                        <span class="screen-tab-label">SQL</span>
+                        <span class="screen-tab-subtitle">{{ tr('Fraud patterns', 'Fraud patterns') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="ml"
+                    >
+                        <span class="screen-tab-label">ML</span>
+                        <span class="screen-tab-subtitle">{{ tr('Model summary', 'Model summary') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="dashboard"
+                    >
+                        <span class="screen-tab-label">{{ tr('Моніторинг', 'Monitoring') }}</span>
+                        <span class="screen-tab-subtitle">Looker Studio</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="json"
+                    >
+                        <span class="screen-tab-label">JSON</span>
+                        <span class="screen-tab-subtitle">{{ tr('API payload', 'API payload') }}</span>
+                    </button>
+                </nav>
+
                 <div class="hero-header">
                     <div class="hero-copy">
                         <h1>
@@ -186,7 +240,7 @@
             </section>
 
             <div class="workspace-shell">
-                <nav class="screen-nav" aria-label="{{ tr('Основні розділи', 'Main sections') }}">
+                <nav class="screen-nav screen-nav--desktop" aria-label="{{ tr('Основні розділи', 'Main sections') }}">
                     <button
                         type="button"
                         class="screen-tab is-active"
