@@ -2165,6 +2165,22 @@ form,
     margin: 0;
 }
 
+.sql-reading-notes {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+
+.sql-reading-notes ul {
+    padding-left: 18px;
+    color: rgba(231, 237, 249, 0.86);
+}
+
+.sql-reading-notes li {
+    color: rgba(231, 237, 249, 0.86);
+}
+
 .sql-evidence {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
@@ -2189,6 +2205,19 @@ form,
     border: 0;
     border-radius: 0;
     background: transparent;
+}
+
+@media (min-width: 1200px) {
+    .sql-case-body {
+        grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    }
+
+    .sql-evidence .sql-query,
+    .sql-evidence .sql-query code {
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
 }
 
 .sql-result-card {
