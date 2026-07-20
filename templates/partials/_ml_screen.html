@@ -1,27 +1,35 @@
 <section class="screen" data-screen-name="ml" hidden>
-    <article class="content-card">
-        <h2>{{ tr('Порівняння ML-моделей', 'ML model comparison') }}</h2>
-        <p>
-            {{ tr(
-                'Цей екран перетворює результати навчання на зручне демо-порівняння між',
-                'This screen turns the training results into a clear demo comparison between'
-            ) }}
-            <code>LogisticRegression</code>
-            {{ tr('та', 'and') }}
-            <code>RandomForestClassifier</code>.
-        </p>
-
-        <section class="summary-block">
-            <div class="summary-block-header">
-                <h3>{{ tr('Короткий знімок вибору моделі', 'Quick model-selection snapshot') }}</h3>
+    <article class="content-card ml-console">
+        <div class="ml-console-header">
+            <div>
+                <span class="hero-point-label">{{ tr('Model Evaluation', 'Model Evaluation') }}</span>
+                <h2>{{ tr('Інженерний зріз вибору MVP-моделі', 'Engineering view of MVP model selection') }}</h2>
                 <p>
-                    {{ tr('Джерело:', 'Source:') }}
-                    <code>{{ ml_content.source_notebook }}</code>
+                    {{ tr(
+                        'Цей екран показує, чому поточний scoring artifact базується на RandomForestClassifier: через quality uplift, threshold behavior і нижче навантаження на manual review.',
+                        'This screen shows why the current scoring artifact is built on RandomForestClassifier: better quality, stronger threshold behavior, and lower manual review load.'
+                    ) }}
                 </p>
             </div>
-            <div class="summary-grid">
+            <div class="ml-console-source">
+                <span class="ml-console-source-label">{{ tr('Notebook source', 'Notebook source') }}</span>
+                <code>{{ ml_content.source_notebook }}</code>
+            </div>
+        </div>
+
+        <section class="summary-block ml-evaluation-summary">
+            <div class="summary-block-header">
+                <h3>{{ tr('Ключовий evaluation snapshot', 'Key evaluation snapshot') }}</h3>
+                <p>
+                    {{ tr(
+                        'Тут зібрані основні рішення для MVP: serving model, baseline reference, review threshold і фінальний артефакт.',
+                        'This block gathers the key MVP decisions: serving model, baseline reference, review threshold, and final artifact.'
+                    ) }}
+                </p>
+            </div>
+            <div class="summary-grid ml-summary-grid">
                 {% for item in ml_content.overview_cards %}
-                <article class="summary-card">
+                <article class="summary-card ml-summary-card">
                     <span class="summary-label">{{ item.label }}</span>
                     <strong class="summary-value">{{ item.value }}</strong>
                     <p class="summary-description">{{ item.description }}</p>
@@ -30,40 +38,66 @@
             </div>
         </section>
 
-        <div class="takeaway-card">
-            <span class="takeaway-label">{{ tr('Чому переміг RandomForest', 'Why RandomForest won') }}</span>
-            <p>{{ ml_content.winner_note }}</p>
-        </div>
+        <section class="ml-decision-strip">
+            <article class="ml-decision-card ml-decision-card-primary">
+                <span class="ml-decision-label">{{ tr('Selected serving path', 'Selected serving path') }}</span>
+                <strong class="ml-decision-value">RandomForestClassifier</strong>
+                <p>{{ ml_content.winner_note }}</p>
+            </article>
+            <article class="ml-decision-card">
+                <span class="ml-decision-label">{{ tr('Evaluation lens', 'Evaluation lens') }}</span>
+                <strong class="ml-decision-value">{{ tr('Quality + thresholding', 'Quality + thresholding') }}</strong>
+                <p>
+                    {{ tr(
+                        'Рішення приймається не лише по одній метриці, а по поєднанню precision, recall, f1, roc_auc і manual review load.',
+                        'The decision is not based on a single metric but on precision, recall, f1, roc_auc, and manual review load together.'
+                    ) }}
+                </p>
+            </article>
+            <article class="ml-decision-card">
+                <span class="ml-decision-label">{{ tr('Operator impact', 'Operator impact') }}</span>
+                <strong class="ml-decision-value">{{ tr('Manual review pressure', 'Manual review pressure') }}</strong>
+                <p>
+                    {{ tr(
+                        'Порогове порівняння показує, як вибір моделі впливає на ручну перевірку та реальне експлуатаційне навантаження.',
+                        'Threshold comparison shows how model choice affects manual review and real operational load.'
+                    ) }}
+                </p>
+            </article>
+        </section>
 
         {% if ml_content.warning %}
         <p class="deferred-hint">{{ ml_content.warning }}</p>
         {% endif %}
 
-        {% for table in ml_content.tables %}
-        <section class="learning-block">
-            <div class="learning-block-header">
-                <p class="learning-step">{{ tr('ML-крок', 'ML step') }} {{ loop.index }}</p>
-                <h3>{{ table.title }}</h3>
-            </div>
-
-            <div class="sql-meta">
-                <div class="metric">
-                    <span class="metric-label">{{ tr('Таблиця з ноутбука', 'Notebook table') }}</span>
-                    <span class="metric-value">{{ table.table_name }}</span>
+        <section class="ml-table-stack">
+            {% for table in ml_content.tables %}
+            <section class="learning-block ml-table-block">
+                <div class="learning-block-header">
+                    <p class="learning-step">{{ tr('ML-крок', 'ML step') }} {{ loop.index }}</p>
+                    <h3>{{ table.title }}</h3>
                 </div>
-            </div>
 
-            <p>{{ table.description }}</p>
+                <div class="ml-table-header-meta">
+                    <div class="metric">
+                        <span class="metric-label">{{ tr('Артефакт оцінки', 'Evaluation artifact') }}</span>
+                        <span class="metric-value">{{ table.table_name }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">{{ tr('Що показує блок', 'What this block shows') }}</span>
+                        <span class="metric-value">{{ table.description }}</span>
+                    </div>
+                </div>
 
-            {% if table.html %}
-            <div class="notebook-html-output">
-                {{ table.html | safe }}
-            </div>
-            {% else %}
-            <p class="deferred-hint">{{ tr('Вивід ноутбука недоступний для цього блоку.', 'Notebook output is unavailable for this block.') }}</p>
-            {% endif %}
+                {% if table.html %}
+                <div class="notebook-html-output">
+                    {{ table.html | safe }}
+                </div>
+                {% else %}
+                <p class="deferred-hint">{{ tr('Вивід ноутбука недоступний для цього блоку.', 'Notebook output is unavailable for this block.') }}</p>
+                {% endif %}
+            </section>
+            {% endfor %}
         </section>
-        {% endfor %}
-
     </article>
 </section>
