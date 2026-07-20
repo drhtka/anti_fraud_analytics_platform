@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 from api.i18n import Language, translate
 from api.schemas import ScoreRequest
-from api.ui_content.shared import build_duckdb_connection, render_html_table, resolve_dataset_dir, run_query
+from api.ui_content.shared import (
+    build_duckdb_connection,
+    load_cached_payload,
+    render_html_table,
+    resolve_dataset_dir,
+    run_query,
+    store_cached_payload,
+)
 
 
 def _sql_literal(value: str) -> str:
@@ -13,6 +22,24 @@ def _sql_literal(value: str) -> str:
 
 def _format_pct(value: object) -> str:
     return f"{value}%"
+
+
+def _build_score_evidence_cache_key(
+    score_request: ScoreRequest,
+    feature_values: dict[str, float],
+    lang: Language,
+) -> str:
+    raw_payload = json.dumps(
+        {
+            "request": score_request.model_dump(mode="json"),
+            "feature_values": feature_values,
+            "lang": lang,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    payload_hash = hashlib.sha256(raw_payload.encode("utf-8")).hexdigest()
+    return f"score_evidence_{payload_hash}"
 
 
 def _build_product_evidence(
@@ -259,6 +286,11 @@ def load_score_evidence(
     if dataset_dir is None:
         return []
 
+    cache_key = _build_score_evidence_cache_key(score_request, feature_values, lang)
+    cached_payload = load_cached_payload(base_data_path, cache_key)
+    if isinstance(cached_payload, list):
+        return cached_payload
+
     connection = build_duckdb_connection(dataset_dir)
     evidence_blocks: list[dict[str, object]] = []
 
@@ -296,4 +328,5 @@ def load_score_evidence(
     finally:
         connection.close()
 
+    store_cached_payload(base_data_path, cache_key, evidence_blocks)
     return evidence_blocks
