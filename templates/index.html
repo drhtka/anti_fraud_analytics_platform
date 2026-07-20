@@ -13,7 +13,7 @@
         <main>
             <section class="hero-panel">
                 <div class="hero-topbar">
-                    <span class="hero-kicker">End-to-End Anti-Fraud MVP</span>
+                    <span class="hero-kicker">Anti-Fraud Decision Console</span>
                     <div
                         class="language-switcher"
                         role="group"
@@ -37,50 +37,95 @@
                         </button>
                     </div>
                 </div>
-                <h1>{{ tr('Антифрод-скоринг транзакцій', 'Transaction anti-fraud scoring') }}</h1>
-                <p class="intro">
-                    {{ tr(
-                        'Цей MVP показує повний anti-fraud workflow: від EDA та SQL-інсайтів до ML-скорингу й пояснюваного рішення для конкретної транзакції. На одному екрані зібрані fraud score, активні сигнали ризику, рішення щодо manual review та технічний API-вивід для перевірки інтеграції.',
-                        'This MVP shows the full anti-fraud workflow: from EDA and SQL insights to ML scoring and an explainable decision for a specific transaction. One screen brings together the fraud score, active risk signals, the manual review decision, and the technical API output for integration checks.'
-                    ) }}
-                </p>
+
+                <div class="hero-header">
+                    <div class="hero-copy">
+                        <h1>
+                            {{ tr(
+                                'Інженерна консоль anti-fraud рішень',
+                                'Engineering anti-fraud decision console'
+                            ) }}
+                        </h1>
+                        <p class="intro">
+                            {{ tr(
+                                'Інтерфейс перебудовано як product-style risk console: скоринг транзакції, пояснення рішення, evidence із сирих таблиць, EDA та SQL-зрізи зібрані в одному операційному shell без зміни API-потоку.',
+                                'The interface is structured as a product-style risk console: transaction scoring, decision explainability, raw-table evidence, and EDA/SQL slices live inside one operational shell without changing the API flow.'
+                            ) }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="hero-context-grid" aria-label="{{ tr('Системний контекст', 'System context') }}">
+                    <article class="hero-context-card">
+                        <span class="hero-context-label">{{ tr('Сценарій продукту', 'Product scenario') }}</span>
+                        <strong class="hero-context-value">{{ tr('Transaction risk decisioning', 'Transaction risk decisioning') }}</strong>
+                        <p class="hero-context-note">
+                            {{ tr(
+                                'Один workflow для score, manual review та audit trail.',
+                                'One workflow for score, manual review, and audit trail.'
+                            ) }}
+                        </p>
+                    </article>
+                    <article class="hero-context-card">
+                        <span class="hero-context-label">{{ tr('Контур даних', 'Data contour') }}</span>
+                        <strong class="hero-context-value">IEEE-CIS + local artifacts</strong>
+                        <p class="hero-context-note">
+                            {{ tr(
+                                'Локальні CSV, SQL-агрегації та UI-кеш для стабільного MVP.',
+                                'Local CSVs, SQL aggregations, and UI cache for a stable MVP.'
+                            ) }}
+                        </p>
+                    </article>
+                    <article class="hero-context-card">
+                        <span class="hero-context-label">{{ tr('Операційний вихід', 'Operational output') }}</span>
+                        <strong class="hero-context-value">{{ tr('Score + explanation + JSON', 'Score + explanation + JSON') }}</strong>
+                        <p class="hero-context-note">
+                            {{ tr(
+                                'Той самий результат придатний для демо, перевірки інтеграції та Swagger.',
+                                'The same output is usable for demo flows, integration checks, and Swagger.'
+                            ) }}
+                        </p>
+                    </article>
+                </div>
+
                 <div class="hero-points" aria-label="{{ tr('Ключові можливості', 'Key capabilities') }}">
                     <article class="hero-point">
-                        <span class="hero-point-label">{{ tr('EDA та SQL', 'EDA and SQL') }}</span>
+                        <span class="hero-point-label">{{ tr('Decisioning', 'Decisioning') }}</span>
                         <p>
                             {{ tr(
-                                'Пошук fraud-патернів у транзакціях і живі зрізи з локальних даних.',
-                                'Fraud-pattern discovery in transactions and live slices from local data.'
+                                'Fraud score, risk label, threshold та manual review decision для конкретної транзакції.',
+                                'Fraud score, risk label, threshold, and manual review decision for a specific transaction.'
                             ) }}
                         </p>
                     </article>
                     <article class="hero-point">
-                        <span class="hero-point-label">ML scoring</span>
+                        <span class="hero-point-label">{{ tr('Explainability', 'Explainability') }}</span>
                         <p>
                             {{ tr(
-                                'Оцінка ризику, активні сигнали та рішення щодо manual review.',
-                                'Risk scoring, active signals, and the manual review decision.'
+                                'Активні сигнали, текстове пояснення та підтвердження з сирих таблиць для аудиту рішення.',
+                                'Active signals, explanation text, and raw-table evidence for auditing the decision.'
                             ) }}
                         </p>
                     </article>
                     <article class="hero-point">
-                        <span class="hero-point-label">API + UI</span>
+                        <span class="hero-point-label">{{ tr('Analytics views', 'Analytics views') }}</span>
                         <p>
-                            {{ tr('Пояснюваний результат для демо,', 'Explainable output for the demo,') }}
+                            {{ tr('EDA, SQL, ML,', 'EDA, SQL, ML,') }}
                             <a
                                 href="{{ request.url_for('swagger_ui_html') }}"
                                 class="hero-inline-link"
                                 >Swagger</a
                             >
-                            {{ tr('і перевірки інтеграції.', 'and integration checks.') }}
+                            {{ tr('та dashboard як частини однієї консолі.', 'and dashboard as parts of one console.') }}
                         </p>
                     </article>
                 </div>
+
                 <section class="hero-data-sources" aria-label="{{ tr('Джерела даних', 'Data sources') }}">
-                    <div class="hero-point hero-data-source-card">
-                        <span class="hero-point-label">{{ tr('Джерело даних', 'Data source') }}</span>
+                    <div class="hero-point hero-data-source-card hero-data-source-card-wide">
+                        <span class="hero-point-label">{{ tr('Джерело датасету', 'Dataset source') }}</span>
                         <p class="hero-data-source-text">
-                            {{ tr('Таблиці для MVP взяті з', 'The MVP tables come from') }}
+                            {{ tr('Основний MVP-датасет походить із', 'The main MVP dataset comes from') }}
                             <a
                                 href="{{ dataset_source_url }}"
                                 class="hero-inline-link"
@@ -88,6 +133,10 @@
                                 rel="noreferrer"
                                 >Kaggle IEEE-CIS Fraud Detection</a
                             >.
+                            {{ tr(
+                                'Нижче залишені основні файли для локального аналізу та відтворення сценаріїв.',
+                                'Below are the primary files used for local analysis and scenario reproduction.'
+                            ) }}
                         </p>
                     </div>
                     <div class="hero-data-file-grid">
@@ -118,58 +167,68 @@
                     </div>
                 </section>
             </section>
-            <nav class="screen-nav" aria-label="{{ tr('Основні розділи', 'Main sections') }}">
-                <button
-                    type="button"
-                    class="screen-tab is-active"
-                    data-screen-target="score"
-                >
-                    {{ tr('Скоринг', 'Scoring') }}
-                </button>
-                <button
-                    type="button"
-                    class="screen-tab"
-                    data-screen-target="eda"
-                >
-                    EDA
-                </button>
-                <button
-                    type="button"
-                    class="screen-tab"
-                    data-screen-target="sql"
-                >
-                    SQL
-                </button>
-                <button
-                    type="button"
-                    class="screen-tab"
-                    data-screen-target="ml"
-                >
-                    ML
-                </button>
-                <button
-                    type="button"
-                    class="screen-tab"
-                    data-screen-target="dashboard"
-                >
-                    <span class="screen-tab-label">{{ tr('Дашборд', 'Dashboard') }}</span>
-                    <span class="screen-tab-subtitle">Looker Studio</span>
-                </button>
-                <button
-                    type="button"
-                    class="screen-tab"
-                    data-screen-target="json"
-                >
-                    JSON
-                </button>
-            </nav>
 
-            {% include "partials/_score_screen.html" %} {% include
-            "partials/_eda_screen_placeholder.html" %} {% include
-            "partials/_sql_screen_placeholder.html" %} {% include
-            "partials/_ml_screen_placeholder.html" %} {% include
-            "partials/_dashboard_screen_placeholder.html" %} {% include
-            "partials/_json_screen.html" %}
+            <div class="workspace-shell">
+                <nav class="screen-nav" aria-label="{{ tr('Основні розділи', 'Main sections') }}">
+                    <button
+                        type="button"
+                        class="screen-tab is-active"
+                        data-screen-target="score"
+                    >
+                        <span class="screen-tab-label">{{ tr('Рішення', 'Decision') }}</span>
+                        <span class="screen-tab-subtitle">{{ tr('Scoring workflow', 'Scoring workflow') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="eda"
+                    >
+                        <span class="screen-tab-label">EDA</span>
+                        <span class="screen-tab-subtitle">{{ tr('Local data slices', 'Local data slices') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="sql"
+                    >
+                        <span class="screen-tab-label">SQL</span>
+                        <span class="screen-tab-subtitle">{{ tr('Fraud patterns', 'Fraud patterns') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="ml"
+                    >
+                        <span class="screen-tab-label">ML</span>
+                        <span class="screen-tab-subtitle">{{ tr('Model summary', 'Model summary') }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="dashboard"
+                    >
+                        <span class="screen-tab-label">{{ tr('Моніторинг', 'Monitoring') }}</span>
+                        <span class="screen-tab-subtitle">Looker Studio</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="screen-tab"
+                        data-screen-target="json"
+                    >
+                        <span class="screen-tab-label">JSON</span>
+                        <span class="screen-tab-subtitle">{{ tr('API payload', 'API payload') }}</span>
+                    </button>
+                </nav>
+
+                <section class="screen-shell">
+                    {% include "partials/_score_screen.html" %} {% include
+                    "partials/_eda_screen_placeholder.html" %} {% include
+                    "partials/_sql_screen_placeholder.html" %} {% include
+                    "partials/_ml_screen_placeholder.html" %} {% include
+                    "partials/_dashboard_screen_placeholder.html" %} {% include
+                    "partials/_json_screen.html" %}
+                </section>
+            </div>
         </main>
         <script id="demo-payloads-json" type="application/json">
             {{ demo_payloads | tojson }}
