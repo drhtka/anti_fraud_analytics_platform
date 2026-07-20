@@ -352,7 +352,8 @@ async function activateScreen(screenName) {
     await ensureScreenLoaded(screenName);
 
     localStorage.setItem(ACTIVE_SCREEN_STORAGE_KEY, screenName);
-    if (window.location.hash !== `#${screenName}`) {
+    const currentHash = window.location.hash || '';
+    if (currentHash !== `#${screenName}` && !currentHash.startsWith(`#${screenName}:`)) {
         window.location.hash = screenName;
     }
 
@@ -368,7 +369,7 @@ async function activateScreen(screenName) {
 }
 
 function getInitialScreenName() {
-    const hashScreen = window.location.hash.replace('#', '').trim();
+    const hashScreen = window.location.hash.replace('#', '').trim().split(':')[0];
     const savedScreen = localStorage.getItem(ACTIVE_SCREEN_STORAGE_KEY) ?? '';
     const availableScreens = new Set(
         Array.from(screenTabs).map((tab) => tab.dataset.screenTarget),
@@ -392,7 +393,10 @@ screenTabs.forEach((tab) => {
 });
 
 window.addEventListener('hashchange', async () => {
-    const hashScreen = window.location.hash.replace('#', '').trim();
+    const [hashScreen, anchorTarget = ''] = window.location.hash
+        .replace('#', '')
+        .trim()
+        .split(':');
     const availableScreens = new Set(
         Array.from(screenTabs).map((tab) => tab.dataset.screenTarget),
     );
@@ -402,6 +406,14 @@ window.addEventListener('hashchange', async () => {
     }
 
     await activateScreen(hashScreen);
+
+    const anchorId = anchorTarget.trim();
+    if (anchorId) {
+        const anchor = document.getElementById(anchorId);
+        if (anchor) {
+            anchor.scrollIntoView({ block: 'start' });
+        }
+    }
 });
 
 applySavedLanguagePreference();
@@ -441,6 +453,56 @@ demoButtons.forEach((button) => {
             input.value = fieldValue ?? '';
         });
     });
+});
+
+function parseHashTarget(hashValue) {
+    const cleaned = hashValue.replace('#', '').trim();
+    const [screenName = '', anchorId = ''] = cleaned.split(':');
+    return { screenName: screenName.trim(), anchorId: anchorId.trim() };
+}
+
+document.addEventListener('click', async (event) => {
+    if (!(event.target instanceof Element)) {
+        return;
+    }
+
+    const link = event.target.closest('a[href^="#"]');
+    if (!(link instanceof HTMLAnchorElement)) {
+        return;
+    }
+
+    const href = link.getAttribute('href') ?? '';
+    if (!href || href === '#') {
+        return;
+    }
+
+    const { screenName, anchorId } = parseHashTarget(href);
+    if (!screenName) {
+        return;
+    }
+
+    const availableScreens = new Set(
+        Array.from(screenTabs).map((tab) => tab.dataset.screenTarget),
+    );
+    if (!availableScreens.has(screenName)) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (window.location.hash !== href) {
+        window.location.hash = href;
+        return;
+    }
+
+    await activateScreen(screenName);
+    if (!anchorId) {
+        return;
+    }
+    const anchor = document.getElementById(anchorId);
+    if (anchor) {
+        anchor.scrollIntoView({ block: 'start' });
+    }
 });
 
 if (closeScenarioModalButton) {

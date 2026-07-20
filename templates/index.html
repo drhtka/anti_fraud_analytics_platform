@@ -46,12 +46,29 @@
                                 'Engineering anti-fraud decision console'
                             ) }}
                         </h1>
-                        <p class="intro">
-                            {{ tr(
-                                'Інтерфейс перебудовано як product-style risk console: скоринг транзакції, пояснення рішення, evidence із сирих таблиць, EDA та SQL-зрізи зібрані в одному операційному shell без зміни API-потоку.',
-                                'The interface is structured as a product-style risk console: transaction scoring, decision explainability, raw-table evidence, and EDA/SQL slices live inside one operational shell without changing the API flow.'
-                            ) }}
-                        </p>
+                        <div class="intro">
+                            <ul class="intro-bullets">
+                                <li>
+                                    <strong>{{ tr('Що це', 'What it is') }}</strong>:
+                                    {{ tr(
+                                        'Інженерний anti-fraud MVP у форматі product-style risk console: скоринг транзакції, пояснення рішення, evidence із сирих таблиць, плюс EDA та SQL-зрізи — в одному операційному shell без зміни API-потоку.',
+                                        'An engineering anti-fraud MVP built as a product-style risk console: transaction scoring, decision explanation, raw-table evidence, plus EDA and SQL slices inside one operational shell without changing the API flow.'
+                                    ) }}
+                                </li>
+                                <li>
+                                    <strong>{{ tr('Як спробувати демо', 'How to try the demo') }}</strong>:
+                                    {{ tr(
+                                        'Відкрий вкладку Decision → ',
+                                        'Open the Decision tab → '
+                                    ) }}
+                                    <a class="intro-anchor" href="#score:control-bar">Control bar</a>
+                                    {{ tr(
+                                        ' → обери demo-сценарій (High/Medium/Low) → натисни “Виконати скоринг” → переглянь score, risk label, пояснення та raw evidence. За потреби відкрий JSON, SQL та EDA для перевірки артефактів.',
+                                        ' → pick a demo scenario (High/Medium/Low) → click “Run scoring” → review score, risk label, explanation, and raw evidence. Optionally open JSON, SQL, and EDA to inspect artifacts.'
+                                    ) }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

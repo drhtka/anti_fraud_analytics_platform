@@ -1480,6 +1480,28 @@ strong {
     color: var(--text-secondary);
 }
 
+.intro-bullets {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+.intro-bullets strong {
+    color: var(--text-primary);
+    font-weight: 800;
+}
+
+.intro-anchor {
+    color: var(--accent);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.intro-anchor:hover {
+    text-decoration: underline;
+}
+
 .hero-context-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
