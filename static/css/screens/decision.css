@@ -161,7 +161,8 @@
 }
 
 .decision-actions {
-    justify-content: flex-start;
+    justify-content: center;
+    margin-top: 12px;
 }
 
 .decision-results {

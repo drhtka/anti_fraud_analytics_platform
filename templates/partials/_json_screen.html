@@ -27,9 +27,9 @@
             {% if score_result_json %}
             <pre class="json-block"><code>{{ score_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
-            <pre class="json-block"><code>{
-  "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /score.', 'Run scoring to see the raw /score output here.') }}"
-}</code></pre>
+            <div class="message">
+                <p>{{ tr('Щоб побачити сирий вивід /score, виконай скоринг у Control bar.', 'To see the raw /score output, run scoring in the Control bar.') }}</p>
+            </div>
             {% endif %}
             </section>
 
@@ -41,9 +41,9 @@
             {% if explain_result_json %}
             <pre class="json-block"><code>{{ explain_result_json | tojson(indent=2) }}</code></pre>
             {% else %}
-            <pre class="json-block"><code>{
-  "message": "{{ tr('Виконай скоринг, щоб побачити тут сирий вивід /explain.', 'Run scoring to see the raw /explain output here.') }}"
-}</code></pre>
+            <div class="message">
+                <p>{{ tr('Щоб побачити сирий вивід /explain, виконай скоринг у Control bar.', 'To see the raw /explain output, run scoring in the Control bar.') }}</p>
+            </div>
             {% endif %}
             </section>
         </div>
