@@ -115,6 +115,13 @@ def append_debug_language_switch_log(event: str, payload: dict[str, object]) -> 
     # endregion debug-point language-switch-log-helper
 
 
+def apply_no_store_html_headers(response: HTMLResponse) -> HTMLResponse:
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
 def format_ui_datetime(value: str | None, lang: Language) -> str:
     if not value:
         return "n/a"
@@ -589,7 +596,7 @@ def index(request: Request) -> HTMLResponse:
         },
     )
     response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return response
+    return apply_no_store_html_headers(response)
 
 
 @app.post("/api/debug/deferred-tabs")
@@ -615,7 +622,7 @@ def eda_screen(request: Request) -> HTMLResponse:
         },
     )
     response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return response
+    return apply_no_store_html_headers(response)
 
 
 @app.get("/ui/sql", response_class=HTMLResponse, name="sql_screen")
@@ -631,7 +638,7 @@ def sql_screen(request: Request) -> HTMLResponse:
         },
     )
     response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return response
+    return apply_no_store_html_headers(response)
 
 
 @app.get("/ui/ml", response_class=HTMLResponse, name="ml_screen")
@@ -647,7 +654,7 @@ def ml_screen(request: Request) -> HTMLResponse:
         },
     )
     response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return response
+    return apply_no_store_html_headers(response)
 
 
 @app.get("/ui/dashboard", response_class=HTMLResponse, name="dashboard_screen")
@@ -663,7 +670,7 @@ def dashboard_screen(request: Request) -> HTMLResponse:
         },
     )
     response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return response
+    return apply_no_store_html_headers(response)
 
 
 @app.get("/downloads/{dataset_name}", name="download_dataset")
