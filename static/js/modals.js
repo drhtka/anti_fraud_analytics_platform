@@ -1,9 +1,10 @@
 import {
-    closeScenarioModalButton,
-    scenarioModal,
+    getCloseScenarioModalButton,
+    getScenarioModal,
 } from './dom-state.js';
 
 function showScenarioModal() {
+    const scenarioModal = getScenarioModal();
     if (!(scenarioModal instanceof HTMLDivElement)) {
         return;
     }
@@ -12,6 +13,7 @@ function showScenarioModal() {
 }
 
 function hideScenarioModal() {
+    const scenarioModal = getScenarioModal();
     if (!(scenarioModal instanceof HTMLDivElement)) {
         return;
     }
@@ -20,13 +22,24 @@ function hideScenarioModal() {
 }
 
 function bindScenarioModal() {
+    const closeScenarioModalButton = getCloseScenarioModalButton();
+    const scenarioModal = getScenarioModal();
+
     if (closeScenarioModalButton) {
-        closeScenarioModalButton.addEventListener('click', () => {
-            hideScenarioModal();
-        });
+        if (closeScenarioModalButton.dataset.modalBound !== 'true') {
+            closeScenarioModalButton.dataset.modalBound = 'true';
+            closeScenarioModalButton.addEventListener('click', () => {
+                hideScenarioModal();
+            });
+        }
     }
 
     if (scenarioModal instanceof HTMLDivElement) {
+        if (scenarioModal.dataset.modalBackdropBound === 'true') {
+            return;
+        }
+
+        scenarioModal.dataset.modalBackdropBound = 'true';
         scenarioModal.addEventListener('click', (event) => {
             if (event.target === scenarioModal) {
                 hideScenarioModal();

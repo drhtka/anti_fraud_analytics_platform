@@ -1,34 +1,38 @@
 import {
     SCORE_RESULT_SCROLL_STORAGE_KEY,
-    clearFormButton,
-    demoButtons,
-    demoPayloads,
     getCurrentLanguage,
+    getClearFormButton,
+    getDemoButtons,
+    getDemoPayloads,
     getSelectedDemoKey,
-    scoreLoadingOverlay,
+    getScoreLoadingOverlay,
+    getSubmitButton,
+    getTransactionForm,
+    getUiTexts,
     setSelectedDemoKey,
-    submitButton,
-    transactionForm,
-    uiTexts,
 } from './dom-state.js';
 import { activateScreen } from './app-shell.js';
-import { buildUrlWithLanguage } from './language-switch.js';
+import { buildUrlWithLanguage } from './url-state.js';
 import { hideScenarioModal, showScenarioModal } from './modals.js';
 
-const SCORE_PLACEHOLDER_HTML = `
-    <section class="placeholder">
-        <h2>${uiTexts.scorePlaceholderTitle ?? 'Готово до демонстрації скорингу'}</h2>
-        <p>${uiTexts.scorePlaceholderIntro ?? 'Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".'}</p>
-        <p>${uiTexts.scorePlaceholderAfter ?? "Після запуску на цій сторінці з'являться:"}</p>
-        <ul>
-            ${(uiTexts.scorePlaceholderBullets ?? [])
-                .map((item) => `<li>${item}</li>`)
-                .join('')}
-        </ul>
-    </section>
-`;
+function buildScorePlaceholderHtml() {
+    const uiTexts = getUiTexts();
+    return `
+        <section class="placeholder">
+            <h2>${uiTexts.scorePlaceholderTitle ?? 'Готово до демонстрації скорингу'}</h2>
+            <p>${uiTexts.scorePlaceholderIntro ?? 'Обери один із трьох демо-сценаріїв і натисни кнопку "Виконати скоринг".'}</p>
+            <p>${uiTexts.scorePlaceholderAfter ?? "Після запуску на цій сторінці з'являться:"}</p>
+            <ul>
+                ${(uiTexts.scorePlaceholderBullets ?? [])
+                    .map((item) => `<li>${item}</li>`)
+                    .join('')}
+            </ul>
+        </section>
+    `;
+}
 
 function showScoreLoadingOverlay() {
+    const scoreLoadingOverlay = getScoreLoadingOverlay();
     if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
         return;
     }
@@ -38,6 +42,7 @@ function showScoreLoadingOverlay() {
 }
 
 function hideScoreLoadingOverlay() {
+    const scoreLoadingOverlay = getScoreLoadingOverlay();
     if (!(scoreLoadingOverlay instanceof HTMLDivElement)) {
         return;
     }
@@ -75,14 +80,14 @@ function resetScoreScreenView() {
     scoreScreen.querySelector('.json-action-link')?.remove();
 
     if (!scoreScreen.querySelector('.placeholder')) {
-        scoreScreen.insertAdjacentHTML('beforeend', SCORE_PLACEHOLDER_HTML);
+        scoreScreen.insertAdjacentHTML('beforeend', buildScorePlaceholderHtml());
     }
 }
 
 function updateSelectedDemoButton(nextDemoKey) {
     setSelectedDemoKey(nextDemoKey);
 
-    demoButtons.forEach((button) => {
+    getDemoButtons().forEach((button) => {
         const isActive = button.dataset.demoKey === nextDemoKey;
         button.classList.toggle('is-selected', isActive);
         button.setAttribute('aria-pressed', String(isActive));
@@ -90,10 +95,17 @@ function updateSelectedDemoButton(nextDemoKey) {
 }
 
 function bindDemoButtons() {
-    demoButtons.forEach((button) => {
+    const transactionForm = getTransactionForm();
+
+    getDemoButtons().forEach((button) => {
+        if (button.dataset.demoBound === 'true') {
+            return;
+        }
+
+        button.dataset.demoBound = 'true';
         button.addEventListener('click', () => {
             const payloadKey = button.dataset.demoKey;
-            const payloadEntry = demoPayloads.find(
+            const payloadEntry = getDemoPayloads().find(
                 (entry) => entry.filename === payloadKey,
             );
             const payload = payloadEntry?.payload;
@@ -119,12 +131,20 @@ function bindDemoButtons() {
 }
 
 function bindTransactionForm() {
+    const transactionForm = getTransactionForm();
     if (!transactionForm) {
         return;
     }
 
+    if (transactionForm.dataset.submitBound === 'true') {
+        return;
+    }
+
+    transactionForm.dataset.submitBound = 'true';
     transactionForm.addEventListener('submit', (event) => {
         if (getSelectedDemoKey()) {
+            const submitButton = getSubmitButton();
+            const uiTexts = getUiTexts();
             sessionStorage.setItem(SCORE_RESULT_SCROLL_STORAGE_KEY, 'true');
             showScoreLoadingOverlay();
             if (submitButton instanceof HTMLButtonElement) {
@@ -141,11 +161,20 @@ function bindTransactionForm() {
 }
 
 function bindClearForm() {
+    const clearFormButton = getClearFormButton();
+    const transactionForm = getTransactionForm();
     if (!clearFormButton || !transactionForm) {
         return;
     }
 
+    if (clearFormButton.dataset.clearBound === 'true') {
+        return;
+    }
+
+    clearFormButton.dataset.clearBound = 'true';
     clearFormButton.addEventListener('click', () => {
+        const submitButton = getSubmitButton();
+        const uiTexts = getUiTexts();
         const cleanUrl = `${window.location.pathname}${window.location.hash || ''}`;
 
         sessionStorage.removeItem(SCORE_RESULT_SCROLL_STORAGE_KEY);

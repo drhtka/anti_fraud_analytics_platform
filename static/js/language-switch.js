@@ -2,18 +2,41 @@ import {
     LANGUAGE_STORAGE_KEY,
     SCORE_RESULT_SCROLL_STORAGE_KEY,
     getCurrentLanguage,
-    languageSwitchButtons,
+    getLanguageSwitchButtons,
 } from './dom-state.js';
+import { bootstrapUi } from './index.js';
+import { buildUrlWithLanguage } from './url-state.js';
 
 const TRANSLATE_ONLY_QUERY_PARAM = 'ui_translate';
 const LANGUAGE_PAGE_CACHE_PREFIX = 'anti-fraud-language-page:';
 const inFlightLanguageFetches = new Map();
 
-function buildUrlWithLanguage(targetLanguage, baseUrl = window.location.href) {
-    const nextUrl = new URL(baseUrl, window.location.origin);
-    nextUrl.searchParams.set('lang', targetLanguage);
-    return nextUrl;
+// #region debug-point language-switch-report
+function reportLanguageSwitchDebug(event, payload = {}) {
+    try {
+        const body = JSON.stringify({
+            event,
+            payload,
+            href: window.location.href,
+            ua: window.navigator.userAgent,
+            at: new Date().toISOString(),
+        });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/debug/deferred-tabs', body);
+            return;
+        }
+        fetch('/api/debug/deferred-tabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            keepalive: true,
+            credentials: 'same-origin',
+        }).catch(() => {});
+    } catch (_) {
+        // no-op
+    }
 }
+// #endregion debug-point language-switch-report
 
 function getStaticAssetFingerprint() {
     return (
@@ -107,14 +130,36 @@ async function fetchLanguagePageHtml(
     targetLanguage,
     baseUrl = window.location.href,
 ) {
+    // #region debug-point language-switch-fetch
+    const requestStartedAt = performance.now();
+    // #endregion debug-point language-switch-fetch
     const cachedHtml = getCachedLanguagePage(targetLanguage, baseUrl);
     if (cachedHtml) {
+        // #region debug-point language-switch-fetch
+        reportLanguageSwitchDebug('language_switch_fetch_html', {
+            targetLanguage,
+            baseUrl,
+            cacheHit: true,
+            durationMs: Number((performance.now() - requestStartedAt).toFixed(2)),
+            htmlLength: cachedHtml.length,
+        });
+        // #endregion debug-point language-switch-fetch
         return cachedHtml;
     }
 
     const requestUrl = buildTranslateOnlyUrl(targetLanguage, baseUrl).toString();
     const existingRequest = inFlightLanguageFetches.get(requestUrl);
     if (existingRequest) {
+        // #region debug-point language-switch-fetch
+        reportLanguageSwitchDebug('language_switch_fetch_html', {
+            targetLanguage,
+            baseUrl,
+            requestUrl,
+            cacheHit: false,
+            reusedInFlightRequest: true,
+            durationMs: Number((performance.now() - requestStartedAt).toFixed(2)),
+        });
+        // #endregion debug-point language-switch-fetch
         return existingRequest;
     }
 
@@ -133,7 +178,30 @@ async function fetchLanguagePageHtml(
         })
         .then((html) => {
             setCachedLanguagePage(targetLanguage, html, baseUrl);
+            // #region debug-point language-switch-fetch
+            reportLanguageSwitchDebug('language_switch_fetch_html', {
+                targetLanguage,
+                baseUrl,
+                requestUrl,
+                cacheHit: false,
+                reusedInFlightRequest: false,
+                durationMs: Number((performance.now() - requestStartedAt).toFixed(2)),
+                htmlLength: html.length,
+            });
+            // #endregion debug-point language-switch-fetch
             return html;
+        })
+        .catch((error) => {
+            // #region debug-point language-switch-fetch
+            reportLanguageSwitchDebug('language_switch_fetch_error', {
+                targetLanguage,
+                baseUrl,
+                requestUrl,
+                durationMs: Number((performance.now() - requestStartedAt).toFixed(2)),
+                message: error instanceof Error ? error.message : String(error),
+            });
+            // #endregion debug-point language-switch-fetch
+            throw error;
         })
         .finally(() => {
             inFlightLanguageFetches.delete(requestUrl);
@@ -144,14 +212,16 @@ async function fetchLanguagePageHtml(
 }
 
 function replaceDocumentWithLanguageHtml(html, targetLanguage) {
+    const parsedDocument = new DOMParser().parseFromString(html, 'text/html');
     const cleanTargetUrl = stripTranslateOnlyParams(
         buildUrlWithLanguage(targetLanguage),
     );
 
+    document.documentElement.lang = parsedDocument.documentElement.lang || targetLanguage;
+    document.title = parsedDocument.title;
+    document.body.replaceWith(parsedDocument.body);
     window.history.replaceState({}, document.title, cleanTargetUrl.toString());
-    document.open();
-    document.write(html);
-    document.close();
+    bootstrapUi();
 }
 
 function preserveScoreResultScroll() {
@@ -192,27 +262,61 @@ function applySavedLanguagePreference() {
 }
 
 function bindLanguageSwitchButtons() {
-    languageSwitchButtons.forEach((button) => {
+    getLanguageSwitchButtons().forEach((button) => {
         const targetLanguage = button.dataset.langSwitch;
 
         if (targetLanguage && targetLanguage !== getCurrentLanguage()) {
             scheduleLanguagePrefetch(targetLanguage);
         }
 
+        if (button.dataset.langSwitchBound === 'true') {
+            return;
+        }
+
+        button.dataset.langSwitchBound = 'true';
         button.addEventListener('click', async () => {
             const targetLanguage = button.dataset.langSwitch;
+            // #region debug-point language-switch-click
+            const clickStartedAt = performance.now();
+            // #endregion debug-point language-switch-click
 
             if (!targetLanguage || targetLanguage === getCurrentLanguage()) {
                 return;
             }
 
             localStorage.setItem(LANGUAGE_STORAGE_KEY, targetLanguage);
+            // #region debug-point language-switch-click
+            reportLanguageSwitchDebug('language_switch_click', {
+                targetLanguage,
+                currentLanguage: getCurrentLanguage(),
+                hasScoreStatusCard: Boolean(
+                    document.querySelector('[data-score-status-card]'),
+                ),
+            });
+            // #endregion debug-point language-switch-click
 
             try {
                 preserveScoreResultScroll();
                 const html = await fetchLanguagePageHtml(targetLanguage);
+                // #region debug-point language-switch-click
+                reportLanguageSwitchDebug('language_switch_before_replace', {
+                    targetLanguage,
+                    totalDurationMs: Number(
+                        (performance.now() - clickStartedAt).toFixed(2),
+                    ),
+                    htmlLength: html.length,
+                });
+                // #endregion debug-point language-switch-click
                 replaceDocumentWithLanguageHtml(html, targetLanguage);
             } catch (_) {
+                // #region debug-point language-switch-click
+                reportLanguageSwitchDebug('language_switch_fallback_navigation', {
+                    targetLanguage,
+                    totalDurationMs: Number(
+                        (performance.now() - clickStartedAt).toFixed(2),
+                    ),
+                });
+                // #endregion debug-point language-switch-click
                 window.location.assign(
                     stripTranslateOnlyParams(
                         buildUrlWithLanguage(targetLanguage),

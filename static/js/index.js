@@ -18,17 +18,22 @@ import {
     restoreScoreResultScroll,
 } from './score-form.js';
 
+function bootstrapUi() {
+    bindScreenTabs();
+    bindHashChange();
+    bindInternalHashLinks();
+    bindScenarioModal();
+    bindDemoButtons();
+    bindTransactionForm();
+    bindClearForm();
+    bindLanguageSwitchButtons();
+
+    activateScreen(getInitialScreenName());
+    initDashboardEmbeds();
+    restoreScoreResultScroll();
+}
+
 applySavedLanguagePreference();
+bootstrapUi();
 
-bindScreenTabs();
-bindHashChange();
-bindInternalHashLinks();
-bindScenarioModal();
-bindDemoButtons();
-bindTransactionForm();
-bindClearForm();
-bindLanguageSwitchButtons();
-
-activateScreen(getInitialScreenName());
-initDashboardEmbeds();
-restoreScoreResultScroll();
+export { bootstrapUi };

@@ -1,7 +1,7 @@
 import {
     inFlightScreenLoads,
-    uiTexts,
     getCurrentLanguage,
+    getUiTexts,
 } from './dom-state.js';
 import { initDashboardEmbeds } from './dashboard-embed.js';
 
@@ -39,6 +39,7 @@ function normalizeDeferredUrl(value) {
 }
 
 function getScreenLabel(screenName) {
+    const uiTexts = getUiTexts();
     return uiTexts.screenLabels?.[screenName] ?? screenName.toUpperCase();
 }
 
@@ -76,6 +77,7 @@ async function ensureScreenLoaded(screenName) {
     }
 
     screen.dataset.loaded = 'loading';
+    const uiTexts = getUiTexts();
     screen.innerHTML = `
         <article class="content-card deferred-card">
             <h2>${uiTexts.loadingTitle ?? 'Завантаження'}</h2>
@@ -135,6 +137,7 @@ async function ensureScreenLoaded(screenName) {
                 loaded: renderedScreen.dataset.loaded,
             });
         } catch (error) {
+            const uiTexts = getUiTexts();
             reportDeferredDebug('ensure_screen_loaded_error', {
                 screenName,
                 message: error instanceof Error ? error.message : String(error),

@@ -3,9 +3,12 @@ import {
     DEFAULT_SCREEN,
     getAvailableScreens,
     getScreens,
-    screenTabs,
+    getScreenTabs,
 } from './dom-state.js';
 import { ensureScreenLoaded } from './screen-loader.js';
+
+let isHashChangeBound = false;
+let isInternalHashLinksBound = false;
 
 function parseHashTarget(hashValue) {
     const cleaned = hashValue.replace('#', '').trim();
@@ -25,7 +28,7 @@ async function activateScreen(screenName) {
         window.location.hash = screenName;
     }
 
-    screenTabs.forEach((tab) => {
+    getScreenTabs().forEach((tab) => {
         const isActive = tab.dataset.screenTarget === screenName;
         tab.classList.toggle('is-active', isActive);
         tab.setAttribute('aria-pressed', String(isActive));
@@ -53,7 +56,12 @@ function getInitialScreenName() {
 }
 
 function bindScreenTabs() {
-    screenTabs.forEach((tab) => {
+    getScreenTabs().forEach((tab) => {
+        if (tab.dataset.screenTabBound === 'true') {
+            return;
+        }
+
+        tab.dataset.screenTabBound = 'true';
         tab.addEventListener('click', async () => {
             await activateScreen(tab.dataset.screenTarget);
         });
@@ -61,6 +69,11 @@ function bindScreenTabs() {
 }
 
 function bindHashChange() {
+    if (isHashChangeBound) {
+        return;
+    }
+
+    isHashChangeBound = true;
     window.addEventListener('hashchange', async () => {
         const { screenName, anchorId } = parseHashTarget(window.location.hash);
         const availableScreens = getAvailableScreens();
@@ -83,6 +96,11 @@ function bindHashChange() {
 }
 
 function bindInternalHashLinks() {
+    if (isInternalHashLinksBound) {
+        return;
+    }
+
+    isInternalHashLinksBound = true;
     document.addEventListener('click', async (event) => {
         if (!(event.target instanceof Element)) {
             return;

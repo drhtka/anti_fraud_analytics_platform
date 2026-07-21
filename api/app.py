@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
+from time import perf_counter
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -75,6 +76,7 @@ PAYLOADS_DIR = Path(__file__).resolve().parent / "payloads"
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 DEBUG_DEFERRED_TABS_LOG = BASE_DIR / "debug-domain-deferred-tabs.ndjson"
+DEBUG_LANGUAGE_SWITCH_LOG = BASE_DIR / "debug-language-switch-lag.ndjson"
 DATASET_SOURCE_URL = (
     "https://www.kaggle.com/datasets/lnasiri007/ieeecis-fraud-detection/data"
 )
@@ -93,6 +95,24 @@ DOWNLOADABLE_DATASETS = {
 @lru_cache(maxsize=1)
 def get_model_bundle() -> ModelBundle:
     return load_model_bundle()
+
+
+def append_debug_language_switch_log(event: str, payload: dict[str, object]) -> None:
+    # region debug-point language-switch-log-helper
+    DEBUG_LANGUAGE_SWITCH_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with DEBUG_LANGUAGE_SWITCH_LOG.open("a", encoding="utf-8") as log_file:
+        log_file.write(
+            json.dumps(
+                {
+                    "event": event,
+                    "payload": payload,
+                    "at": datetime.now(timezone.utc).isoformat(),
+                },
+                ensure_ascii=False,
+            )
+            + "\n"
+        )
+    # endregion debug-point language-switch-log-helper
 
 
 def format_ui_datetime(value: str | None, lang: Language) -> str:
@@ -142,13 +162,36 @@ def format_ui_datetime(value: str | None, lang: Language) -> str:
 
 
 def get_score_response(request: ScoreRequest) -> tuple[ScoreResponse, str]:
+    # region debug-point language-switch-get-score-response
+    started_at = perf_counter()
+    # endregion debug-point language-switch-get-score-response
     cached_response = load_cached_score_response(request)
     if cached_response is not None:
+        # region debug-point language-switch-get-score-response
+        append_debug_language_switch_log(
+            "server_get_score_response",
+            {
+                "duration_ms": round((perf_counter() - started_at) * 1000, 2),
+                "score_source": "redis_cache",
+                "transaction_id": request.transaction_id,
+            },
+        )
+        # endregion debug-point language-switch-get-score-response
         return cached_response, "redis_cache"
 
     bundle = get_model_bundle()
     score_response = score_transaction(request=request, bundle=bundle)
     store_cached_score_response(request, score_response)
+    # region debug-point language-switch-get-score-response
+    append_debug_language_switch_log(
+        "server_get_score_response",
+        {
+            "duration_ms": round((perf_counter() - started_at) * 1000, 2),
+            "score_source": "model",
+            "transaction_id": request.transaction_id,
+        },
+    )
+    # endregion debug-point language-switch-get-score-response
     return score_response, "model"
 
 
@@ -334,6 +377,9 @@ def iter_static_asset_paths() -> list[Path]:
 
 
 def get_asset_version() -> str:
+    # region debug-point language-switch-asset-version
+    started_at = perf_counter()
+    # endregion debug-point language-switch-asset-version
     version_fingerprint = hashlib.sha256()
 
     for path in iter_static_asset_paths():
@@ -343,7 +389,18 @@ def get_asset_version() -> str:
             f"{relative_path}:{stat.st_mtime_ns}:{stat.st_size}\n".encode("utf-8")
         )
 
-    return version_fingerprint.hexdigest()[:16]
+    version = version_fingerprint.hexdigest()[:16]
+    # region debug-point language-switch-asset-version
+    append_debug_language_switch_log(
+        "server_get_asset_version",
+        {
+            "duration_ms": round((perf_counter() - started_at) * 1000, 2),
+            "asset_count": len(iter_static_asset_paths()),
+            "version": version,
+        },
+    )
+    # endregion debug-point language-switch-asset-version
+    return version
 
 
 @lru_cache(maxsize=2)
@@ -389,6 +446,10 @@ def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request) -> HTMLResponse:
+    # region debug-point language-switch-index
+    request_started_at = perf_counter()
+    server_timing: dict[str, float] = {}
+    # endregion debug-point language-switch-index
     lang = detect_language(request)
     translate_only = is_ui_translate_request(request)
     tr = lambda uk, en: translate(lang, uk, en)
@@ -404,8 +465,24 @@ def index(request: Request) -> HTMLResponse:
     if has_score_form_input(form_data):
         try:
             score_request = build_score_request(form_data)
+            # region debug-point language-switch-index
+            score_started_at = perf_counter()
+            # endregion debug-point language-switch-index
             score_result, score_source = get_score_response(score_request)
+            # region debug-point language-switch-index
+            server_timing["get_score_response_ms"] = round(
+                (perf_counter() - score_started_at) * 1000,
+                2,
+            )
+            localize_started_at = perf_counter()
+            # endregion debug-point language-switch-index
             score_result = localize_score_response(score_result, lang)
+            # region debug-point language-switch-index
+            server_timing["localize_score_response_ms"] = round(
+                (perf_counter() - localize_started_at) * 1000,
+                2,
+            )
+            # endregion debug-point language-switch-index
 
             if translate_only:
                 score_result = score_result.model_copy(
@@ -426,13 +503,29 @@ def index(request: Request) -> HTMLResponse:
                     event_id=dispatch_result.event_id,
                 )
 
+            # region debug-point language-switch-index
+            explain_started_at = perf_counter()
+            # endregion debug-point language-switch-index
             explain_result = explain_from_score_response(score_result, lang=lang)
+            # region debug-point language-switch-index
+            server_timing["explain_from_score_response_ms"] = round(
+                (perf_counter() - explain_started_at) * 1000,
+                2,
+            )
+            evidence_started_at = perf_counter()
+            # endregion debug-point language-switch-index
             score_evidence_blocks = load_score_evidence(
                 str(DATA_DIR),
                 score_request=score_request,
                 feature_values=score_result.feature_values,
                 lang=lang,
             )
+            # region debug-point language-switch-index
+            server_timing["load_score_evidence_ms"] = round(
+                (perf_counter() - evidence_started_at) * 1000,
+                2,
+            )
+            # endregion debug-point language-switch-index
             if not score_evidence_blocks:
                 score_evidence_note = tr(
                     "Поточні MVP-блоки підтвердження покривають ProductCD, "
@@ -449,12 +542,34 @@ def index(request: Request) -> HTMLResponse:
         except ValidationError as exc:
             error_message = exc.errors()[0]["msg"]
 
+    # region debug-point language-switch-index
+    asset_version_started_at = perf_counter()
+    asset_version = get_asset_version()
+    server_timing["get_asset_version_ms"] = round(
+        (perf_counter() - asset_version_started_at) * 1000,
+        2,
+    )
+    append_debug_language_switch_log(
+        "server_index_timing",
+        {
+            "duration_ms": round((perf_counter() - request_started_at) * 1000, 2),
+            "path": str(request.url.path),
+            "query": str(request.url.query),
+            "lang": lang,
+            "translate_only": translate_only,
+            "has_score_form_input": has_score_form_input(form_data),
+            "error_message": error_message,
+            "score_evidence_block_count": len(score_evidence_blocks),
+            "timing": server_timing,
+        },
+    )
+    # endregion debug-point language-switch-index
     response = templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "lang": lang,
-            "asset_version": get_asset_version(),
+            "asset_version": asset_version,
             "page_title": tr("Антифрод аналітика та скоринг", "Anti-fraud analytics and scoring"),
             "tr": tr,
             "form_data": form_data,
