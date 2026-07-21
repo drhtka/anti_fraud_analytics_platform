@@ -20,46 +20,21 @@ jobs:
       SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
       REMOTE_DIR: /home/drhtka/projects/anti_fraud_analytics_platform
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/fsprojects-github
+          chmod 600 ~/.ssh/fsprojects-github
           ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
 
-      - name: Ensure rsync is available
-        run: sudo apt-get update && sudo apt-get install -y rsync
-
-      - name: Sync project to server
+      - name: Update code and restart services on server
         run: |
-          rsync -az --delete --delete-excluded \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude '.venv/' \
-            --exclude '__pycache__/' \
-            --exclude '.cache/' \
-            --exclude '.dbg/' \
-            --exclude '.vscode/' \
-            --exclude 'node_modules/' \
-            --exclude '*.pyc' \
-            --exclude '*.pyo' \
-            --exclude '*.pyd' \
-            --exclude 'data/raw/' \
-            --exclude 'docs/' \
-            --exclude '.env' \
-            --no-owner --no-group --no-perms \
-            --chmod='Fu=rw,Fg=rw,Fo=r,Du=rwx,Dg=rwx,Do=rx' \
-            -e "ssh -i ~/.ssh/id_ed25519 -p $SSH_PORT" \
-            ./ "$SSH_USER@$SSH_HOST:$REMOTE_DIR/"
-
-      - name: Rebuild and restart app and worker
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" << 'EOF'
+          ssh -i ~/.ssh/fsprojects-github -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" << 'EOF'
           set -euo pipefail
           cd /home/drhtka/projects/anti_fraud_analytics_platform
+          git fetch origin
+          git checkout prod
+          git pull --ff-only origin prod
           sudo docker compose build --no-cache app worker
           sudo docker compose up -d --force-recreate app worker
           EOF
