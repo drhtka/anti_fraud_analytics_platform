@@ -72,4 +72,18 @@
     .screen-nav--mobile .screen-tab {
         min-height: 52px;
     }
+
+    .screen-nav--mobile .screen-tab-label {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .screen-nav--mobile .screen-tab {
+        padding: 8px 6px;
+    }
+
+    .screen-nav--mobile .screen-tab-label {
+        font-size: 11px;
+    }
 }
