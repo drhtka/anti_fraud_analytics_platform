@@ -37,4 +37,5 @@ jobs:
           git pull --ff-only origin prod
           sudo docker compose build --no-cache app worker
           sudo docker compose up -d --force-recreate app worker
+          sudo docker compose exec -T app python scripts/precompute_ui_cache.py
           EOF

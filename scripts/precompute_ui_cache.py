@@ -11,6 +11,8 @@ if str(PROJECT_ROOT) not in sys.path:
 from api.ui_content import load_eda_sections, load_eda_summary, load_sql_sections
 from api.ui_content.shared import get_ui_cache_dir
 
+LANGUAGES = ("en", "uk")
+
 
 def main() -> None:
     data_dir = PROJECT_ROOT / "data"
@@ -25,12 +27,14 @@ def main() -> None:
     print(f"Precomputing UI cache from {data_dir}")
     print(f"Cache directory: {cache_dir}")
 
-    for cache_name, loader in steps:
-        started_at = perf_counter()
-        payload = loader(str(data_dir))
-        elapsed = perf_counter() - started_at
-        size = len(payload) if isinstance(payload, list) else 0
-        print(f"- {cache_name}: {size} items in {elapsed:.2f}s")
+    for lang in LANGUAGES:
+        print(f"Language: {lang}")
+        for cache_name, loader in steps:
+            started_at = perf_counter()
+            payload = loader(str(data_dir), lang=lang)
+            elapsed = perf_counter() - started_at
+            size = len(payload) if isinstance(payload, list) else 0
+            print(f"- {cache_name}: {size} items in {elapsed:.2f}s")
 
     print("UI cache precompute completed.")
 
