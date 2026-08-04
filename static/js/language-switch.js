@@ -1,9 +1,4 @@
-import {
-    LANGUAGE_STORAGE_KEY,
-    SCORE_RESULT_SCROLL_STORAGE_KEY,
-    getCurrentLanguage,
-    getLanguageSwitchButtons,
-} from './dom-state.js';
+import { LANGUAGE_STORAGE_KEY, getCurrentLanguage, getLanguageSwitchButtons } from './dom-state.js';
 import { bootstrapUi } from './index.js';
 import { buildUrlWithLanguage } from './url-state.js';
 
@@ -224,16 +219,32 @@ function replaceDocumentWithLanguageHtml(html, targetLanguage) {
     bootstrapUi();
 }
 
-function preserveScoreResultScroll() {
-    if (!document.querySelector('[data-score-status-card]')) {
-        return;
-    }
+function preserveViewportPosition() {
+    const activeElementId =
+        document.activeElement instanceof HTMLElement && document.activeElement.id
+            ? document.activeElement.id
+            : null;
 
-    try {
-        sessionStorage.setItem(SCORE_RESULT_SCROLL_STORAGE_KEY, 'true');
-    } catch (_) {
-        // no-op
-    }
+    return {
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
+        activeElementId,
+    };
+}
+
+function restoreViewportPosition(viewportState) {
+    window.requestAnimationFrame(() => {
+        window.scrollTo({ left: viewportState.scrollX, top: viewportState.scrollY });
+
+        if (!viewportState.activeElementId) {
+            return;
+        }
+
+        const nextActiveElement = document.getElementById(viewportState.activeElementId);
+        if (nextActiveElement instanceof HTMLElement) {
+            nextActiveElement.focus({ preventScroll: true });
+        }
+    });
 }
 
 function scheduleLanguagePrefetch(targetLanguage) {
@@ -296,7 +307,7 @@ function bindLanguageSwitchButtons() {
             // #endregion debug-point language-switch-click
 
             try {
-                preserveScoreResultScroll();
+                const viewportState = preserveViewportPosition();
                 const html = await fetchLanguagePageHtml(targetLanguage);
                 // #region debug-point language-switch-click
                 reportLanguageSwitchDebug('language_switch_before_replace', {
@@ -308,6 +319,7 @@ function bindLanguageSwitchButtons() {
                 });
                 // #endregion debug-point language-switch-click
                 replaceDocumentWithLanguageHtml(html, targetLanguage);
+                restoreViewportPosition(viewportState);
             } catch (_) {
                 // #region debug-point language-switch-click
                 reportLanguageSwitchDebug('language_switch_fallback_navigation', {
