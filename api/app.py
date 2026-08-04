@@ -417,15 +417,10 @@ def get_downloadable_dataset_stats() -> dict[str, dict[str, int]]:
     for dataset_name, dataset in DOWNLOADABLE_DATASETS.items():
         dataset_path = dataset["path"]
         file_size_bytes = dataset_path.stat().st_size if dataset_path.exists() else 0
-        row_count = 0
-
-        if dataset_path.exists():
-            with dataset_path.open("r", encoding="utf-8", newline="") as dataset_file:
-                row_count = max(sum(1 for _ in dataset_file) - 1, 0)
 
         stats[dataset_name] = {
             "file_size_bytes": file_size_bytes,
-            "row_count": row_count,
+            "row_count": 0,
         }
 
     return stats
