@@ -52,19 +52,27 @@ function hideScoreLoadingOverlay() {
 }
 
 function scrollToLatestScoreResult() {
-    const scoreStatusCard = document.querySelector('[data-score-status-card]');
     const scoreResults = document.querySelector('[data-score-results]');
-    const target = scoreStatusCard ?? scoreResults;
+    const scoreStatusCard = document.querySelector('[data-score-status-card]');
 
-    if (!(target instanceof HTMLElement)) {
+    if (!(scoreResults instanceof HTMLElement)) {
         return;
     }
 
+    const focusTarget =
+        scoreResults.querySelector('.decision-summary-card h2') ?? scoreResults;
+
     window.requestAnimationFrame(() => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (scoreStatusCard instanceof HTMLElement) {
-            scoreStatusCard.focus({ preventScroll: true });
-        }
+        scoreResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        window.setTimeout(() => {
+            scoreResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (focusTarget instanceof HTMLElement) {
+                focusTarget.focus({ preventScroll: true });
+            } else if (scoreStatusCard instanceof HTMLElement) {
+                scoreStatusCard.blur();
+            }
+        }, 250);
     });
 }
 
