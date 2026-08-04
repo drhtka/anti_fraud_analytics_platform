@@ -410,9 +410,9 @@ def get_asset_version() -> str:
     return version
 
 
-@lru_cache(maxsize=2)
-def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
-    datasets: dict[str, dict[str, object]] = {}
+@lru_cache(maxsize=1)
+def get_downloadable_dataset_stats() -> dict[str, dict[str, int]]:
+    stats: dict[str, dict[str, int]] = {}
 
     for dataset_name, dataset in DOWNLOADABLE_DATASETS.items():
         dataset_path = dataset["path"]
@@ -422,6 +422,24 @@ def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
         if dataset_path.exists():
             with dataset_path.open("r", encoding="utf-8", newline="") as dataset_file:
                 row_count = max(sum(1 for _ in dataset_file) - 1, 0)
+
+        stats[dataset_name] = {
+            "file_size_bytes": file_size_bytes,
+            "row_count": row_count,
+        }
+
+    return stats
+
+
+@lru_cache(maxsize=2)
+def get_downloadable_datasets(lang: Language) -> dict[str, dict[str, object]]:
+    datasets: dict[str, dict[str, object]] = {}
+    dataset_stats = get_downloadable_dataset_stats()
+
+    for dataset_name, dataset in DOWNLOADABLE_DATASETS.items():
+        dataset_path = dataset["path"]
+        file_size_bytes = dataset_stats.get(dataset_name, {}).get("file_size_bytes", 0)
+        row_count = dataset_stats.get(dataset_name, {}).get("row_count", 0)
 
         datasets[dataset_name] = {
             **dataset,
